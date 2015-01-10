@@ -21,7 +21,7 @@ jacques_LDFLAGS =
 
 SUBLIBS = jio/libjio.a
 
-jacques_LDADD = $(JACQUES_LIBS) $(SUBLIBS)
+jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 
 SUBDIRS = \

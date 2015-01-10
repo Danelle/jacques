@@ -1,5 +1,5 @@
 /*
- * jsocket.h
+ * jio.h
  *
  * Copyright (C) 2015 - Wiky L <wiiiky@outlook.com>
  *
@@ -17,29 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __J_SOCKET_H__
-#define __J_SOCKET_H__
+#ifndef __J_JIO_H__
+#define __J_JIO_H__
+
+#include "jsocket.h"
 
 
-/*
- * JSocket - receive/send packaged data
- */
-
-
-typedef struct{
-     int sockfd;
-}JSocket;
-
-/*
- * Creates a new passive IPv4 socket, which listens on port
- * Returns NULL on error;
- */
-JSocket *j_server_socket_new(unsigned short port,unsigned int backlog);
-
-/*
- * Closes the JSocket
- */
-void j_socket_close(JSocket *jsock);
-
-
-#endif /* __J_SOCKET_H__ */
+#endif /* __J_JIO_H__ */

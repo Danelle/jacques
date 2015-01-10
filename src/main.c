@@ -17,12 +17,12 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <glib.h>
-#include <glib/gprintf.h>
+#include "jio/jio.h"
 
 int main()
 {
-    g_printf("Hello world\n");
+	JSocket *jsock = j_server_socket_new(2345,512);
+	j_socket_close(jsock);
     return (0);
 }
 

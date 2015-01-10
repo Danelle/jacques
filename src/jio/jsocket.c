@@ -1,7 +1,7 @@
 /*
  * jsocket.c
  *
- * Copyright (C) 2015 - wiky
+ * Copyright (C) 2015 - Wiky L <wiiiky@outlook.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,4 +55,13 @@ JSocket *j_server_socket_new(unsigned short port, unsigned int backlog)
     jsock->sockfd = sockfd;
 
     return jsock;
+}
+
+/*
+ * Closes the JSocket
+ */
+void j_socket_close(JSocket *jsock)
+{
+    close(jsock->sockfd);
+    g_slice_free1(sizeof(JSocket), jsock);
 }
