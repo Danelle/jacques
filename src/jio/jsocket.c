@@ -24,6 +24,18 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
+
+
+/*
+ * Creates a new JSocket from a native socket descriptor
+ */
+JSocket *j_socket_new_fromfd(int sockfd)
+{
+    JSocket *jsock = (JSocket*)g_slice_alloc(sizeof(JSocket));
+    j_socket_set_fd(jsock,sockfd);
+    return jsock;
+}
 
 /*
  * Creates a new passive IPv4 socket, which listens on port
@@ -51,10 +63,7 @@ JSocket *j_server_socket_new(unsigned short port, unsigned int backlog)
         return NULL;
     }
 
-    JSocket *jsock = (JSocket*)g_slice_alloc(sizeof(JSocket));
-    jsock->sockfd = sockfd;
-
-    return jsock;
+    return j_socket_new_fromfd(sockfd);
 }
 
 /*
@@ -62,6 +71,55 @@ JSocket *j_server_socket_new(unsigned short port, unsigned int backlog)
  */
 void j_socket_close(JSocket *jsock)
 {
-    close(jsock->sockfd);
+    close(j_socket_fd(jsock));
     g_slice_free1(sizeof(JSocket), jsock);
+}
+
+
+/*
+ * Wrapper for write() and read()
+ * recall if interrupted by signal
+ */
+int j_socket_write(JSocket *jsock,const void *buf, unsigned int count)
+{
+    int sockfd = j_socket_fd(jsock);
+    int n;
+    AGAIN:
+    n = write(sockfd, buf, count);
+    if(n<0 && errno ==EINTR){
+        goto AGAIN;
+    }
+    return n;
+}
+
+int j_socket_read(JSocket *jsock, void *buf, unsigned int count)
+{
+    int sockfd = j_socket_fd(jsock);
+    int n;
+    AGAIN:
+    n = read(sockfd, buf, count);
+    if(n<0 && errno ==EINTR){
+        goto AGAIN;
+    }
+    return n;
+}
+
+/*
+ * Packages the data and write to the socket
+ * Returns 1 if all data sent
+ * Returns 0 on error
+ */
+int j_socket_writeall(JSocket *jsock, const void *buf, unsigned int count)
+{
+    int sockfd = j_socket_fd(jsock);
+    int n=0;
+
+    while(count>0){
+        n = j_socket_write(jsock, buf + n, count);
+        if(n<0){    /* on error */
+            return 0;
+        }
+        count -= n;
+    }
+    return 1;
 }
