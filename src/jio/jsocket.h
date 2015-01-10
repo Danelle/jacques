@@ -22,7 +22,7 @@
 
 
 /*
- * JSocket - receive/send packaged data
+ * JSocket - socket that receives/sends packaged data
  */
 
 
