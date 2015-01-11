@@ -29,6 +29,18 @@
 #include <stdlib.h>
 
 
+/* this structure is private */
+struct _JSocket {
+    int sockfd;                 /* native socket descriptor */
+    GByteArray *buf;            /* read buffer */
+    guint32 total_len;          /* the total size of the whole package */
+    struct sockaddr_storage addr;
+    socklen_t addrlen;
+};
+
+
+/* private macros */
+#define j_socket_fd(jsock) (jsock)->sockfd
 #define j_socket_set_data_length(jsock, len) g_byte_array_set_size((jsock)->buf,(len))
 #define j_socket_clear_data(jsock)  j_socket_set_data_length((jsock),0)
 #define j_socket_append_data(jsock,data,len) g_byte_array_append((jsock)->buf,(data),(len))
@@ -39,11 +51,20 @@
 /*
  * Creates a new JSocket from a native socket descriptor
  */
-JSocket *j_socket_new_fromfd(int sockfd)
+JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
+                             socklen_t addrlen)
 {
     JSocket *jsock = (JSocket *) g_slice_alloc(sizeof(JSocket));
     jsock->sockfd = sockfd;
     jsock->buf = g_byte_array_new();
+    jsock->total_len = 0;
+
+    if (addr) {
+        memcpy(&(jsock->addr), addr, addrlen);
+    } else {
+        memset(&(jsock->addr), 0, sizeof(jsock->addr));
+    }
+
     return jsock;
 }
 
@@ -73,7 +94,25 @@ JSocket *j_server_socket_new(gushort port, guint32 backlog)
         return NULL;
     }
 
-    return j_socket_new_fromfd(sockfd);
+    return j_socket_new_fromfd(sockfd, (struct sockaddr *) &addr,
+                               sizeof(addr));
+}
+
+/*
+ * Accepts a connection and construct a new JSocket, will block
+ * Returns NULL on error
+ */
+JSocket *j_server_socket_accept(JSocket * jsock)
+{
+    struct sockaddr_storage addr;
+    socklen_t addrlen;
+
+    int fd =
+        j_socket_accept_raw(jsock, (struct sockaddr *) &addr, &addrlen);
+    if (fd < 0) {
+        return NULL;
+    }
+    return j_socket_new_fromfd(fd, (struct sockaddr *) &addr, addrlen);
 }
 
 /*
@@ -86,6 +125,18 @@ void j_socket_close(JSocket * jsock)
     g_slice_free1(sizeof(JSocket), jsock);
 }
 
+int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
+                        socklen_t * addrlen)
+{
+    int sockfd = j_socket_fd(jsock);
+    int fd;
+  AGAIN:
+    fd = accept(sockfd, addr, addrlen);
+    if (fd < 0 && errno == EINTR) {
+        goto AGAIN;
+    }
+    return fd;
+}
 
 /*
  * Wrapper for write[v and read[v]
@@ -211,9 +262,8 @@ static int j_socket_read_length(JSocket * jsock)
  */
 int j_socket_read(JSocket * jsock)
 {
-    if (j_socket_total_length(jsock) == 0 &&
-        j_socket_read_length(jsock) == 0) {
-        /* read length error */
+    if (j_socket_total_length(jsock) == 0 && j_socket_read_length(jsock) == 0) {    /* read the length of a new package */
+        /* error */
         return -1;
     }
 
@@ -221,7 +271,7 @@ int j_socket_read(JSocket * jsock)
     gint32 left = j_socket_left_length(jsock);
     guint32 count = sizeof(databuf) > left ? left : sizeof(databuf);
     while (left > 0) {
-        int n = j_socket_recv_raw(jsock, databuf, count, MSG_DONTWAIT);
+        int n = j_socket_recv_raw(jsock, databuf, count, MSG_DONTWAIT); /* non-blocking reading */
         if (n < 0) {
             if (errno == EAGAIN) {
                 return 0;

@@ -21,20 +21,14 @@
 #define __J_SOCKET_H__
 
 #include <sys/uio.h>
+#include <netinet/in.h>
 #include <glib.h>
 
 /*
- * JSocket - socket that receives/sends packaged data
+ * JSocket - IPv4 stream socket that receives/sends packaged data
  */
+typedef struct _JSocket JSocket;
 
-
-typedef struct {
-    int sockfd;
-    GByteArray *buf;            /* read buffer */
-    guint32 total_len;          /* the total size of the whole package */
-} JSocket;
-
-#define j_socket_fd(jsock) (jsock)->sockfd
 #define j_socket_data(jsock) ((jsock)->buf)->data
 #define j_socket_data_length(jsock) ((jsock)->buf)->len
 
@@ -44,11 +38,18 @@ typedef struct {
  */
 JSocket *j_server_socket_new(gushort port, guint32 backlog);
 
-
 /*
  * Creates a new JSocket from a native socket descriptor
+ * @param addr must be type of struct sockaddr_in
  */
-JSocket *j_socket_new_fromfd(int sockfd);
+JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
+                             socklen_t addrlen);
+
+/*
+ * Accepts a connection and construct a new JSocket, will block
+ * Returns NULL on error
+ */
+JSocket *j_server_socket_accept(JSocket * jsock);
 
 /*
  * Closes the JSocket
@@ -56,7 +57,7 @@ JSocket *j_socket_new_fromfd(int sockfd);
 void j_socket_close(JSocket * jsock);
 
 
-/* wrapper for write[v] and read[v] */
+/* wrappers */
 int j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count);
 int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count);
 int j_socket_writev_raw(JSocket * jsock, const struct iovec *iov,
@@ -65,6 +66,8 @@ int j_socket_readv_raw(JSocket * jsock, const struct iovec *iov,
                        guint32 iovcnt);
 int j_socket_recv_raw(JSocket * jsock, void *buf, guint32 size,
                       gint32 flags);
+int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
+                        socklen_t * addrlen);
 
 /*
  * Packages the data and write to the socket

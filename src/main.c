@@ -21,8 +21,7 @@
 
 int main()
 {
-	JSocket *jsock = j_server_socket_new(2345,512);
-	j_socket_close(jsock);
+    JSocket *jsock = j_server_socket_new(2345, 512);
+    j_socket_close(jsock);
     return (0);
 }
-
