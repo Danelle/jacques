@@ -21,6 +21,7 @@
 #define __J_SOCKET_H__
 
 #include <sys/uio.h>
+#include <glib.h>
 
 /*
  * JSocket - socket that receives/sends packaged data
@@ -29,16 +30,19 @@
 
 typedef struct {
     int sockfd;
+    GByteArray *buf;            /* read buffer */
+    guint32 total_len;          /* the total size of the whole package */
 } JSocket;
 
 #define j_socket_fd(jsock) (jsock)->sockfd
-#define j_socket_set_fd(jsock,fd) (jsock)->sockfd = (fd)
+#define j_socket_data(jsock) ((jsock)->buf)->data
+#define j_socket_data_length(jsock) ((jsock)->buf)->len
 
 /*
  * Creates a new passive IPv4 socket, which listens on port
  * Returns NULL on error;
  */
-JSocket *j_server_socket_new(unsigned short port, unsigned int backlog);
+JSocket *j_server_socket_new(gushort port, guint32 backlog);
 
 
 /*
@@ -53,19 +57,33 @@ void j_socket_close(JSocket * jsock);
 
 
 /* wrapper for write[v] and read[v] */
-int j_socket_write(JSocket * jsock, const void *buf, unsigned int count);
-int j_socket_read(JSocket * jsock, void *buf, unsigned int count);
-int j_socket_writev(JSocket * jsock, const struct iovec *iov, int iovcnt);
-int j_socket_readv(JSocket * jsock, const struct iovec *iov, int iovcnt);
+int j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count);
+int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count);
+int j_socket_writev_raw(JSocket * jsock, const struct iovec *iov,
+                        guint32 iovcnt);
+int j_socket_readv_raw(JSocket * jsock, const struct iovec *iov,
+                       guint32 iovcnt);
+int j_socket_recv_raw(JSocket * jsock, void *buf, guint32 size,
+                      gint32 flags);
 
 /*
  * Packages the data and write to the socket
  * Returns 1 if all data sent
  * Returns 0 on error
  */
-int j_socket_writeall(JSocket * jsock, const void *buf,
-                      unsigned int count);
+int j_socket_write(JSocket * jsock, const void *buf, guint32 count);
 
+/*
+ * Reads a whole package
+ * Returns 0 if not all data recevied (should continue next time)
+ * Returns 1 if all data recevied
+ * Returns -1 if error occurs
+ *
+ * After a successful read (a whole package data recevied), 
+ * call j_socket_data() to get the data
+ * call j_socket_data_length() to get the data length
+ */
+int j_socket_read(JSocket * jsock);
 
 
 #endif                          /* __J_SOCKET_H__ */

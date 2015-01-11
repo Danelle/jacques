@@ -18,20 +18,30 @@
  */
 
 #include "pack.h"
-#include <stdlib.h>
 
 
 /*
  * Converts integer to 4-bytes array
  * Memory returned is dynamically allocated
  */
-char *pack_length4(unsigned int length)
+gchar *pack_length4(guint32 length)
 {
-    char *bytes = (char *) malloc(sizeof(char) * 4);
+    gchar *bytes = (gchar *) g_malloc(sizeof(gchar) * 4);
     bytes[0] = length % 0x100;
     bytes[1] = length % 0x10000 / 0x100;
     bytes[2] = length % 0x1000000 / 0x10000;
     bytes[3] = length / 0x1000000;
 
     return bytes;
+}
+
+/*
+ * Converts 4-bytes array to integer
+ */
+guint32 unpack_length4(gchar * bytes)
+{
+    guint32 length =
+        bytes[0] + bytes[1] * 0x100 + bytes[2] * 0x10000 +
+        bytes[3] * 0x1000000;
+    return length;
 }

@@ -20,6 +20,8 @@
 #ifndef __J_PACK_H__
 #define __J_PACK_H__
 
+#include <glib.h>
+
 /*
  * functions for packing data
  */
@@ -30,9 +32,12 @@
  * Memory returned is dynamically allocated
  * @param length can't be greater than 2^32
  */
-char *pack_length4(unsigned int length);
+gchar *pack_length4(guint32 length);
 
-
+/*
+ * Converts 4-bytes array to integer
+ */
+guint32 unpack_length4(gchar * bytes);
 
 
 #endif                          /* __J_PACK_H__ */

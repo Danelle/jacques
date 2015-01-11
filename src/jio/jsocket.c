@@ -29,13 +29,21 @@
 #include <stdlib.h>
 
 
+#define j_socket_set_data_length(jsock, len) g_byte_array_set_size((jsock)->buf,(len))
+#define j_socket_clear_data(jsock)  j_socket_set_data_length((jsock),0)
+#define j_socket_append_data(jsock,data,len) g_byte_array_append((jsock)->buf,(data),(len))
+#define j_socket_total_length(jsock) (jsock)->total_len
+#define j_socket_set_total_length(jsock, len) (jsock)->total_len = (len)
+#define j_socket_left_length(jsock) j_socket_total_length(jsock) - j_socket_data_length(jsock)
+
 /*
  * Creates a new JSocket from a native socket descriptor
  */
 JSocket *j_socket_new_fromfd(int sockfd)
 {
     JSocket *jsock = (JSocket *) g_slice_alloc(sizeof(JSocket));
-    j_socket_set_fd(jsock, sockfd);
+    jsock->sockfd = sockfd;
+    jsock->buf = g_byte_array_new();
     return jsock;
 }
 
@@ -44,7 +52,7 @@ JSocket *j_socket_new_fromfd(int sockfd)
  * 
  * Returns NULL on error;
  */
-JSocket *j_server_socket_new(unsigned short port, unsigned int backlog)
+JSocket *j_server_socket_new(gushort port, guint32 backlog)
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -74,6 +82,7 @@ JSocket *j_server_socket_new(unsigned short port, unsigned int backlog)
 void j_socket_close(JSocket * jsock)
 {
     close(j_socket_fd(jsock));
+    g_byte_array_free(jsock->buf, TRUE);
     g_slice_free1(sizeof(JSocket), jsock);
 }
 
@@ -82,7 +91,7 @@ void j_socket_close(JSocket * jsock)
  * Wrapper for write[v and read[v]
  * recall if interrupted by signal
  */
-int j_socket_write(JSocket * jsock, const void *buf, unsigned int count)
+int j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count)
 {
     int sockfd = j_socket_fd(jsock);
     int n;
@@ -94,7 +103,7 @@ int j_socket_write(JSocket * jsock, const void *buf, unsigned int count)
     return n;
 }
 
-int j_socket_read(JSocket * jsock, void *buf, unsigned int count)
+int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
 {
     int sockfd = j_socket_fd(jsock);
     int n;
@@ -106,7 +115,8 @@ int j_socket_read(JSocket * jsock, void *buf, unsigned int count)
     return n;
 }
 
-int j_socket_writev(JSocket * jsock, const struct iovec *iov, int iovcnt)
+int j_socket_writev_raw(JSocket * jsock, const struct iovec *iov,
+                        guint32 iovcnt)
 {
     int sockfd = j_socket_fd(jsock);
     int n;
@@ -118,7 +128,8 @@ int j_socket_writev(JSocket * jsock, const struct iovec *iov, int iovcnt)
     return n;
 }
 
-int j_socket_readv(JSocket * jsock, const struct iovec *iov, int iovcnt)
+int j_socket_readv_raw(JSocket * jsock, const struct iovec *iov,
+                       guint32 iovcnt)
 {
     int sockfd = j_socket_fd(jsock);
     int n;
@@ -130,14 +141,27 @@ int j_socket_readv(JSocket * jsock, const struct iovec *iov, int iovcnt)
     return n;
 }
 
+int j_socket_recv_raw(JSocket * jsock, void *buf, guint32 size,
+                      gint32 flags)
+{
+    int sockfd = j_socket_fd(jsock);
+    int n;
+  AGAIN:
+    n = recv(sockfd, buf, size, flags);
+    if (n < 0 && errno == EINTR) {
+        goto AGAIN;
+    }
+    return n;
+}
+
 /*
  * Packages the data and write to the socket
  * Returns 1 if all data sent
  * Returns 0 on error
  */
-int j_socket_writeall(JSocket * jsock, const void *buf, unsigned int count)
+int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
 {
-    char *len = pack_length4(count);
+    gchar *len = pack_length4(count);
 
     struct iovec iovs[2];
     iovs[0].iov_base = (void *) len;
@@ -145,11 +169,72 @@ int j_socket_writeall(JSocket * jsock, const void *buf, unsigned int count)
     iovs[1].iov_base = (void *) buf;
     iovs[1].iov_len = count;
 
-    int n = j_socket_writev(jsock, iovs, 2);
+    int n = j_socket_writev_raw(jsock, iovs, 2);
     free(len);
 
     if (n != count + 4) {
         return 0;
     }
+    return 1;
+}
+
+
+/*
+ * Reads the length of a package
+ * Returns 1 if success, 0 otherwise
+ */
+static int j_socket_read_length(JSocket * jsock)
+{
+    gchar lenbuf[4];
+    int n = j_socket_read_raw(jsock, lenbuf, 4);
+    if (n != 4) {               /* error */
+        return 0;
+    }
+    guint32 length = unpack_length4(lenbuf);
+    if (length == 0) {
+        return 0;
+    }
+    j_socket_set_total_length(jsock, length);
+    j_socket_clear_data(jsock);
+    return 1;
+}
+
+/*
+ * Reads a whole package
+ * Returns 0 if not all data recevied (should continue next time)
+ * Returns 1 if all data recevied
+ * Returns -1 if error occurs
+ *
+ * After a successful read (a whole package data recevied), 
+ * call j_socket_data() to get the data
+ * call j_socket_data_length() to get the data length
+ */
+int j_socket_read(JSocket * jsock)
+{
+    if (j_socket_total_length(jsock) == 0 &&
+        j_socket_read_length(jsock) == 0) {
+        /* read length error */
+        return -1;
+    }
+
+    gchar databuf[4096];
+    gint32 left = j_socket_left_length(jsock);
+    guint32 count = sizeof(databuf) > left ? left : sizeof(databuf);
+    while (left > 0) {
+        int n = j_socket_recv_raw(jsock, databuf, count, MSG_DONTWAIT);
+        if (n < 0) {
+            if (errno == EAGAIN) {
+                return 0;
+            }
+            return -1;
+        }
+        j_socket_append_data(jsock, databuf, n);
+        left = j_socket_left_length(jsock);
+        count = sizeof(databuf) > left ? left : sizeof(databuf);
+    }
+    if (left != 0) {            /* unknown error, will hanppen? */
+        return -1;
+    }
+    j_socket_set_total_length(jsock, 0);    /* a whole package read successfully */
     return 1;
 }
