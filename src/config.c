@@ -17,29 +17,25 @@
  */
 
 #include "config.h"
-#include <gio/gio.h>
+#include "ge/ge.h"
 
+/**********************************/
+static inline JaConfig *ja_config_new();
+static inline JaDirectiveGroup *ja_config_add_group(JaConfig * jcfg,
+                                                    const gchar * gname);
 
-typedef void (*ParseLineFunc) (const gchar * line, gpointer user_data);
-/*
- * Reads the configuration file, and call func() on each line
- * Returns 1 on success,otherwise 0
- */
-static int read_config_file(const gchar * filepath, ParseLineFunc func,
-                            gpointer user_data);
+static inline JaDirectiveGroup *ja_directive_group_new(const gchar * name);
+static inline void ja_directive_group_free(JaDirectiveGroup * jdg);
+static inline JaDirective *ja_directive_group_add(JaDirectiveGroup * jdg,
+                                                  const gchar * name,
+                                                  const gchar * args);
 
+static inline JaDirective *ja_directive_new(const gchar * name,
+                                            const gchar * value);
+static inline void ja_directive_free(JaDirective * jd);
+static inline void ja_directive_set_args(JaDirective * jd,
+                                         const gchar * args);
 
-/*******************************************/
-static inline JaConfig *ja_config_new_default();
-static inline JaConfig *ja_config_new0();
-static inline void ja_config_free(JaConfig * cfg);
-static inline void ja_config_set_default(JaConfig * cfg);
-
-
-static void parse_line(const gchar * line, gpointer user_data)
-{
-    g_printf("%s\n", line);
-}
 
 /*
  * Parses configuration file CONFIG_FILEPATH
@@ -48,91 +44,120 @@ static void parse_line(const gchar * line, gpointer user_data)
 JaConfig *ja_config_load()
 {
     /* TODO */
-    JaConfig *cfg = ja_config_new0();
-    if (!read_config_file(CONFIG_FILEPATH, parse_line, cfg)) {
-        ja_config_free(cfg);
+    GKeyFile *kf = g_key_file_new();
+    if (g_key_file_load_from_file
+        (kf, CONFIG_FILEPATH, G_KEY_FILE_NONE, NULL) == FALSE) {
+        g_key_file_free(kf);
         return NULL;
     }
-    ja_config_set_default(cfg);
-    return cfg;
-}
+    JaConfig *cfg = ja_config_new();
 
-
-
-static inline JaConfig *ja_config_new_default()
-{
-    JaConfig *cfg = (JaConfig *) g_malloc(sizeof(JaConfig));
-    cfg->user = g_strdup(DEFAULT_USER);
-    cfg->group = g_strdup(DEFAULT_GROUP);
-    cfg->log_location = g_strdup(DEFAULT_LOG_LOCATION);
-    cfg->backlog = DEFAULT_BACKLOG;
-    return cfg;
-}
-
-
-#define if_null_dup(ptr,data)	if((ptr)==NULL){ \
-									ptr=g_strdup(data);	 \
-								}
-#define if_zero_set(obj,data)	if((obj)==0){	\
-									obj=data;	\
-								}
-static inline void ja_config_set_default(JaConfig * cfg)
-{
-    if_null_dup(cfg->user, DEFAULT_USER);
-    if_null_dup(cfg->group, DEFAULT_GROUP);
-    if_null_dup(cfg->log_location, DEFAULT_LOG_LOCATION);
-    if_zero_set(cfg->backlog, DEFAULT_BACKLOG);
-}
-
-static inline JaConfig *ja_config_new0()
-{
-    JaConfig *cfg = (JaConfig *) g_malloc0(sizeof(JaConfig));
-    return cfg;
-}
-
-static inline void ja_config_free(JaConfig * cfg)
-{
-    g_free(cfg->user);
-    g_free(cfg->group);
-    g_free(cfg->log_location);
-    g_free(cfg);
-}
-
-
-static int read_config_file(const gchar * filepath, ParseLineFunc func,
-                            gpointer user_data)
-{
-    GFile *file = g_file_new_for_path(filepath);
-    GFileInputStream *input = g_file_read(file, NULL, NULL);
-    if (input == NULL) {
-        g_object_unref(file);
-        return 0;
-    }
-    GString *all = g_string_new(NULL);
-    gssize n;
-    gchar buf[4096];
-    while ((n =
-            g_input_stream_read(G_INPUT_STREAM(input), buf, sizeof(buf),
-                                NULL, NULL)) > 0) {
-        g_string_append_len(all, buf, n);
-    }
-    g_object_unref(file);
-    g_object_unref(input);
-    if (n != 0) {
-        g_string_free(all, TRUE);
-        return 0;
-    }
-
-    /* all data read */
-    guint i;
-    guint start = 0;
-    for (i = 0; i < all->len; i++) {
-        if (all->str[i] == '\n') {
-            gchar *line = g_strndup(all->str + start, i - start);
-            func(line, user_data);
-            g_free(line);
-            start = i + 1;
+    gchar **groups = g_key_file_get_groups(kf, NULL);
+    gchar *group;
+    gint i = 0;
+    while ((group = groups[i]) != NULL) {
+        gchar **keys = g_key_file_get_keys(kf, group, NULL, NULL);
+        gchar *key;
+        gint j = 0;
+        JaDirectiveGroup *jdg = ja_config_add_group(cfg, group);
+        while ((key = keys[j]) != NULL) {
+            gchar *value = g_key_file_get_value(kf, group, key, NULL);
+            ja_directive_group_add(jdg, key, value);
+            g_free(value);
+            j++;
         }
+        g_strfreev(keys);
+        i++;
     }
-    return 1;
+    g_strfreev(groups);
+    g_key_file_free(kf);
+
+
+    return cfg;
+}
+
+
+static inline JaConfig *ja_config_new()
+{
+    JaConfig *jcfg = (JaConfig *) g_slice_alloc(sizeof(JaConfig));
+    jcfg->groups = NULL;
+    return jcfg;
+}
+
+static inline JaDirectiveGroup *ja_directive_group_new(const gchar * name)
+{
+    JaDirectiveGroup *group =
+        (JaDirectiveGroup *) g_slice_alloc(sizeof(JaDirectiveGroup));
+    group->name = g_strdup(name);
+    group->directives =
+        g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
+                              (GDestroyNotify) ja_directive_free);
+
+    return group;
+}
+
+static inline void ja_directive_group_free(JaDirectiveGroup * jdg)
+{
+}
+
+static inline JaDirective *ja_directive_new(const gchar * name,
+                                            const gchar * value)
+{
+    JaDirective *jd = (JaDirective *) g_slice_alloc(sizeof(JaDirective));
+    jd->name = g_strdup(name);
+    jd->args = g_strdup(value);
+    return jd;
+}
+
+static inline void ja_directive_free(JaDirective * jd)
+{
+    g_free(jd->name);
+    g_free(jd->args);
+    g_slice_free1(sizeof(JaDirective), jd);
+}
+
+static inline void ja_directive_set_args(JaDirective * jd,
+                                         const gchar * args)
+{
+    g_free(jd->args);
+    jd->args = g_strdup(args);
+}
+
+/*
+ * If group $gname already exists in the JConfig, it will be returned directly
+ * Otherwise, a new group named $gname is created and returned
+ */
+static inline JaDirectiveGroup *ja_config_add_group(JaConfig * jcfg,
+                                                    const gchar * gname)
+{
+    GList *ptr = jcfg->groups;
+    while (ptr) {
+        JaDirectiveGroup *group = (JaDirectiveGroup *) ptr->data;
+        if (g_strcmp0(group->name, gname) == 0) {
+            return group;
+        }
+        ptr = g_list_next(ptr);
+    }
+    JaDirectiveGroup *group = ja_directive_group_new(gname);
+    jcfg->groups = g_list_append(jcfg->groups, group);
+    return group;
+}
+
+/*
+ * If directive with name already exists, it will be updated and returned directly
+ * Otherwise, a new JaDirective is returned
+ */
+static inline JaDirective *ja_directive_group_add(JaDirectiveGroup * jdg,
+                                                  const gchar * name,
+                                                  const gchar * args)
+{
+    JaDirective *jd =
+        (JaDirective *) g_hash_table_lookup(jdg->directives, name);
+    if (jd != NULL) {
+        ja_directive_set_args(jd, args);
+        return jd;
+    }
+    jd = ja_directive_new(name, args);
+    g_hash_table_insert(jdg->directives, jd->name, jd);
+    return jd;
 }

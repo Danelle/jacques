@@ -12,23 +12,14 @@ AM_SILENT_RULES([yes])
 AC_PROG_CC
 
 
-
-
-
-
-
-
 LT_INIT
 
-
-PKG_CHECK_MODULES(JACQUES, [python2 python3 glib-2.0 gio-2.0])
-
-
+PKG_CHECK_MODULES(JACQUES, [python2 python3 glib-2.0 ])
 
 
 AC_OUTPUT([
-Makefile
-src/Makefile
-src/jio/Makefile
-
-])
+		   Makefile
+		   src/Makefile
+		   src/jio/Makefile
+		   src/ge/Makefile
+		   ])

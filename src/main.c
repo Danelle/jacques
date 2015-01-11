@@ -22,7 +22,19 @@
 
 int main(int argc, const char *argv[])
 {
-    ja_config_load();
+    JaConfig *jcfg = ja_config_load();
+    if (jcfg == NULL) {
+        g_printf("fail to parse configuration file\n");
+        return -1;
+    }
+
+    GList *group = jcfg->groups;
+    while (group) {
+        JaDirectiveGroup *g = (JaDirectiveGroup *) group->data;
+        g_printf("Group:%s\n", g->name);
+        group = g_list_next(group);
+    }
+
     // JSocket *jsock = j_server_socket_new(2345, 512);
     // JSocket *csock = NULL;
     // while ((csock = j_socket_accept(jsock)) != NULL) {

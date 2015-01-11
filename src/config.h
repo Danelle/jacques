@@ -53,12 +53,23 @@
 #define DEFAULT_BACKLOG 512
 #endif
 
-/* the configuration structure */
+
+
 typedef struct {
-    gchar *user;                /* 以什么用户运行 */
-    gchar *group;               /* 以什么组运行 */
-    gchar *log_location;        /* 日志文件的存储位置 */
-    guint32 backlog;            /* listen()的第二个参数，连接等待队列的长度 */
+    gchar *name;                /* directive name */
+    gchar *args;                /* directive arguments */
+} JaDirective;
+
+
+typedef struct {
+    gchar *name;                /* directive group name */
+    GHashTable *directives;
+} JaDirectiveGroup;
+
+/* all directive structure */
+typedef struct {
+    GList *groups;
+    /* reserverd */
 } JaConfig;
 
 
