@@ -17,15 +17,17 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
 #include "jio/jio.h"
 
-int main()
+int main(int argc, const char *argv[])
 {
-    JSocket *jsock = j_server_socket_new(2345, 512);
-    JSocket *csock = NULL;
-    while ((csock = j_socket_accept(jsock)) != NULL) {
-        j_socket_close(csock);
-    }
-    j_socket_close(jsock);
+    ja_config_load();
+    // JSocket *jsock = j_server_socket_new(2345, 512);
+    // JSocket *csock = NULL;
+    // while ((csock = j_socket_accept(jsock)) != NULL) {
+    //     j_socket_close(csock);
+    // }
+    // j_socket_close(jsock);
     return (0);
 }

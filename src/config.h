@@ -18,7 +18,54 @@
 #ifndef __JA_CONFIG_H__
 #define __JA_CONFIG_H__
 
+#include <glib.h>
+
+/* absulote configuration directory */
+#ifndef CONFIG_LOCATION
+#define CONFIG_LOCATION "/etc/jacques"
+#endif
+
+/* configuration filename */
+#ifndef CONFIG_FILENAME
+#define CONFIG_FILENAME "jacques.conf"
+#endif
+
+/* absulote configuration file path */
+#define CONFIG_FILEPATH CONFIG_LOCATION "/" CONFIG_FILENAME
 
 
+/* the default log location */
+#ifndef DEFAULT_LOG_LOCATION
+#define DEFAULT_LOG_LOCATION "/var/log/jacques"
+#endif
+
+/* default user & group */
+#ifndef DEFAULT_USER
+#define DEFAULT_USER "jacques-app"
+#endif
+
+#ifndef DEFAULT_GROUP
+#define DEFAULT_GROUP "jacques-app"
+#endif
+
+/* default listen() backlog */
+#ifndef DEFAULT_BACKLOG
+#define DEFAULT_BACKLOG 512
+#endif
+
+/* the configuration structure */
+typedef struct {
+    gchar *user;                /* 以什么用户运行 */
+    gchar *group;               /* 以什么组运行 */
+    gchar *log_location;        /* 日志文件的存储位置 */
+    guint32 backlog;            /* listen()的第二个参数，连接等待队列的长度 */
+} JaConfig;
+
+
+/*
+ * Parses configuration file CONFIG_FILEPATH
+ * Returns NULL on error
+ */
+JaConfig *ja_config_load();
 
 #endif

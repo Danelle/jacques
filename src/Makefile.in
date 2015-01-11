@@ -338,7 +338,7 @@ AM_CFLAGS = \
 jacques_SOURCES = \
 	main.c \
 	config.h \
-	config.c
+	config.c 
 
 jacques_LDFLAGS = 
 SUBLIBS = jio/libjio.a
