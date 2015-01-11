@@ -15,7 +15,9 @@ AM_CFLAGS =\
 bin_PROGRAMS = jacques
 
 jacques_SOURCES = \
-	main.c
+	main.c \
+	config.h \
+	config.c
 
 jacques_LDFLAGS = 
 

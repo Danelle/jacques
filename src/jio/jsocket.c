@@ -102,7 +102,7 @@ JSocket *j_server_socket_new(gushort port, guint32 backlog)
  * Accepts a connection and construct a new JSocket, will block
  * Returns NULL on error
  */
-JSocket *j_server_socket_accept(JSocket * jsock)
+JSocket *j_socket_accept(JSocket * jsock)
 {
     struct sockaddr_storage addr;
     socklen_t addrlen;
@@ -271,7 +271,7 @@ int j_socket_read(JSocket * jsock)
     gint32 left = j_socket_left_length(jsock);
     guint32 count = sizeof(databuf) > left ? left : sizeof(databuf);
     while (left > 0) {
-        int n = j_socket_recv_raw(jsock, databuf, count, MSG_DONTWAIT); /* non-blocking reading */
+        int n = j_socket_recv_raw(jsock, databuf, count, MSG_DONTWAIT); /* in non-blocking way */
         if (n < 0) {
             if (errno == EAGAIN) {
                 return 0;

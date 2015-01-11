@@ -26,6 +26,10 @@
 
 /*
  * JSocket - IPv4 stream socket that receives/sends packaged data
+ * 
+ * Every package starts with 4 bytes which means the length of rest data
+ * When JSocket writes data, it preppend the 4 bytes, it blocks to write
+ * When JSocket reads data, it parses the first 4 bytes and reads the real data, in a non-blocking way 
  */
 typedef struct _JSocket JSocket;
 
@@ -49,7 +53,7 @@ JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
  * Accepts a connection and construct a new JSocket, will block
  * Returns NULL on error
  */
-JSocket *j_server_socket_accept(JSocket * jsock);
+JSocket *j_socket_accept(JSocket * jsock);
 
 /*
  * Closes the JSocket
@@ -57,7 +61,7 @@ JSocket *j_server_socket_accept(JSocket * jsock);
 void j_socket_close(JSocket * jsock);
 
 
-/* wrappers */
+/* wrappers for the raw syscalls */
 int j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count);
 int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count);
 int j_socket_writev_raw(JSocket * jsock, const struct iovec *iov,

@@ -1,6 +1,5 @@
-/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * main.c
+ * config.c
  * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
  * 
  * Jacques is free software: you can redistribute it and/or modify it
@@ -17,15 +16,4 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "jio/jio.h"
-
-int main()
-{
-    JSocket *jsock = j_server_socket_new(2345, 512);
-    JSocket *csock = NULL;
-    while ((csock = j_socket_accept(jsock)) != NULL) {
-        j_socket_close(csock);
-    }
-    j_socket_close(jsock);
-    return (0);
-}
+#include "config.h"

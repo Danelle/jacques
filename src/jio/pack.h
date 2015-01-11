@@ -23,7 +23,7 @@
 #include <glib.h>
 
 /*
- * functions for packing data
+ * functions for packing or unpacking data
  */
 
 
