@@ -20,15 +20,16 @@
 #ifndef __J_SOCKET_H__
 #define __J_SOCKET_H__
 
+#include <sys/uio.h>
 
 /*
  * JSocket - socket that receives/sends packaged data
  */
 
 
-typedef struct{
-     int sockfd;
-}JSocket;
+typedef struct {
+    int sockfd;
+} JSocket;
 
 #define j_socket_fd(jsock) (jsock)->sockfd
 #define j_socket_set_fd(jsock,fd) (jsock)->sockfd = (fd)
@@ -37,7 +38,7 @@ typedef struct{
  * Creates a new passive IPv4 socket, which listens on port
  * Returns NULL on error;
  */
-JSocket *j_server_socket_new(unsigned short port,unsigned int backlog);
+JSocket *j_server_socket_new(unsigned short port, unsigned int backlog);
 
 
 /*
@@ -48,20 +49,23 @@ JSocket *j_socket_new_fromfd(int sockfd);
 /*
  * Closes the JSocket
  */
-void j_socket_close(JSocket *jsock);
+void j_socket_close(JSocket * jsock);
 
 
-/* wrapper for write and read */
-int j_socket_write(JSocket *jsock,const void *buf, unsigned int count);
-int j_socket_read(JSocket *jsock, void *buf, unsigned int count);
+/* wrapper for write[v] and read[v] */
+int j_socket_write(JSocket * jsock, const void *buf, unsigned int count);
+int j_socket_read(JSocket * jsock, void *buf, unsigned int count);
+int j_socket_writev(JSocket * jsock, const struct iovec *iov, int iovcnt);
+int j_socket_readv(JSocket * jsock, const struct iovec *iov, int iovcnt);
 
 /*
  * Packages the data and write to the socket
  * Returns 1 if all data sent
  * Returns 0 on error
  */
-int j_socket_writeall(JSocket *jsock, const void *buf, unsigned int count);
+int j_socket_writeall(JSocket * jsock, const void *buf,
+                      unsigned int count);
 
 
 
-#endif /* __J_SOCKET_H__ */
+#endif                          /* __J_SOCKET_H__ */

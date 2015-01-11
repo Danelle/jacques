@@ -6,6 +6,8 @@ lib_LIBRARIES =  \
 
 libjio_a_SOURCES =  \
 	jsocket.c \
-	jsocket.h
+	jsocket.h \
+	pack.c \
+	pack.h
 
 libjio_a_CPPFLAGS = $(JACQUES_CFLAGS)

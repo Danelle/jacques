@@ -1,5 +1,5 @@
 /*
- * pack.h
+ * pack.c
  *
  * Copyright (C) 2015 - Wiky L <wiiiky@outlook.com>
  *
@@ -17,22 +17,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __J_PACK_H__
-#define __J_PACK_H__
-
-/*
- * functions for packing data
- */
+#include "pack.h"
+#include <stdlib.h>
 
 
 /*
  * Converts integer to 4-bytes array
  * Memory returned is dynamically allocated
- * @param length can't be greater than 2^32
  */
-char *pack_length4(unsigned int length);
+char *pack_length4(unsigned int length)
+{
+    char *bytes = (char *) malloc(sizeof(char) * 4);
+    bytes[0] = length % 0x100;
+    bytes[1] = length % 0x10000 / 0x100;
+    bytes[2] = length % 0x1000000 / 0x10000;
+    bytes[3] = length / 0x1000000;
 
-
-
-
-#endif                          /* __J_PACK_H__ */
+    return bytes;
+}

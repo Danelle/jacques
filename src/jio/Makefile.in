@@ -125,7 +125,8 @@ am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
 libjio_a_AR = $(AR) $(ARFLAGS)
 libjio_a_LIBADD =
-am_libjio_a_OBJECTS = libjio_a-jsocket.$(OBJEXT)
+am_libjio_a_OBJECTS = libjio_a-jsocket.$(OBJEXT) \
+	libjio_a-pack.$(OBJEXT)
 libjio_a_OBJECTS = $(am_libjio_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -316,7 +317,9 @@ lib_LIBRARIES = \
 
 libjio_a_SOURCES = \
 	jsocket.c \
-	jsocket.h
+	jsocket.h \
+	pack.c \
+	pack.h
 
 libjio_a_CPPFLAGS = $(JACQUES_CFLAGS)
 all: all-am
@@ -397,6 +400,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjio_a-jsocket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjio_a-pack.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -432,6 +436,20 @@ libjio_a-jsocket.obj: jsocket.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jsocket.c' object='libjio_a-jsocket.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjio_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjio_a-jsocket.obj `if test -f 'jsocket.c'; then $(CYGPATH_W) 'jsocket.c'; else $(CYGPATH_W) '$(srcdir)/jsocket.c'; fi`
+
+libjio_a-pack.o: pack.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjio_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjio_a-pack.o -MD -MP -MF $(DEPDIR)/libjio_a-pack.Tpo -c -o libjio_a-pack.o `test -f 'pack.c' || echo '$(srcdir)/'`pack.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjio_a-pack.Tpo $(DEPDIR)/libjio_a-pack.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pack.c' object='libjio_a-pack.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjio_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjio_a-pack.o `test -f 'pack.c' || echo '$(srcdir)/'`pack.c
+
+libjio_a-pack.obj: pack.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjio_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjio_a-pack.obj -MD -MP -MF $(DEPDIR)/libjio_a-pack.Tpo -c -o libjio_a-pack.obj `if test -f 'pack.c'; then $(CYGPATH_W) 'pack.c'; else $(CYGPATH_W) '$(srcdir)/pack.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjio_a-pack.Tpo $(DEPDIR)/libjio_a-pack.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='pack.c' object='libjio_a-pack.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjio_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjio_a-pack.obj `if test -f 'pack.c'; then $(CYGPATH_W) 'pack.c'; else $(CYGPATH_W) '$(srcdir)/pack.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
