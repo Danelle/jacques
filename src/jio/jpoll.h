@@ -20,9 +20,22 @@
 #define __J_POLL_H__
 
 #include "jsocket.h"
+#include <sys/epoll.h>
 
 
 typedef struct _JPoll JPoll;
+
+
+#define J_POLL_EVENT_IN EPOLLIN
+#define J_POLL_EVENT_OUT EPOLLOUT
+#define J_POLL_EVENT_HUP EPOLLHUP
+#define J_POLL_EVENT_ERR EPOLLERR
+
+
+typedef struct {
+    guint32 type;
+    JSocket *jsock;
+} JPollEvent;
 
 
 /*
@@ -31,6 +44,22 @@ typedef struct _JPoll JPoll;
  */
 JPoll *j_poll_new();
 
+
+/*
+ * Returns the list of ready JSocket since last j_poll_wait()
+ * The return GList is maintained by JPoll, do not modify it,nor free it
+ */
+GList *j_poll_ready(JPoll * jp);
+
+
+/*
+ * Waits for events on JPoll instance. Up to maxevents 
+ * When successfully, j_poll_wait() returns a number of ready JSocket.
+ * then you can call j_poll_ready() to get the ready JSocket
+ * or zero if no JSocket became ready during the request timeout milliseconds
+ * When an error occurs, returns -1
+ */
+int j_poll_wait(JPoll * jp, guint maxevents, guint timeout);
 
 /*
  * Registers the JSocket with event EPOLLIN

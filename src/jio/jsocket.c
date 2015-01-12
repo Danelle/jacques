@@ -47,7 +47,7 @@
 /*
  * Creates a new JSocket from a native socket descriptor
  */
-JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr * addr,
+JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
                              socklen_t addrlen)
 {
     JSocket *jsock = (JSocket *) g_slice_alloc(sizeof(JSocket));
@@ -158,7 +158,7 @@ int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
     int n;
   AGAIN:
     n = recv(sockfd, buf, count, MSG_DONTWAIT); /* Hold on! I'll be back! */
-    if (n < 0 && errno == EINTR) {
+    if (n < 0 && errno == EINTR) {  /* interrupted by signal? */
         goto AGAIN;
     }
     return n;
@@ -167,10 +167,10 @@ int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
 /*
  * Packs up the buf and write to socket in non-blocking way
  * If all data is writen, return 1
- * If only part of data is writen, return 0, should continue next time
+ * If only part of data is writen, return 0, to be continue next time
  * If error occurs, return -1
  * 
- * Note, if j_socket_write() returns 0, then you can it with buf NULL next time, until all data is writen
+ * Note, if j_socket_write() returns 0, then you can call it with NULL in buf next time, until all data is writen
  */
 int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
 {
@@ -187,14 +187,20 @@ int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
         size = j_socket_wdata_length(jsock);
     }
 
-    int n = j_socket_write_raw(jsock, j_socket_wdata(jsock), size);
-    if (n < 0) {
-        return -1;
-    } else if (n < size) {
+    gint n;
+    count = size > 4096 ? 4096 : size;
+
+    while (count > 0) {         /* writes segmentation */
+        n = j_socket_write_raw(jsock, j_socket_wdata(jsock), count);
+        if (n < 0) {
+            if (errno == EAGAIN) {
+                return 0;
+            }
+            return -1;          /* It's a real error */
+        }
         j_socket_wdata_pop(jsock, n);
-        return 0;               /* continue next time */
-    } else {
-        j_socket_wdata_pop(jsock, size);
+        size = j_socket_wdata_length(jsock);
+        count = size > 4096 ? 4096 : size;
     }
     return 1;
 }
