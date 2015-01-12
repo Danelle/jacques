@@ -84,6 +84,13 @@ static inline JaConfig *ja_config_new()
     return jcfg;
 }
 
+void ja_config_free(JaConfig * jcfg)
+{
+    g_list_free_full(jcfg->groups,
+                     (GDestroyNotify) ja_directive_group_free);
+    g_slice_free1(sizeof(JaConfig), jcfg);
+}
+
 static inline JaDirectiveGroup *ja_directive_group_new(const gchar * name)
 {
     JaDirectiveGroup *group =
@@ -98,6 +105,9 @@ static inline JaDirectiveGroup *ja_directive_group_new(const gchar * name)
 
 static inline void ja_directive_group_free(JaDirectiveGroup * jdg)
 {
+    g_free(jdg->name);
+    g_hash_table_unref(jdg->directives);
+    g_slice_free1(sizeof(JaDirectiveGroup), jdg);
 }
 
 static inline JaDirective *ja_directive_new(const gchar * name,

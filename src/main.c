@@ -32,8 +32,20 @@ int main(int argc, const char *argv[])
     while (group) {
         JaDirectiveGroup *g = (JaDirectiveGroup *) group->data;
         g_printf("Group:%s\n", g->name);
+        GList *keys = g_hash_table_get_keys(g->directives);
+        GList *ptr = keys;
+        while (ptr) {
+            JaDirective *jd =
+                (JaDirective *) g_hash_table_lookup(g->directives,
+                                                    ptr->data);
+            g_printf("\t%s:%s\n", jd->name, jd->args);
+            ptr = g_list_next(ptr);
+        }
+        g_list_free(keys);
         group = g_list_next(group);
     }
+
+    ja_config_free(jcfg);
 
     // JSocket *jsock = j_server_socket_new(2345, 512);
     // JSocket *csock = NULL;

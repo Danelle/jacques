@@ -79,4 +79,9 @@ typedef struct {
  */
 JaConfig *ja_config_load();
 
+/*
+ * Frees all the memory used by JaConfig
+ */
+void ja_config_free(JaConfig * jcfg);
+
 #endif

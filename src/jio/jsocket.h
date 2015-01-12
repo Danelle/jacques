@@ -28,13 +28,31 @@
  * JSocket - IPv4 stream socket that receives/sends packaged data
  * 
  * Every package starts with 4 bytes which means the length of rest data
- * When JSocket writes data, it preppend the 4 bytes, it blocks to write
- * When JSocket reads data, it parses the first 4 bytes and reads the real data, in a non-blocking way 
+ * When JSocket writes data, it preppend the 4 bytes, 
+ * When JSocket reads data, it parses the first 4 bytes and reads the real data,
+ * in a non-blocking way 
  */
 typedef struct _JSocket JSocket;
 
-#define j_socket_data(jsock) ((jsock)->buf)->data
-#define j_socket_data_length(jsock) ((jsock)->buf)->len
+struct _JSocket {
+    int sockfd;                 /* native socket descriptor */
+
+    /* read buffer */
+    GByteArray *rbuf;
+    guint32 total_len;          /* the total size of the whole package */
+
+    /* write buffer */
+    GByteArray *wbuf;
+
+    struct sockaddr_storage addr;
+    socklen_t addrlen;
+};
+/* use macros to access the members */
+
+#define j_socket_fd(jsock) (jsock)->sockfd
+/* get read buffer data & length */
+#define j_socket_data(jsock) ((jsock)->rbuf)->data
+#define j_socket_data_length(jsock) ((jsock)->rbuf)->len
 
 /*
  * Creates a new passive IPv4 socket, which listens on port
@@ -61,22 +79,20 @@ JSocket *j_socket_accept(JSocket * jsock);
 void j_socket_close(JSocket * jsock);
 
 
-/* wrappers for the raw syscalls */
+/* wrappers for syscalls, non-blocking */
 int j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count);
 int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count);
-int j_socket_writev_raw(JSocket * jsock, const struct iovec *iov,
-                        guint32 iovcnt);
-int j_socket_readv_raw(JSocket * jsock, const struct iovec *iov,
-                       guint32 iovcnt);
-int j_socket_recv_raw(JSocket * jsock, void *buf, guint32 size,
-                      gint32 flags);
+/* blocking */
 int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
                         socklen_t * addrlen);
 
 /*
- * Packages the data and write to the socket
- * Returns 1 if all data sent
- * Returns 0 on error
+ * Packs up the buf and write to socket in non-blocking way
+ * If all data is writen, return 1
+ * If only part of data is writen, return 0, should continue next time
+ * If error occurs, return -1
+ * 
+ * Note, if j_socket_write() returns 0, then you can it with buf NULL next time, until all data is writen
  */
 int j_socket_write(JSocket * jsock, const void *buf, guint32 count);
 
