@@ -36,6 +36,13 @@ typedef struct _JaWorker JaWorker;
  */
 JaWorker *ja_worker_create(JaServerConfig * cfg);
 
+
+/*
+ * Adds a client to the worker
+ */
+void ja_worker_add(JaWorker *jw, JSocket *jsock);
+
+
 /*
  * Check if worker is running
  */

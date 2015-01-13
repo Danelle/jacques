@@ -16,6 +16,13 @@ LT_INIT
 
 PKG_CHECK_MODULES(JACQUES, [python2 python3 glib-2.0 ])
 
+AC_SEARCH_LIBS([pthread_create],[pthread],
+			   [],
+			   AC_MSG_ERROR([POSIX thread library required]))
+AC_CHECK_FUNC(epoll_create,
+			  [],
+			 AC_MSG_ERROR([epoll not found]))
+
 
 AC_OUTPUT([
 		   Makefile

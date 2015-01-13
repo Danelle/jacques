@@ -47,7 +47,7 @@ JPoll *j_poll_new();
 
 
 /*
- * Returns the list of ready JSocket since last j_poll_wait()
+ * Returns the list of JPollEvent since last j_poll_wait()
  * The return GList is maintained by JPoll, do not modify it,nor free it
  */
 GList *j_poll_ready(JPoll * jp);

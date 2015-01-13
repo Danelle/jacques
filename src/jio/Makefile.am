@@ -13,4 +13,5 @@ libjio_a_SOURCES =  \
 	jpoll.h \
 	jpoll.c
 
-libjio_a_CPPFLAGS = $(JACQUES_CFLAGS)
+
+libjio_a_CPPFLAGS =  $(JACQUES_CFLAGS)
