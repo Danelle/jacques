@@ -224,8 +224,8 @@ static inline void ja_server_main(JaServer * server)
             g_warning("~~~~~");
             continue;
         }
-        ja_worker_add (worker,conn);
-        g_message ("new socket");
+        ja_worker_add(worker, conn);
+        g_message("new socket");
     }
     /* error */
     _exit(0);
