@@ -10,6 +10,7 @@ AM_CPPFLAGS = \
 
 AM_CFLAGS =\
 	 -Wall\
+	 -pthread \
 	 -g
 
 bin_PROGRAMS = jacques
@@ -21,7 +22,9 @@ jacques_SOURCES = \
 	core.c \
 	core.h \
 	server.c \
-	server.h 
+	server.h \
+	worker.c \
+	worker.h 
 
 jacques_LDFLAGS = 
 

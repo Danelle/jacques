@@ -1,5 +1,5 @@
 /*
- * core.h
+ * worker.h
  *
  * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
  *
@@ -16,19 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __JA_CORE_H__
-#define __JA_CORE_H__
+
+#ifndef __JA_WORKER_H__
+#define __JA_WORKER_H__
+
+
+#include <pthread.h>
 
 
 /*
- * JaCore, the controller of servers
+ * JaWorker - the thread worker
  */
-
-#include <glib.h>
 
 
 typedef struct {
-} JaCore;
+    pthread_t tid;              /* thread id */
+} JaWorker;
 
 
-#endif                          /* __JA_CORE_H__ */
+
+#endif

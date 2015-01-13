@@ -129,9 +129,17 @@ int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
     int sockfd = j_socket_fd(jsock);
     int fd;
   AGAIN:
+    errno = 0;
     fd = accept(sockfd, addr, addrlen);
-    if (fd < 0 && errno == EINTR) {
-        goto AGAIN;
+    if (fd < 0) {
+        if (errno == ENETDOWN || errno == EPROTO ||
+            errno == ENOPROTOOPT || errno == EHOSTDOWN || errno == ENONET
+            || errno == EHOSTUNREACH || errno == EOPNOTSUPP
+            || errno == ENETUNREACH || errno == EAGAIN
+            || errno == EWOULDBLOCK) {
+            /* check `man 2 accept` #Error handling for details */
+            goto AGAIN;
+        }
     }
     return fd;
 }
@@ -145,6 +153,7 @@ int j_socket_write_raw(JSocket * jsock, const void *rbuf, guint32 count)
     int sockfd = j_socket_fd(jsock);
     int n;
   AGAIN:
+    errno = 0;
     n = send(sockfd, rbuf, count, MSG_DONTWAIT);    /* Run! Don't wait for me! You're the hope of human */
     if (n < 0 && errno == EINTR) {
         goto AGAIN;
@@ -157,6 +166,7 @@ int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
     int sockfd = j_socket_fd(jsock);
     int n;
   AGAIN:
+    errno = 0;
     n = recv(sockfd, buf, count, MSG_DONTWAIT); /* Hold on! I'll be back! */
     if (n < 0 && errno == EINTR) {  /* interrupted by signal? */
         goto AGAIN;

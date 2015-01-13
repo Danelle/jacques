@@ -93,7 +93,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
-	server.$(OBJEXT)
+	server.$(OBJEXT) worker.$(OBJEXT)
 jacques_OBJECTS = $(am_jacques_OBJECTS)
 am__DEPENDENCIES_1 =
 jacques_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
@@ -334,6 +334,7 @@ AM_CPPFLAGS = \
 
 AM_CFLAGS = \
 	 -Wall\
+	 -pthread \
 	 -g
 
 jacques_SOURCES = \
@@ -343,7 +344,9 @@ jacques_SOURCES = \
 	core.c \
 	core.h \
 	server.c \
-	server.h 
+	server.h \
+	worker.c \
+	worker.h 
 
 jacques_LDFLAGS = 
 SUBLIBS = jio/libjio.a 
@@ -449,6 +452,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/worker.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

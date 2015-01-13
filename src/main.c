@@ -20,6 +20,7 @@
 #include "config.h"
 #include "server.h"
 #include "jio/jio.h"
+#include <sys/wait.h>
 
 int main(int argc, const char *argv[])
 {
@@ -35,14 +36,26 @@ int main(int argc, const char *argv[])
         ja_config_free(jcfg);
         return -1;
     }
+    ja_config_free(jcfg);
 
-    GList *servers = ja_server_config_load();
-    GList *ptr = servers;
+    GList *scfgs = ja_server_config_load();
+    GList *ptr = scfgs;
+    GList *children = NULL;
     while (ptr) {
         JaServerConfig *server = (JaServerConfig *) ptr->data;
         g_printf("%u,%s\n", server->listen_port, server->name);
+        gint pid = ja_server_create(server);
+        if (pid < 0) {
+            g_warning("fail to create server %s", server->name);
+        } else {
+            children = g_list_append(children, (void *) (glong) pid);
+        }
         ptr = g_list_next(ptr);
     }
+    ja_server_config_free_all(scfgs);
+
+    int status;
+    wait(&status);
 
     return (0);
 }

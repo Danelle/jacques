@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x1019+0+27
 
 [File Loader]
-Files=../../src/main.c#36%%%../../src/config.h#3%%%../../src/config.c#100%%%../../src/core.c#19%%%../../src/core.h#4%%%../../src/server.c#20%%%../../src/server.h#24
+Files=../../src/main.c#49%%%../../src/config.h#3%%%../../src/config.c#100%%%../../src/core.c#19%%%../../src/core.h#26%%%../../src/server.h#70%%%../../src/jio/jsocket.h#61%%%../../src/jio/jsocket.c#134%%%../../src/server.c#129
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -13,7 +13,7 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Shortcut=jacques//src//jio//libjio.a%%%jacques//src//ge//libge.a%%%jacques//src//jacques
+Shortcut=%%%
 Expand=jacques%%%jacques//src%%%jacques//src//jio%%%jacques//src//jio//libjio.a%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Build]

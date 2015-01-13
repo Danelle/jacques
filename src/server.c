@@ -17,11 +17,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "server.h"
+#include <unistd.h>
 
 
 static inline JaServerConfig *ja_server_config_default(const gchar * name,
                                                        gushort port);
 static inline void ja_server_config_free(JaServerConfig * cfg);
+
+
+/*
+ * Allocates memory for JaServer
+ */
+static inline JaServer *ja_server_alloc(JSocket * jsock,
+                                        JaServerConfig * cfg);
+/*
+ * The main loop of server process
+ * This function will never return, if error occurs or signal catched, it may _exit() but not return
+ */
+static inline void ja_server_main(JaServer * server);
 
 /*
  * Constructs a JaServerConfig
@@ -71,6 +84,14 @@ GList *ja_server_config_load()
     g_dir_close(dir);
 
     return ret;
+}
+
+/*
+ * Free all the memory used by JaServerConfig GList 
+ */
+void ja_server_config_free_all(GList * scfgs)
+{
+    g_list_free_full(scfgs, (GDestroyNotify) ja_server_config_free);
 }
 
 static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
@@ -126,11 +147,50 @@ static inline void ja_server_config_free(JaServerConfig * cfg)
 }
 
 
+
+static inline JaServer *ja_server_alloc(JSocket * jsock,
+                                        JaServerConfig * cfg)
+{
+    JaServer *server = (JaServer *) g_slice_alloc(sizeof(JaServer));
+    server->listen_sock = jsock;
+    server->cfg = cfg;
+    server->workers = NULL;
+    return server;
+}
+
+
 /*
  * Creates a JaServer, (fork a new process)
  * Returns fork()
  */
-int ja_server_create(JaServerConfig * cfg)
+gint ja_server_create(JaServerConfig * cfg)
 {
+    pid_t pid = fork();
+    if (pid < 0) {
+        return (gint) pid;
+    } else if (pid > 0) {       /* parent */
+        return (gint) pid;
+    }
+
+    JSocket *jsock =
+        j_server_socket_new(cfg->listen_port, cfg->max_pending);
+    if (jsock == NULL) {
+        _exit(-1);
+    }
+
+    JaServer *server = ja_server_alloc(jsock, cfg);
+    ja_server_main(server);
+
+    /* never come here */
     return -1;
+}
+
+
+static inline void ja_server_main(JaServer * server)
+{
+    JSocket *conn = NULL;
+    while ((conn = j_socket_accept(server->listen_sock))) {
+    }
+    /* error */
+    _exit(0);
 }

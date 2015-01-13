@@ -49,10 +49,17 @@ typedef struct {
 GList *ja_server_config_load();
 
 
+/*
+ * Free all the memory used by JaServerConfig GList 
+ */
+void ja_server_config_free_all(GList * scfgs);
+
+
 
 typedef struct {
     JSocket *listen_sock;
-    JPoll *poller;
+
+    GList *workers;             /* the list of worker thread */
 
     JaServerConfig *cfg;
 } JaServer;
@@ -60,8 +67,9 @@ typedef struct {
 /*
  * Creates a JaServer, (fork a new process)
  * Returns fork()
+ * Child process will not return
  */
-int ja_server_create(JaServerConfig * cfg);
+gint ja_server_create(JaServerConfig * cfg);
 
 
 
