@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "server.h"
+#include "worker.h"
 #include <unistd.h>
 
 
@@ -185,11 +186,43 @@ gint ja_server_create(JaServerConfig * cfg)
     return -1;
 }
 
+/*
+ * find a worker that can handle more connection
+ * if no existing one found, and more worker is allowed to create, then create a new one
+ * otherwise return NULL
+ */
+static inline JaWorker *ja_server_find_worker(JaServer * server)
+{
+    GList *ptr = server->workers;
+    JaWorker *worker = NULL;
+    while (ptr) {
+        JaWorker *jw = (JaWorker *) ptr->data;
+        if (!ja_worker_is_full(jw)) {
+            worker = jw;
+            break;
+        }
+        ptr = g_list_next(ptr);
+    }
+    if (worker) {
+        return worker;
+    }
+    worker = ja_worker_create(server->cfg);
+    if (worker) {
+        server->workers = g_list_append(server->workers, worker);
+    }
+    return worker;
+}
+
 
 static inline void ja_server_main(JaServer * server)
 {
     JSocket *conn = NULL;
     while ((conn = j_socket_accept(server->listen_sock))) {
+        JaWorker *worker = ja_server_find_worker(server);
+        if (!worker) {
+            j_socket_close(conn);
+            g_warning("~~~~~");
+        }
     }
     /* error */
     _exit(0);

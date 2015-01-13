@@ -21,18 +21,29 @@
 #define __JA_WORKER_H__
 
 
-#include <pthread.h>
-
+#include "server.h"
 
 /*
  * JaWorker - the thread worker
  */
 
-
-typedef struct {
-    pthread_t tid;              /* thread id */
-} JaWorker;
+typedef struct _JaWorker JaWorker;
 
 
+/*
+ * Creates an JaWorker, and run it
+ * JaWorker is thread safe
+ */
+JaWorker *ja_worker_create(JaServerConfig * cfg);
+
+/*
+ * Check if worker is running
+ */
+gboolean ja_worker_is_running(JaWorker * jw);
+
+/*
+ * Check if worker is full load
+ */
+gboolean ja_worker_is_full(JaWorker * jw);
 
 #endif

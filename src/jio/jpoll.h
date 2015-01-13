@@ -61,26 +61,32 @@ GList *j_poll_all(JPoll * jp);
 
 
 /*
+ * Gets the count of JSockets 
+ */
+gint j_poll_count(JPoll * jp);
+
+
+/*
  * Waits for events on JPoll instance. Up to maxevents 
  * When successfully, j_poll_wait() returns a number of ready JSocket.
  * then you can call j_poll_ready() to get the ready JSocket
  * or zero if no JSocket became ready during the request timeout milliseconds
  * When an error occurs, returns -1
  */
-int j_poll_wait(JPoll * jp, guint maxevents, guint timeout);
+gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout);
 
 
 /*
  * Registers a JSocket
  * Returns 1 on success, otherwise 0
  */
-int j_poll_register(JPoll * jp, JSocket * jsock, guint32 types);
+gint j_poll_register(JPoll * jp, JSocket * jsock, guint32 types);
 
 /*
  * Unregisters the JSocket
  * Returns 1 on success, otherwise 0
  */
-int j_poll_delete(JPoll * jp, JSocket * jsock);
+gint j_poll_delete(JPoll * jp, JSocket * jsock);
 
 
 /*
@@ -89,7 +95,12 @@ int j_poll_delete(JPoll * jp, JSocket * jsock);
  * But not free JSockets registered.
  * So get all JSockets registered before close the JPoll
  */
-int j_poll_close(JPoll * jp);
+gint j_poll_close(JPoll * jp);
+
+/*
+ * Closes JPoll and all JSocket registered
+ */
+gint j_poll_close_all(JPoll * jp);
 
 
 

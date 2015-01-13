@@ -24,11 +24,12 @@
 struct _JPoll {
     int epollfd;
     GList *jsocks;              /* the list of JSockets registered */
+    gint count;                 /* the length of jsocks */
     GList *ready;
 };
 
-#define j_poll_add_jsocket(jp,jsock)    (jp)->jsocks=g_list_append((jp)->jsocks,(jsock))
-#define j_poll_remove_jsocket(jp,jsock) (jp)->jsocks=g_list_remove((jp)->jsocks,(jsock))
+#define j_poll_add_jsocket(jp,jsock)    do{(jp)->jsocks=g_list_append((jp)->jsocks,(jsock));(jp)->count++;}while(0)
+#define j_poll_remove_jsocket(jp,jsock) do{(jp)->jsocks=g_list_remove((jp)->jsocks,(jsock));(jp)->count--;}while(0)
 
 
 #define j_poll_fd(jp)	(jp)->epollfd
@@ -45,6 +46,14 @@ GList *j_poll_ready(JPoll * jp)
 GList *j_poll_all(JPoll * jp)
 {
     return jp->jsocks;
+}
+
+/*
+ * Gets the count of JSockets 
+ */
+gint j_poll_count(JPoll * jp)
+{
+    return jp->count;
 }
 
 static inline void j_poll_clear_ready(JPoll * jp);
@@ -75,6 +84,7 @@ static inline JPoll *j_poll_new_fromfd(int fd)
     jp->epollfd = fd;
     jp->ready = NULL;
     jp->jsocks = NULL;
+    jp->count = 0;
     return jp;
 }
 
@@ -85,7 +95,7 @@ static inline JPoll *j_poll_new_fromfd(int fd)
  * or zero if no JSocket became ready during the request timeout milliseconds
  * When an error occurs, returns -1
  */
-int j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
+gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
 {
     struct epoll_event events[128];
     if (maxevents > 128) {
@@ -116,7 +126,7 @@ int j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
 
 
 /* Registers a JSocket */
-int j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
+gint j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
 {
     int epollfd = j_poll_fd(jp);
     int sockfd = j_socket_fd(jsock);
@@ -134,7 +144,7 @@ int j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
  * Unregisters the JSocket
  * Returns 1 on success, otherwise 0
  */
-int j_poll_delete(JPoll * jp, JSocket * jsock)
+gint j_poll_delete(JPoll * jp, JSocket * jsock)
 {
     int epollfd = j_poll_fd(jp);
     int sockfd = j_socket_fd(jsock);
@@ -151,7 +161,7 @@ int j_poll_delete(JPoll * jp, JSocket * jsock)
  * But not free JSockets registered.
  * So get all JSockets registered before close the JPoll
  */
-int j_poll_close(JPoll * jp)
+gint j_poll_close(JPoll * jp)
 {
     int epollfd = j_poll_fd(jp);
     j_poll_clear_ready(jp);
@@ -159,6 +169,18 @@ int j_poll_close(JPoll * jp)
 
     int ret = close(epollfd);
     g_slice_free1(sizeof(jp), jp);
+
+    return ret;
+}
+
+/*
+ * Closes JPoll and all JSocket registered
+ */
+gint j_poll_close_all(JPoll * jp)
+{
+    GList *jsocks = j_poll_all(jp);
+    int ret = j_poll_close(jp);
+    g_list_free_full(jsocks, (GDestroyNotify) j_socket_close);
 
     return ret;
 }
