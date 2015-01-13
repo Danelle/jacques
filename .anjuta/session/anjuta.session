@@ -1,0 +1,28 @@
+[Anjuta]
+Maximized=1
+Geometry=1920x1019+0+27
+
+[File Loader]
+Files=../../src/main.c#36%%%../../src/config.h#3%%%../../src/config.c#100%%%../../src/core.c#19%%%../../src/core.h#4%%%../../src/server.c#20%%%../../src/server.h#24
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
+[Execution]
+Run in terminal=2
+Working directories=../../.
+
+[Project Manager]
+Shortcut=jacques//src//jio//libjio.a%%%jacques//src//ge//libge.a%%%jacques//src//jacques
+Expand=jacques%%%jacques//src%%%jacques//src//jio%%%jacques//src//jio//libjio.a%%%jacques//src//jacques%%%jacques//dist_doc
+
+[Build]
+Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
+Selected Configuration=Default
+BuildArgs/Default=--enable-maintainer-mode
+BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
+BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
+BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2

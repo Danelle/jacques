@@ -17,7 +17,6 @@
  */
 
 #include "config.h"
-#include "ge/ge.h"
 
 /**********************************/
 static inline JaConfig *ja_config_new();
@@ -80,14 +79,15 @@ JaConfig *ja_config_load()
 static inline JaConfig *ja_config_new()
 {
     JaConfig *jcfg = (JaConfig *) g_slice_alloc(sizeof(JaConfig));
-    jcfg->groups = NULL;
+    jcfg->groups =
+        g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
+                              (GDestroyNotify) ja_directive_group_free);
     return jcfg;
 }
 
 void ja_config_free(JaConfig * jcfg)
 {
-    g_list_free_full(jcfg->groups,
-                     (GDestroyNotify) ja_directive_group_free);
+    g_hash_table_unref(jcfg->groups);
     g_slice_free1(sizeof(JaConfig), jcfg);
 }
 
@@ -140,16 +140,11 @@ static inline void ja_directive_set_args(JaDirective * jd,
 static inline JaDirectiveGroup *ja_config_add_group(JaConfig * jcfg,
                                                     const gchar * gname)
 {
-    GList *ptr = jcfg->groups;
-    while (ptr) {
-        JaDirectiveGroup *group = (JaDirectiveGroup *) ptr->data;
-        if (g_strcmp0(group->name, gname) == 0) {
-            return group;
-        }
-        ptr = g_list_next(ptr);
+    JaDirectiveGroup *group = ja_config_lookup(jcfg, gname);
+    if (group == NULL) {
+        group = ja_directive_group_new(gname);
+        g_hash_table_insert(jcfg->groups, group->name, group);
     }
-    JaDirectiveGroup *group = ja_directive_group_new(gname);
-    jcfg->groups = g_list_append(jcfg->groups, group);
     return group;
 }
 
@@ -161,8 +156,7 @@ static inline JaDirective *ja_directive_group_add(JaDirectiveGroup * jdg,
                                                   const gchar * name,
                                                   const gchar * args)
 {
-    JaDirective *jd =
-        (JaDirective *) g_hash_table_lookup(jdg->directives, name);
+    JaDirective *jd = (JaDirective *) ja_directive_group_lookup(jdg, name);
     if (jd != NULL) {
         ja_directive_set_args(jd, args);
         return jd;
@@ -170,4 +164,47 @@ static inline JaDirective *ja_directive_group_add(JaDirectiveGroup * jdg,
     jd = ja_directive_new(name, args);
     g_hash_table_insert(jdg->directives, jd->name, jd);
     return jd;
+}
+
+/*
+ * Looks up a JaDirectiveGroup with name
+ */
+JaDirectiveGroup *ja_config_lookup(JaConfig * jcfg, const gchar * name)
+{
+    JaDirectiveGroup *jdg =
+        (JaDirectiveGroup *) g_hash_table_lookup(jcfg->groups, name);
+    return jdg;
+}
+
+/*
+ * Looks up a JaDirective with name
+ */
+JaDirective *ja_directive_group_lookup(JaDirectiveGroup * jdg,
+                                       const gchar * name)
+{
+    JaDirective *jd =
+        (JaDirective *) g_hash_table_lookup(jdg->directives, name);
+    return jd;
+}
+
+/*
+ * Calls the given function in every JaDirective in JaDirectiveGroup
+ */
+gint ja_directive_group_foreach(JaDirectiveGroup * jdg, JaHFunc func,
+                                void *user_data)
+{
+    GList *keys = g_hash_table_get_keys(jdg->directives);
+    GList *ptr = keys;
+    while (ptr) {
+        JaDirective *jd =
+            (JaDirective *) g_hash_table_lookup(jdg->directives,
+                                                (void *) ptr->data);
+        if (!func(jd, user_data)) {
+            g_list_free(keys);
+            return 0;
+        }
+        ptr = g_list_next(ptr);
+    }
+    g_list_free(keys);
+    return 1;
 }

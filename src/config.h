@@ -34,6 +34,10 @@
 #define CONFIG_FILEPATH CONFIG_LOCATION "/" CONFIG_FILENAME
 
 
+/* the directory stores app server configurations */
+#define CONFIG_APP_LOCATION CONFIG_LOCATION "/app-enabled"
+
+
 /* the default log location */
 #ifndef DEFAULT_LOG_LOCATION
 #define DEFAULT_LOG_LOCATION "/var/log/jacques"
@@ -68,7 +72,7 @@ typedef struct {
 
 /* all directive structure */
 typedef struct {
-    GList *groups;
+    GHashTable *groups;
     /* reserverd */
 } JaConfig;
 
@@ -83,5 +87,28 @@ JaConfig *ja_config_load();
  * Frees all the memory used by JaConfig
  */
 void ja_config_free(JaConfig * jcfg);
+
+
+/*
+ * Looks up a JaDirectiveGroup with name
+ */
+JaDirectiveGroup *ja_config_lookup(JaConfig * jcfg, const gchar * name);
+
+/*
+ * Looks up a JaDirective with name
+ */
+JaDirective *ja_directive_group_lookup(JaDirectiveGroup * jdg,
+                                       const gchar * name);
+
+
+
+typedef gint(*JaHFunc) (JaDirective * jd, void *user_data);
+/*
+ * Calls the given function in every JaDirective in JaDirectiveGroup
+ * Func returns 0 to stop iteration, and ja_directive_group_foreach() returns 0
+ * Otherwise, ja_directive_group_foreach() returns 1
+ */
+gint ja_directive_group_foreach(JaDirectiveGroup * jdg, JaHFunc func,
+                                void *user_data);
 
 #endif

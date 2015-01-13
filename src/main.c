@@ -18,6 +18,7 @@
  */
 
 #include "config.h"
+#include "server.h"
 #include "jio/jio.h"
 
 int main(int argc, const char *argv[])
@@ -28,30 +29,20 @@ int main(int argc, const char *argv[])
         return -1;
     }
 
-    GList *group = jcfg->groups;
-    while (group) {
-        JaDirectiveGroup *g = (JaDirectiveGroup *) group->data;
-        g_printf("Group:%s\n", g->name);
-        GList *keys = g_hash_table_get_keys(g->directives);
-        GList *ptr = keys;
-        while (ptr) {
-            JaDirective *jd =
-                (JaDirective *) g_hash_table_lookup(g->directives,
-                                                    ptr->data);
-            g_printf("\t%s:%s\n", jd->name, jd->args);
-            ptr = g_list_next(ptr);
-        }
-        g_list_free(keys);
-        group = g_list_next(group);
+    JaDirectiveGroup *jdg_core = ja_config_lookup(jcfg, "core");
+    if (jdg_core == NULL) {
+        g_printf("you must set [core] in %s\n", CONFIG_FILEPATH);
+        ja_config_free(jcfg);
+        return -1;
     }
 
-    ja_config_free(jcfg);
+    GList *servers = ja_server_config_load();
+    GList *ptr = servers;
+    while (ptr) {
+        JaServerConfig *server = (JaServerConfig *) ptr->data;
+        g_printf("%u,%s\n", server->listen_port, server->name);
+        ptr = g_list_next(ptr);
+    }
 
-    // JSocket *jsock = j_server_socket_new(2345, 512);
-    // JSocket *csock = NULL;
-    // while ((csock = j_socket_accept(jsock)) != NULL) {
-    //     j_socket_close(csock);
-    // }
-    // j_socket_close(jsock);
     return (0);
 }

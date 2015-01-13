@@ -39,6 +39,14 @@ GList *j_poll_ready(JPoll * jp)
     return jp->ready;
 }
 
+/*
+ * Gets all the JSockets that is registered in JPoll
+ */
+GList *j_poll_all(JPoll * jp)
+{
+    return jp->jsocks;
+}
+
 static inline void j_poll_clear_ready(JPoll * jp);
 
 static inline JPollEvent *j_poll_event_new(struct epoll_event *event);
@@ -107,8 +115,8 @@ int j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
 }
 
 
-static inline int j_poll_add_internal(JPoll * jp, JSocket * jsock,
-                                      guint32 events)
+/* Registers a JSocket */
+int j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
 {
     int epollfd = j_poll_fd(jp);
     int sockfd = j_socket_fd(jsock);
@@ -120,33 +128,6 @@ static inline int j_poll_add_internal(JPoll * jp, JSocket * jsock,
     j_poll_add_jsocket(jp, jsock);
 
     return !epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &event);
-}
-
-/*
- * Registers the JSocket
- * Returns 1 on success, otherwise 0
- */
-int j_poll_addin(JPoll * jp, JSocket * jsock)
-{
-    return j_poll_add_internal(jp, jsock, EPOLLIN);
-}
-
-/*
- * Registers the JSocket with event EPOLLOUT
- * Returns 1 on success, otherwise 0
- */
-int j_poll_addout(JPoll * jp, JSocket * jsock)
-{
-    return j_poll_add_internal(jp, jsock, EPOLLOUT);
-}
-
-/*
- * Registers the JSocket with event EPOLLOUT|EPOLLIN
- * Returns 1 on success, otherwise 0
- */
-int j_poll_addio(JPoll * jp, JSocket * jsock)
-{
-    return j_poll_add_internal(jp, jsock, EPOLLIN | EPOLLOUT);
 }
 
 /*
@@ -162,6 +143,24 @@ int j_poll_delete(JPoll * jp, JSocket * jsock)
 
     struct epoll_event event;   /* linux 2.6.9 required a non-null pointer in event */
     return !epoll_ctl(epollfd, EPOLL_CTL_DEL, sockfd, &event);
+}
+
+/*
+ * Closes JPoll
+ * This function will close JPoll and free all the memory used by JPoll
+ * But not free JSockets registered.
+ * So get all JSockets registered before close the JPoll
+ */
+int j_poll_close(JPoll * jp)
+{
+    int epollfd = j_poll_fd(jp);
+    j_poll_clear_ready(jp);
+    g_list_free(jp->jsocks);
+
+    int ret = close(epollfd);
+    g_slice_free1(sizeof(jp), jp);
+
+    return ret;
 }
 
 static inline void j_poll_clear_ready(JPoll * jp)

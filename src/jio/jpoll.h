@@ -32,6 +32,7 @@ typedef struct _JPoll JPoll;
 #define J_POLL_EVENT_ERR EPOLLERR
 
 
+/* this structure is public */
 typedef struct {
     guint32 type;
     JSocket *jsock;
@@ -53,6 +54,13 @@ GList *j_poll_ready(JPoll * jp);
 
 
 /*
+ * Gets all the JSockets that is registered in JPoll
+ * The return GList is maintained by JPoll
+ */
+GList *j_poll_all(JPoll * jp);
+
+
+/*
  * Waits for events on JPoll instance. Up to maxevents 
  * When successfully, j_poll_wait() returns a number of ready JSocket.
  * then you can call j_poll_ready() to get the ready JSocket
@@ -61,30 +69,27 @@ GList *j_poll_ready(JPoll * jp);
  */
 int j_poll_wait(JPoll * jp, guint maxevents, guint timeout);
 
-/*
- * Registers the JSocket with event EPOLLIN
- * Returns 1 on success, otherwise 0
- */
-int j_poll_addin(JPoll * jp, JSocket * jsock);
 
 /*
- * Registers the JSocket with event EPOLLOUT
+ * Registers a JSocket
  * Returns 1 on success, otherwise 0
  */
-int j_poll_addout(JPoll * jp, JSocket * jsock);
-
-
-/*
- * Registers the JSocket with event EPOLLOUT|EPOLLIN
- * Returns 1 on success, otherwise 0
- */
-int j_poll_addio(JPoll * jp, JSocket * jsock);
+int j_poll_register(JPoll * jp, JSocket * jsock, guint32 types);
 
 /*
  * Unregisters the JSocket
  * Returns 1 on success, otherwise 0
  */
 int j_poll_delete(JPoll * jp, JSocket * jsock);
+
+
+/*
+ * Closes JPoll
+ * This function will close JPoll and free all the memory used by JPoll
+ * But not free JSockets registered.
+ * So get all JSockets registered before close the JPoll
+ */
+int j_poll_close(JPoll * jp);
 
 
 

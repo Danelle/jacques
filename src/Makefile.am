@@ -17,7 +17,11 @@ bin_PROGRAMS = jacques
 jacques_SOURCES = \
 	main.c \
 	config.h \
-	config.c 
+	config.c \
+	core.c \
+	core.h \
+	server.c \
+	server.h 
 
 jacques_LDFLAGS = 
 
