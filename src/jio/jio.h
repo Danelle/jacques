@@ -21,6 +21,7 @@
 #define __J_JIO_H__
 
 #include "jsocket.h"
+#include "jpoll.h"
 
 
 #endif                          /* __J_JIO_H__ */

@@ -25,11 +25,10 @@ jacques_SOURCES = \
 
 jacques_LDFLAGS = 
 
-SUBLIBS = jio/libjio.a ge/libge.a
+SUBLIBS = jio/libjio.a 
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 
 SUBDIRS = \
-	jio \
-	ge
+	jio

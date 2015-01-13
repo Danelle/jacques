@@ -21,5 +21,4 @@ AC_OUTPUT([
 		   Makefile
 		   src/Makefile
 		   src/jio/Makefile
-		   src/ge/Makefile
 		   ])

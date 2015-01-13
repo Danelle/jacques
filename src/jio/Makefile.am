@@ -5,6 +5,7 @@ lib_LIBRARIES =  \
 	libjio.a
 
 libjio_a_SOURCES =  \
+	jio.h \
 	jsocket.c \
 	jsocket.h \
 	pack.c \

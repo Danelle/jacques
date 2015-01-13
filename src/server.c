@@ -124,3 +124,13 @@ static inline void ja_server_config_free(JaServerConfig * cfg)
     g_free(cfg->name);
     g_slice_free1(sizeof(JaServerConfig), cfg);
 }
+
+
+/*
+ * Creates a JaServer, (fork a new process)
+ * Returns fork()
+ */
+int ja_server_create(JaServerConfig * cfg)
+{
+    return -1;
+}

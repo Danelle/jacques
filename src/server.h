@@ -20,6 +20,7 @@
 #define __JA_SERVER_H__
 
 #include <glib.h>
+#include "jio/jio.h"
 #include "config.h"
 
 
@@ -47,6 +48,20 @@ typedef struct {
  */
 GList *ja_server_config_load();
 
+
+
+typedef struct {
+    JSocket *listen_sock;
+    JPoll *poller;
+
+    JaServerConfig *cfg;
+} JaServer;
+
+/*
+ * Creates a JaServer, (fork a new process)
+ * Returns fork()
+ */
+int ja_server_create(JaServerConfig * cfg);
 
 
 
