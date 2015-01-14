@@ -90,6 +90,7 @@ static inline void ja_worker_remove(JaWorker * jw, JSocket * jsock)
     JPoll *poller = jw->poller;
     j_poll_delete(poller, jsock);
     ja_worker_unlock(jw);
+    g_message("remove socket");
 }
 
 
@@ -114,7 +115,9 @@ static void *ja_worker_main(void *arg)
     JaWorker *self = (JaWorker *) arg;
     JPoll *poller = self->poller;
     gint n;
-    while ((n = j_poll_wait(poller, 128, 0)) >= 0) {
+    g_message("new worker");
+    while ((n = j_poll_wait(poller, 128, -1)) >= 0) {
+        g_message("poll %d", n);
         if (n == 0) {
             continue;
         }
@@ -123,18 +126,25 @@ static void *ja_worker_main(void *arg)
             JPollEvent *event = (JPollEvent *) ready->data;
             JSocket *jsock = event->jsock;
             guint32 type = event->type;
+            g_message("type:%u", type);
             if (type & J_POLL_EVENT_IN) {   /* ready for reading */
-                const void *data = j_socket_data(jsock);
-                guint length = j_socket_data_length(jsock);
-                if (ja_worker_send(self, jsock, data, length) == 0) {   /* just echo */
-                    ja_worker_modify(self, jsock, J_POLL_EVENT_OUT);
+                gint n = j_socket_read(jsock);
+                if (n < 0) {
+                    ja_worker_remove(self, jsock);
+                } else if (n > 0) {
+                    const void *data = j_socket_data(jsock);
+                    guint length = j_socket_data_length(jsock);
+                    if (ja_worker_send(self, jsock, data, length) == 0) {   /* just echo */
+                        ja_worker_modify(self, jsock, J_POLL_EVENT_OUT);
+                    }
                 }
             } else if (type & J_POLL_EVENT_OUT) {   /* ready for writing */
                 ja_worker_send(self, jsock, NULL, 0);
             } else if (type & (J_POLL_EVENT_HUP | J_POLL_EVENT_ERR)) {
                 /* error */
-                ja_worker_remove(self, event->jsock);
+                ja_worker_remove(self, jsock);
             }
+
             ready = g_list_next(ready);
         }
     }

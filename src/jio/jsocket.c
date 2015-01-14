@@ -76,6 +76,11 @@ JSocket *j_server_socket_new(gushort port, guint32 backlog)
     if (sockfd < 0) {
         return NULL;
     }
+
+    int set = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *) &set,
+               sizeof(set));
+
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
@@ -87,6 +92,31 @@ JSocket *j_server_socket_new(gushort port, guint32 backlog)
     }
 
     if (listen(sockfd, backlog) < 0) {
+        close(sockfd);
+        return NULL;
+    }
+
+    return j_socket_new_fromfd(sockfd, (struct sockaddr *) &addr,
+                               sizeof(addr));
+}
+
+/*
+ * Creates a new client IPv4 socket, connect to remote in blocking way
+ * Returns NULL on error
+ */
+JSocket *j_client_socket_new(const gchar * remote, gushort port)
+{
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        return NULL;
+    }
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = inet_addr(remote);
+    if (connect(sockfd, (struct sockaddr *) &addr, sizeof(addr)) != 0) {
         close(sockfd);
         return NULL;
     }
@@ -262,6 +292,8 @@ int j_socket_read(JSocket * jsock)
             if (errno == EAGAIN) {
                 return 0;
             }
+            return -1;
+        } else if (n == 0) {
             return -1;
         }
         j_socket_append_rdata(jsock, databuf, n);

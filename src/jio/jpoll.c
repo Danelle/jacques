@@ -212,6 +212,7 @@ static inline JPollEvent *j_poll_event_new(struct epoll_event *event)
     JPollEvent *jpe = (JPollEvent *) g_slice_alloc(sizeof(JPollEvent));
     jpe->type = event->events;
     jpe->jsock = (JSocket *) event->data.ptr;
+    return jpe;
 }
 
 static inline void j_poll_event_free(JPollEvent * jpe)

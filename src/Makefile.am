@@ -13,7 +13,8 @@ AM_CFLAGS =\
 	 -pthread \
 	 -g
 
-bin_PROGRAMS = jacques
+bin_PROGRAMS = jacques \
+	client
 
 jacques_SOURCES = \
 	main.c \
@@ -31,6 +32,12 @@ jacques_LDFLAGS =
 SUBLIBS = jio/libjio.a 
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
+
+client_SOURCES =  \
+	client.c
+
+client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
+
 
 
 SUBDIRS = \

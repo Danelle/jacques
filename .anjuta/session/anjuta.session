@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x1017+0+29
 
 [File Loader]
-Files=../../src/worker.c#32%%%../../src/server.h#30%%%../../src/server.c#198%%%../../src/worker.h#23%%%../../src/jio/jpoll.h#86%%%../../src/jio/jpoll.c#133%%%../../src/jio/jsocket.h#55%%%../../src/jio/jsocket.c#1
+Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#295%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#57%%%../../src/server.c#1%%%../../src/worker.c#136%%%../../src/jio/jpoll.c#204
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -13,7 +13,8 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Expand=jacques%%%jacques//src%%%jacques//src//jio%%%jacques//src//jio//libjio.a%%%jacques//src//jacques%%%jacques//dist_doc
+Shortcut=jacques//src//client
+Expand=jacques%%%jacques//src%%%jacques//src//jio%%%jacques//src//jio//libjio.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized

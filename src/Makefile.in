@@ -78,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = jacques$(EXEEXT)
+bin_PROGRAMS = jacques$(EXEEXT) client$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -92,15 +92,18 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
-	server.$(OBJEXT) worker.$(OBJEXT)
-jacques_OBJECTS = $(am_jacques_OBJECTS)
+am_client_OBJECTS = client.$(OBJEXT)
+client_OBJECTS = $(am_client_OBJECTS)
 am__DEPENDENCIES_1 =
-jacques_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
+client_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
+	server.$(OBJEXT) worker.$(OBJEXT)
+jacques_OBJECTS = $(am_jacques_OBJECTS)
+jacques_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
 jacques_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(jacques_LDFLAGS) $(LDFLAGS) -o $@
@@ -138,8 +141,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(jacques_SOURCES)
-DIST_SOURCES = $(jacques_SOURCES)
+SOURCES = $(client_SOURCES) $(jacques_SOURCES)
+DIST_SOURCES = $(client_SOURCES) $(jacques_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -351,6 +354,10 @@ jacques_SOURCES = \
 jacques_LDFLAGS = 
 SUBLIBS = jio/libjio.a 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
+client_SOURCES = \
+	client.c
+
+client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 SUBDIRS = \
 	jio
 
@@ -438,6 +445,10 @@ clean-binPROGRAMS:
 	echo " rm -f" $$list; \
 	rm -f $$list
 
+client$(EXEEXT): $(client_OBJECTS) $(client_DEPENDENCIES) $(EXTRA_client_DEPENDENCIES) 
+	@rm -f client$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(client_OBJECTS) $(client_LDADD) $(LIBS)
+
 jacques$(EXEEXT): $(jacques_OBJECTS) $(jacques_DEPENDENCIES) $(EXTRA_jacques_DEPENDENCIES) 
 	@rm -f jacques$(EXEEXT)
 	$(AM_V_CCLD)$(jacques_LINK) $(jacques_OBJECTS) $(jacques_LDADD) $(LIBS)
@@ -448,6 +459,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@

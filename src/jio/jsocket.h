@@ -61,6 +61,12 @@ struct _JSocket {
 JSocket *j_server_socket_new(gushort port, guint32 backlog);
 
 /*
+ * Creates a new client IPv4 socket, connect to remote in blocking way
+ * Returns NULL on error
+ */
+JSocket *j_client_socket_new(const gchar * remote, gushort port);
+
+/*
  * Creates a new JSocket from a native socket descriptor
  * @param addr must be type of struct sockaddr_in
  */
