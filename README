@@ -20,8 +20,7 @@ a server program which focuses on mobile applications.
 
 	[core]
 
-	MaxThreadCount = 0	# 0 for no limit
-	MaxConnPerThread = 100	# 0 for default 60
+	ThreadCount = 6		# 0 for default
 
 还需要在/etc/jacques/app-enabled目录下放置服务配置文件（文件名任意），（如apache的虚拟主机）
     一个服务配置文件如下,你可以放置多个
@@ -31,8 +30,7 @@ a server program which focuses on mobile applications.
 	ListenPort = 23432
 	NaxPending = 512
 
-	MaxThreadCount = 6		# 0 for no limit
-	MaxConnPerThread = 100	# 0 for default 60
+	ThreadCount = 6		# 0 for default
 
 注意，目前这些配置并没有完全用到。但是必须有。
 有了配置文件后就可以运行jacques了。
