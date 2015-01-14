@@ -122,7 +122,7 @@ static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
         g_key_file_get_integer(kf, group, DIRECTIVE_MAX_CONN_PER_THREAD,
                                NULL);
     if (max_conn_per_thread > 0) {
-        cfg->max_thread_count = max_conn_per_thread;
+        cfg->max_conn_per_thread = max_conn_per_thread;
     }
     return cfg;
 }
@@ -196,12 +196,26 @@ static inline JaWorker *ja_server_find_worker(JaServer * server)
     GList *ptr = server->workers;
     JaWorker *worker = NULL;
     while (ptr) {
+        GList *next = g_list_next(ptr);
         JaWorker *jw = (JaWorker *) ptr->data;
-        if (!ja_worker_is_full(jw)) {
+        if (!ja_worker_is_running(jw)) {
+            if (next) {
+                next->prev = ptr->prev;
+            }
+
+            if (ptr->prev == NULL) {
+                server->workers = next;
+            } else {
+                ptr->prev->next = next;
+            }
+            g_list_free1(ptr);
+            ja_worker_free(jw);
+            g_warning("remove worker");
+        } else if (!ja_worker_is_full(jw)) {
             worker = jw;
             break;
         }
-        ptr = g_list_next(ptr);
+        ptr = next;
     }
     if (worker) {
         return worker;
@@ -214,6 +228,8 @@ static inline JaWorker *ja_server_find_worker(JaServer * server)
 }
 
 
+#include <errno.h>
+#include <string.h>
 static inline void ja_server_main(JaServer * server)
 {
     JSocket *conn = NULL;
@@ -227,6 +243,7 @@ static inline void ja_server_main(JaServer * server)
         ja_worker_add(worker, conn);
         g_message("new socket");
     }
+    g_warning("server quits: %s", strerror(errno));
     /* error */
     _exit(0);
 }

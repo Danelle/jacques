@@ -45,14 +45,6 @@ typedef struct {
  */
 JPoll *j_poll_new();
 
-
-/*
- * Returns the list of JPollEvent since last j_poll_wait()
- * The return GList is maintained by JPoll, do not modify it,nor free it
- */
-GList *j_poll_ready(JPoll * jp);
-
-
 /*
  * Gets all the JSockets that is registered in JPoll
  * The return GList is maintained by JPoll
@@ -73,7 +65,8 @@ gint j_poll_count(JPoll * jp);
  * or zero if no JSocket became ready during the request timeout milliseconds
  * When an error occurs, returns -1
  */
-gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout);
+gint j_poll_wait(JPoll * jp, JPollEvent * jevents, guint maxevents,
+                 gint timeout);
 
 
 /*
@@ -94,6 +87,12 @@ gint j_poll_modify(JPoll * jp, JSocket * jsock, guint32 type);
  * Returns 1 on success, otherwise 0
  */
 gint j_poll_delete(JPoll * jp, JSocket * jsock);
+
+
+/*
+ * Unregisters the Jsocket and close it
+ */
+gint j_poll_delete_close(JPoll * jp, JSocket * jsock);
 
 
 /*

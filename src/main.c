@@ -26,13 +26,13 @@ int main(int argc, const char *argv[])
 {
     JaConfig *jcfg = ja_config_load();
     if (jcfg == NULL) {
-        g_printf("fail to parse configuration file\n");
+        g_error("fail to parse configuration file\n");
         return -1;
     }
 
     JaDirectiveGroup *jdg_core = ja_config_lookup(jcfg, "core");
     if (jdg_core == NULL) {
-        g_printf("you must set [core] in %s\n", CONFIG_FILEPATH);
+        g_error("you must set [core] in %s\n", CONFIG_FILEPATH);
         ja_config_free(jcfg);
         return -1;
     }
@@ -43,7 +43,7 @@ int main(int argc, const char *argv[])
     GList *children = NULL;
     while (ptr) {
         JaServerConfig *server = (JaServerConfig *) ptr->data;
-        g_printf("%u,%s\n", server->listen_port, server->name);
+        g_message("%u,%s", server->listen_port, server->name);
         gint pid = ja_server_create(server);
         if (pid < 0) {
             g_warning("fail to create server %s", server->name);

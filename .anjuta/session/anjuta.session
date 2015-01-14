@@ -2,19 +2,22 @@
 Maximized=1
 Geometry=1920x1017+0+29
 
-[File Loader]
-Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#295%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#49%%%../../src/server.c#1%%%../../src/worker.c#136%%%../../src/jio/jpoll.c#154
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Run in terminal=2
 Working directories=../../.
 
+[File Loader]
+Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#164%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#48%%%../../src/server.c#211%%%../../src/jio/jpoll.c#202%%%../../src/server.h#43%%%../../src/worker.h#44%%%../../src/worker.c#129%%%../../src/jio/jpoll.h#48
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
 [Project Manager]
 Shortcut=jacques//src//client
 Expand=jacques%%%jacques//src%%%jacques//src//jio%%%jacques//src//jio//libjio.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
+
+[Debugger]
+Stop at beginning=2
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
@@ -23,6 +26,3 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
-
-[Debugger]
-Stop at beginning=2

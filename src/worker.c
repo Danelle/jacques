@@ -24,20 +24,19 @@
 
 
 struct _JaWorker {
-    pthread_t tid;              /* thread id */
+    GThread *thread;
     JPoll *poller;
     guint max_client;
     gboolean running;
 
-    pthread_mutex_t lock;       /* the lock */
+    GMutex lock;
 };
 
-#define ja_worker_lock(jw)  pthread_mutex_lock(&(jw)->lock)
-#define ja_worker_unlock(jw) pthread_mutex_unlock(&(jw)->lock)
+#define ja_worker_lock(jw)  g_mutex_lock (&(jw)->lock)
+#define ja_worker_unlock(jw) g_mutex_unlock (&(jw)->lock)
 
 
 static inline JaWorker *ja_worker_alloc(JaServerConfig * cfg);
-static inline void ja_worker_free(JaWorker * jw);
 
 /*
  * pthread routine
@@ -55,8 +54,10 @@ JaWorker *ja_worker_create(JaServerConfig * cfg)
     if (jw == NULL) {
         return NULL;
     }
-    int ret = pthread_create(&jw->tid, NULL, ja_worker_main, (void *) jw);
-    if (ret != 0) {             /* error */
+    jw->thread =
+        g_thread_try_new("worker", (GThreadFunc) ja_worker_main,
+                         (void *) jw, NULL);
+    if (jw->thread == NULL) {   /* error */
         ja_worker_free(jw);
         return NULL;
     }
@@ -77,7 +78,9 @@ void ja_worker_add(JaWorker * jw, JSocket * jsock)
 static inline void ja_worker_modify(JaWorker * jw, JSocket * jsock,
                                     guint32 events)
 {
+    ja_worker_lock(jw);
     j_poll_modify(jw->poller, jsock, events);
+    ja_worker_unlock(jw);
 }
 
 /*
@@ -88,7 +91,7 @@ static inline void ja_worker_remove(JaWorker * jw, JSocket * jsock)
 {
     ja_worker_lock(jw);
     JPoll *poller = jw->poller;
-    j_poll_delete(poller, jsock);
+    j_poll_delete_close(poller, jsock);
     ja_worker_unlock(jw);
     g_message("remove socket");
 }
@@ -114,22 +117,22 @@ static void *ja_worker_main(void *arg)
 {
     JaWorker *self = (JaWorker *) arg;
     JPoll *poller = self->poller;
-    gint n;
-    g_message("new worker");
-    while ((n = j_poll_wait(poller, 128, -1)) >= 0) {
+    gint i, n;
+    g_message("new worker,%u", self->max_client);
+    JPollEvent events[128];
+    while ((n =
+            j_poll_wait(poller, events,
+                        sizeof(events) / sizeof(JPollEvent), -1)) >= 0) {
         g_message("poll %d", n);
         if (n == 0) {
             continue;
         }
-        GList *ready = j_poll_ready(poller);
-        while (ready) {         /* new request */
-            JPollEvent *event = (JPollEvent *) ready->data;
-            JSocket *jsock = event->jsock;
-            guint32 type = event->type;
-            g_message("type:%u", type);
+        for (i = 0; i < n; i++) {
+            JSocket *jsock = events[i].jsock;
+            guint32 type = events[i].type;
             if (type & J_POLL_EVENT_IN) {   /* ready for reading */
                 gint n = j_socket_read(jsock);
-                if (n < 0) {
+                if (n < 0) {    /* read error, EOF? whatever */
                     ja_worker_remove(self, jsock);
                 } else if (n > 0) {
                     const void *data = j_socket_data(jsock);
@@ -144,12 +147,14 @@ static void *ja_worker_main(void *arg)
                 /* error */
                 ja_worker_remove(self, jsock);
             }
-
-            ready = g_list_next(ready);
+        }
+        if (j_poll_count(self->poller) <= 0) {
+            break;
         }
     }
 
     self->running = FALSE;
+    g_message("worker quits");
     return (void *) 0;
 }
 
@@ -185,12 +190,15 @@ static inline JaWorker *ja_worker_alloc(JaServerConfig * cfg)
     jw->poller = poller;
     jw->running = TRUE;
     jw->max_client = cfg->max_conn_per_thread;
-    pthread_mutex_init(&(jw->lock), NULL);
+    g_mutex_init(&jw->lock);
     return jw;
 }
 
-static inline void ja_worker_free(JaWorker * jw)
+void ja_worker_free(JaWorker * jw)
 {
     j_poll_close_all(jw->poller);
+    if (jw->thread) {
+        g_thread_unref(jw->thread);
+    }
     g_slice_free1(sizeof(JaWorker), jw);
 }

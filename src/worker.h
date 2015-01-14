@@ -41,6 +41,7 @@ typedef struct _JaWorker JaWorker;
  */
 JaWorker *ja_worker_create(JaServerConfig * cfg);
 
+void ja_worker_free(JaWorker * jw);
 
 /*
  * Adds a client to the worker

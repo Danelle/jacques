@@ -25,20 +25,24 @@ struct _JPoll {
     int epollfd;
     GList *jsocks;              /* the list of JSockets registered */
     gint count;                 /* the length of jsocks */
-    GList *ready;
 };
 
-#define j_poll_add_jsocket(jp,jsock)    do{(jp)->jsocks=g_list_append((jp)->jsocks,(jsock));(jp)->count++;}while(0)
-#define j_poll_remove_jsocket(jp,jsock) do{(jp)->jsocks=g_list_remove((jp)->jsocks,(jsock));(jp)->count--;}while(0)
+
+static inline void j_poll_add_jsocket(JPoll * jp, JSocket * jsock)
+{
+    jp->jsocks = g_list_append(jp->jsocks, jsock);
+    jp->count++;
+}
+
+static inline void j_poll_remove_jsocket(JPoll * jp, JSocket * jsock)
+{
+    jp->jsocks = g_list_remove(jp->jsocks, jsock);
+    jp->count--;
+}
 
 
 #define j_poll_fd(jp)	(jp)->epollfd
 
-
-GList *j_poll_ready(JPoll * jp)
-{
-    return jp->ready;
-}
 
 /*
  * Gets all the JSockets that is registered in JPoll
@@ -56,7 +60,6 @@ gint j_poll_count(JPoll * jp)
     return jp->count;
 }
 
-static inline void j_poll_clear_ready(JPoll * jp);
 
 static inline JPollEvent *j_poll_event_new(struct epoll_event *event);
 static inline void j_poll_event_free(JPollEvent * event);
@@ -82,7 +85,6 @@ static inline JPoll *j_poll_new_fromfd(int fd)
 {
     JPoll *jp = (JPoll *) g_slice_alloc(sizeof(JPoll));
     jp->epollfd = fd;
-    jp->ready = NULL;
     jp->jsocks = NULL;
     jp->count = 0;
     return jp;
@@ -91,11 +93,11 @@ static inline JPoll *j_poll_new_fromfd(int fd)
 /*
  * Waits for events on JPoll instance. Up to maxevents 
  * When successfully, j_poll_wait() returns a number of ready JSocket.
- * then you can call j_poll_ready() to get the ready JSocket
  * or zero if no JSocket became ready during the request timeout milliseconds
  * When an error occurs, returns -1
  */
-gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
+gint j_poll_wait(JPoll * jp, JPollEvent * jevents, guint maxevents,
+                 gint timeout)
 {
     struct epoll_event events[128];
     if (maxevents > 128) {
@@ -103,7 +105,6 @@ gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
     } else if (maxevents == 0) {
         return 0;
     }
-    j_poll_clear_ready(jp);
     int epollfd = j_poll_fd(jp);
     int n;
   AGAIN:
@@ -119,7 +120,8 @@ gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout)
 
     int i;
     for (i = 0; i < n; i++) {
-        jp->ready = g_list_append(jp->ready, j_poll_event_new(&events[i]));
+        jevents[i].type = events[i].events;
+        jevents[i].jsock = (JSocket *) events[i].data.ptr;
     }
     return n;
 }
@@ -172,6 +174,16 @@ gint j_poll_delete(JPoll * jp, JSocket * jsock)
 }
 
 /*
+ * Unregisters the Jsocket and close it
+ */
+gint j_poll_delete_close(JPoll * jp, JSocket * jsock)
+{
+    gint ret = j_poll_delete(jp, jsock);
+    j_socket_close(jsock);
+    return ret;
+}
+
+/*
  * Closes JPoll
  * This function will close JPoll and free all the memory used by JPoll
  * But not free JSockets registered.
@@ -180,11 +192,9 @@ gint j_poll_delete(JPoll * jp, JSocket * jsock)
 gint j_poll_close(JPoll * jp)
 {
     int epollfd = j_poll_fd(jp);
-    j_poll_clear_ready(jp);
-    g_list_free(jp->jsocks);
 
     int ret = close(epollfd);
-    g_slice_free1(sizeof(jp), jp);
+    g_slice_free1(sizeof(JPoll), jp);
 
     return ret;
 }
@@ -195,16 +205,8 @@ gint j_poll_close(JPoll * jp)
 gint j_poll_close_all(JPoll * jp)
 {
     GList *jsocks = j_poll_all(jp);
-    int ret = j_poll_close(jp);
     g_list_free_full(jsocks, (GDestroyNotify) j_socket_close);
-
-    return ret;
-}
-
-static inline void j_poll_clear_ready(JPoll * jp)
-{
-    g_list_free_full(jp->ready, (GDestroyNotify) j_poll_event_free);
-    jp->ready = NULL;
+    return j_poll_close(jp);
 }
 
 static inline JPollEvent *j_poll_event_new(struct epoll_event *event)
