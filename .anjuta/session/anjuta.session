@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x1017+0+29
 
 [File Loader]
-Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#295%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#57%%%../../src/server.c#1%%%../../src/worker.c#136%%%../../src/jio/jpoll.c#204
+Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#295%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#49%%%../../src/server.c#1%%%../../src/worker.c#136%%%../../src/jio/jpoll.c#154
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

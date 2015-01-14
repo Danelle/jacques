@@ -1,5 +1,49 @@
 Jacques
+====
 
+##Introduce
 a server program which focuses on mobile applications.
 
-in development
+##Build
+	./configure
+	make
+
+	XXX不要安装
+
+##Test
+编译成功后会在src目录下生成两个可执行文件，一个jacques，一个client。
+ jacques是服务器程序，client是测试用的客户端。
+
+要运行服务器，需要有相应的配置文件，默认的配置文件目录在/etc/jacques/下，（你也可以通过修改config.h中的定义来改变配置文件的位置）
+    
+有个主配置文件/etc/jacques/jacques.conf，内容如下
+
+	[core]
+
+	MaxThreadCount = 0	# 0 for no limit
+	MaxConnPerThread = 100	# 0 for default 60
+
+还需要在/etc/jacques/app-enabled目录下放置服务配置文件（文件名任意），（如apache的虚拟主机）
+    一个服务配置文件如下,你可以放置多个
+    
+	[gandalf]
+	
+	ListenPort = 23432
+	NaxPending = 512
+
+	MaxThreadCount = 6		# 0 for no limit
+	MaxConnPerThread = 100	# 0 for default 60
+
+注意，目前这些配置并没有完全用到。但是必须有。
+有了配置文件后就可以运行jacques了。
+
+运行jacques后会在终端输入监听的端口号，于是就可以使用./client [端口号] 来测试服务器了，目前只是完全的回射服务。
+
+也可以运行./batch.sh来批量测试。
+
+
+##Contact
+欢迎和我联系 Wiky L <wiiiky@yeah.net>
+
+Be free to email me
+    

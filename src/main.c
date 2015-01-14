@@ -57,5 +57,7 @@ int main(int argc, const char *argv[])
     int status;
     wait(&status);
 
+    g_warning("status %d", status);
+
     return (0);
 }
