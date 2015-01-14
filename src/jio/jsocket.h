@@ -51,8 +51,8 @@ struct _JSocket {
 
 #define j_socket_fd(jsock) (jsock)->sockfd
 /* get read buffer data & length */
-#define j_socket_data(jsock) ((jsock)->rbuf)->data
-#define j_socket_data_length(jsock) ((jsock)->rbuf)->len
+#define j_socket_data(jsock) ((void*)((jsock)->rbuf)->data)
+#define j_socket_data_length(jsock) (((jsock)->rbuf)->len)
 
 /*
  * Creates a new passive IPv4 socket, which listens on port

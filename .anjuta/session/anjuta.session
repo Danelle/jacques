@@ -1,9 +1,9 @@
 [Anjuta]
 Maximized=1
-Geometry=1366x707+0+27
+Geometry=1920x1017+0+29
 
 [File Loader]
-Files=../../src/worker.c#104%%%../../src/server.h#32%%%../../src/server.c#218%%%../../src/worker.h#44%%%../../src/jio/jpoll.h#32%%%../../src/jio/jpoll.c#25
+Files=../../src/worker.c#32%%%../../src/server.h#30%%%../../src/server.c#198%%%../../src/worker.h#23%%%../../src/jio/jpoll.h#86%%%../../src/jio/jpoll.c#133%%%../../src/jio/jsocket.h#55%%%../../src/jio/jsocket.c#1
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

@@ -141,6 +141,22 @@ gint j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
 }
 
 /*
+ * Modify the event associated to the JSocket
+ * Returns 1 on success, otherwise 0
+ */
+gint j_poll_modify(JPoll * jp, JSocket * jsock, guint32 events)
+{
+    int epollfd = j_poll_fd(jp);
+    int sockfd = j_socket_fd(jsock);
+
+    struct epoll_event event;
+    event.events = events;
+    event.data.ptr = (void *) jsock;
+
+    return !epoll_ctl(epollfd, EPOLL_CTL_MOD, sockfd, &event);
+}
+
+/*
  * Unregisters the JSocket
  * Returns 1 on success, otherwise 0
  */

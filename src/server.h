@@ -24,6 +24,11 @@
 #include "config.h"
 
 
+/*
+ * A server is a process that listen for connection and handle
+ */
+
+
 typedef struct {
     gchar *name;                /* server name */
     gushort listen_port;

@@ -21,6 +21,11 @@
 #define __JA_WORKER_H__
 
 
+/*
+ * A worker is a thread in server which recvices request and sends response
+ */
+
+
 #include "server.h"
 
 /*

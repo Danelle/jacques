@@ -29,7 +29,7 @@ struct _JaWorker {
     guint max_client;
     gboolean running;
 
-    pthread_mutex_t lock;
+    pthread_mutex_t lock;       /* the lock */
 };
 
 #define ja_worker_lock(jw)  pthread_mutex_lock(&(jw)->lock)
@@ -74,6 +74,12 @@ void ja_worker_add(JaWorker * jw, JSocket * jsock)
     ja_worker_unlock(jw);
 }
 
+static inline void ja_worker_modify(JaWorker * jw, JSocket * jsock,
+                                    guint32 events)
+{
+    j_poll_modify(jw->poller, jsock, events);
+}
+
 /*
  * Deletes a JSocket
  * and closes it
@@ -84,6 +90,19 @@ static inline void ja_worker_remove(JaWorker * jw, JSocket * jsock)
     JPoll *poller = jw->poller;
     j_poll_delete(poller, jsock);
     ja_worker_unlock(jw);
+}
+
+
+static inline gint ja_worker_send(JaWorker * jw, JSocket * jsock,
+                                  const void *data, guint32 count)
+{
+    gint n = j_socket_write(jsock, data, count);
+    if (n < 0) {
+        ja_worker_remove(jw, jsock);
+    } else if (n == 1) {
+        ja_worker_modify(jw, jsock, J_POLL_EVENT_IN);
+    }
+    return n;
 }
 
 
@@ -102,9 +121,17 @@ static void *ja_worker_main(void *arg)
         GList *ready = j_poll_ready(poller);
         while (ready) {         /* new request */
             JPollEvent *event = (JPollEvent *) ready->data;
-            if (event->type & J_POLL_EVENT_IN) {    /* ready for reading */
-            } else if (event->type & J_POLL_EVENT_OUT) {    /* ready for writing */
-            } else if (event->type & (J_POLL_EVENT_HUP | J_POLL_EVENT_ERR)) {
+            JSocket *jsock = event->jsock;
+            guint32 type = event->type;
+            if (type & J_POLL_EVENT_IN) {   /* ready for reading */
+                const void *data = j_socket_data(jsock);
+                guint length = j_socket_data_length(jsock);
+                if (ja_worker_send(self, jsock, data, length) == 0) {   /* just echo */
+                    ja_worker_modify(self, jsock, J_POLL_EVENT_OUT);
+                }
+            } else if (type & J_POLL_EVENT_OUT) {   /* ready for writing */
+                ja_worker_send(self, jsock, NULL, 0);
+            } else if (type & (J_POLL_EVENT_HUP | J_POLL_EVENT_ERR)) {
                 /* error */
                 ja_worker_remove(self, event->jsock);
             }

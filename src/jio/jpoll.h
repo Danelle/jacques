@@ -82,6 +82,13 @@ gint j_poll_wait(JPoll * jp, guint maxevents, guint timeout);
  */
 gint j_poll_register(JPoll * jp, JSocket * jsock, guint32 types);
 
+
+/*
+ * Modify the event associated to the JSocket
+ * Returns 1 on success, otherwise 0
+ */
+gint j_poll_modify(JPoll * jp, JSocket * jsock, guint32 type);
+
 /*
  * Unregisters the JSocket
  * Returns 1 on success, otherwise 0
