@@ -7,7 +7,7 @@ Run in terminal=2
 Working directories=../../.
 
 [File Loader]
-Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#164%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#48%%%../../src/server.c#211%%%../../src/jio/jpoll.c#202%%%../../src/server.h#43%%%../../src/worker.h#44%%%../../src/worker.c#129%%%../../src/jio/jpoll.h#48
+Files=../../src/jio/jsocket.h#56%%%../../src/jio/jsocket.c#164%%%../../src/client.c#43%%%../../src/config.h#1%%%../../src/main.c#48%%%../../src/server.c#224%%%../../src/jio/jpoll.c#202%%%../../src/server.h#43%%%../../src/worker.h#42%%%../../src/worker.c#102%%%../../src/jio/jpoll.h#20
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

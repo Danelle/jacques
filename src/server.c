@@ -112,17 +112,11 @@ static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
     if (max_pending > 0) {
         cfg->max_pending = max_pending;
     }
-    gint max_thread_count =
-        g_key_file_get_integer(kf, group, DIRECTIVE_MAX_THREAD_COUNT,
+    gint thread_count =
+        g_key_file_get_integer(kf, group, DIRECTIVE_THREAD_COUNT,
                                NULL);
-    if (max_thread_count > 0) {
-        cfg->max_thread_count = max_thread_count;
-    }
-    gint max_conn_per_thread =
-        g_key_file_get_integer(kf, group, DIRECTIVE_MAX_CONN_PER_THREAD,
-                               NULL);
-    if (max_conn_per_thread > 0) {
-        cfg->max_conn_per_thread = max_conn_per_thread;
+    if (thread_count > 0) {
+        cfg->thread_count = thread_count;
     }
     return cfg;
 }
@@ -136,8 +130,7 @@ static inline JaServerConfig *ja_server_config_default(const gchar * name,
     cfg->name = g_strdup(name);
     cfg->listen_port = port;
     cfg->max_pending = DEFAULT_MAX_PENDING;
-    cfg->max_thread_count = DEFAULT_MAX_THREAD_COUNT;
-    cfg->max_conn_per_thread = DEFAULT_MAX_CONN_PER_THREAD;
+    cfg->thread_count = DEFAULT_THREAD_COUNT;
     return cfg;
 }
 
@@ -211,20 +204,27 @@ static inline JaWorker *ja_server_find_worker(JaServer * server)
             g_list_free1(ptr);
             ja_worker_free(jw);
             g_warning("remove worker");
-        } else if (!ja_worker_is_full(jw)) {
+        } else if (worker == NULL
+                   || ja_worker_payload(worker) > ja_worker_payload(jw)) {
             worker = jw;
-            break;
         }
         ptr = next;
     }
-    if (worker) {
-        return worker;
-    }
-    worker = ja_worker_create(server->cfg);
-    if (worker) {
-        server->workers = g_list_append(server->workers, worker);
-    }
     return worker;
+}
+
+static inline void ja_server_initialize_workers(JaServer * server)
+{
+    gint count = server->cfg->thread_count;
+    gint i = 0;
+    for (i = 0; i < count; i++) {
+        JaWorker *worker = ja_worker_create(server->cfg, i);
+        if (worker) {
+            server->workers = g_list_prepend(server->workers, worker);
+        } else {
+            g_warning("fail to create worker");
+        }
+    }
 }
 
 
@@ -232,6 +232,7 @@ static inline JaWorker *ja_server_find_worker(JaServer * server)
 #include <string.h>
 static inline void ja_server_main(JaServer * server)
 {
+    ja_server_initialize_workers(server);
     JSocket *conn = NULL;
     while ((conn = j_socket_accept(server->listen_sock))) {
         JaWorker *worker = ja_server_find_worker(server);
@@ -241,7 +242,6 @@ static inline void ja_server_main(JaServer * server)
             continue;
         }
         ja_worker_add(worker, conn);
-        g_message("new socket");
     }
     g_warning("server quits: %s", strerror(errno));
     /* error */

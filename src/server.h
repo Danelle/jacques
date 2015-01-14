@@ -33,18 +33,15 @@ typedef struct {
     gchar *name;                /* server name */
     gushort listen_port;
     guint32 max_pending;        /*  maximum length to which the  queue  of pending  connections */
-    guint32 max_thread_count;   /* maximum count of threads */
-    guint32 max_conn_per_thread;    /* maximum count of connection that one thread handles */
+    guint32 thread_count;       /* count of workers */
 } JaServerConfig;
 
 #define DIRECTIVE_LISTEN_PORT "ListenPort"
 #define DIRECTIVE_MAX_PENDING "MaxPending"
-#define DIRECTIVE_MAX_THREAD_COUNT "MaxThreadCount"
-#define DIRECTIVE_MAX_CONN_PER_THREAD "MaxConnPerThread"
+#define DIRECTIVE_THREAD_COUNT "ThreadCount"
 
 #define DEFAULT_MAX_PENDING 256
-#define DEFAULT_MAX_THREAD_COUNT  0
-#define DEFAULT_MAX_CONN_PER_THREAD 60
+#define DEFAULT_THREAD_COUNT  6
 
 
 /*
@@ -63,9 +60,7 @@ void ja_server_config_free_all(GList * scfgs);
 
 typedef struct {
     JSocket *listen_sock;
-
     GList *workers;             /* the list of worker thread */
-
     JaServerConfig *cfg;
 } JaServer;
 

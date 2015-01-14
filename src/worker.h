@@ -39,7 +39,7 @@ typedef struct _JaWorker JaWorker;
  * Creates an JaWorker, and run it
  * JaWorker is thread safe
  */
-JaWorker *ja_worker_create(JaServerConfig * cfg);
+JaWorker *ja_worker_create(JaServerConfig * cfg, gint id);
 
 void ja_worker_free(JaWorker * jw);
 
@@ -54,9 +54,8 @@ void ja_worker_add(JaWorker * jw, JSocket * jsock);
  */
 gboolean ja_worker_is_running(JaWorker * jw);
 
-/*
- * Check if worker is full load
- */
-gboolean ja_worker_is_full(JaWorker * jw);
+
+guint32 ja_worker_payload(JaWorker * jw);
+
 
 #endif
