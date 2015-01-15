@@ -25,10 +25,28 @@
  */
 
 #include <glib.h>
+#include "config.h"
 
 
 typedef struct {
+    JaConfig *cfg;
+    GList *scfg;
+    GList *children;
 } JaCore;
+
+
+/*
+ * Starts the core process of jacques
+ * If fail, will call g_error() to terminate the process
+ */
+JaCore *ja_core_create();
+
+
+void ja_core_wait(JaCore * core);
+
+
+void ja_core_quit(JaCore * core);
+
 
 
 #endif                          /* __JA_CORE_H__ */

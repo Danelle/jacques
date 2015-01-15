@@ -115,6 +115,24 @@ void ja_server_config_free_all(GList * scfgs)
                 }\
             }while(0)
 
+#define ja_server_config_parse_string(cfg,kf,group,DIRECTIVE,field,core)    \
+            do{ \
+                GError *err=NULL;   \
+                JaDirective *jd=NULL;   \
+                gchar* field = g_key_file_get_string (kf,group,DIRECTIVE,&err);  \
+                if(err||field==NULL){  \
+                    g_error_free (err);\
+                    jd=ja_directive_group_lookup(core,DIRECTIVE);   \
+                    if(jd){\
+                        field = g_strdup(ja_directive_get_string (jd));  \
+                    }\
+                }\
+                if(field){\
+                    cfg->field=field;\
+                }\
+            }while(0)
+
+
 static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
                                                      const gchar * group,
                                                      JaDirectiveGroup *
