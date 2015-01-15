@@ -36,28 +36,34 @@ int main(int argc, const char *argv[])
         ja_config_free(jcfg);
         return -1;
     }
-    ja_config_free(jcfg);
 
-    GList *scfgs = ja_server_config_load();
+
+    GList *scfgs = ja_server_config_load(jdg_core);
     GList *ptr = scfgs;
     GList *children = NULL;
     while (ptr) {
-        JaServerConfig *server = (JaServerConfig *) ptr->data;
-        g_message("%u,%s", server->listen_port, server->name);
-        gint pid = ja_server_create(server);
+        JaServerConfig *cfg = (JaServerConfig *) ptr->data;
+        g_message("%u,%s", cfg->listen_port, cfg->name);
+        gint pid = ja_server_create(cfg);
         if (pid < 0) {
-            g_warning("fail to create server %s", server->name);
+            g_warning("fail to create server %s", cfg->name);
         } else {
             children = g_list_append(children, (void *) (glong) pid);
         }
         ptr = g_list_next(ptr);
     }
     ja_server_config_free_all(scfgs);
+    ja_config_free(jcfg);
 
     int status;
-    wait(&status);
+    while (g_list_length(children) > 0) {
+        gint pid = wait(&status);
+        if (pid > 0) {
+            children = g_list_remove(children, (void *) (glong) pid);
+            g_warning("server %d: status %d", pid, status);
+        }
+    }
 
-    g_warning("status %d", status);
 
     return (0);
 }

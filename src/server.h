@@ -48,7 +48,7 @@ typedef struct {
  * Parses every file in CONFIG_APP_LOCATION
  * Creates a list of JaServerConfig
  */
-GList *ja_server_config_load();
+GList *ja_server_config_load(JaDirectiveGroup * core);
 
 
 /*

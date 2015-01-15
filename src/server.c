@@ -41,14 +41,16 @@ static inline void ja_server_main(JaServer * server);
  * Constructs a JaServerConfig
  */
 static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
-                                                     const gchar * group);
+                                                     const gchar * group,
+                                                     JaDirectiveGroup *
+                                                     core);
 
 
 /*
  * Parses every file in CONFIG_APP_LOCATION
  * Creates a list of JaServerConfig
  */
-GList *ja_server_config_load()
+GList *ja_server_config_load(JaDirectiveGroup * core)
 {
     GError *err = NULL;
     GDir *dir = g_dir_open(CONFIG_APP_LOCATION, 0, &err);
@@ -73,7 +75,8 @@ GList *ja_server_config_load()
         gchar **groups = g_key_file_get_groups(kf, NULL);
         guint i = 0;
         while (groups[i]) {
-            JaServerConfig *scfg = ja_server_config_parse(kf, groups[i]);
+            JaServerConfig *scfg =
+                ja_server_config_parse(kf, groups[i], core);
             if (scfg) {
                 ret = g_list_append(ret, scfg);
             }
@@ -95,8 +98,27 @@ void ja_server_config_free_all(GList * scfgs)
     g_list_free_full(scfgs, (GDestroyNotify) ja_server_config_free);
 }
 
+#define ja_server_config_parse_integer(cfg,kf,group,DIRECTIVE,field,core)    \
+            do{ \
+                GError *err=NULL;   \
+                JaDirective *jd=NULL;   \
+                gint field = g_key_file_get_integer (kf,group,DIRECTIVE,&err);  \
+                if(err||field==0){  \
+                    g_error_free (err);\
+                    jd=ja_directive_group_lookup(core,DIRECTIVE);   \
+                    if(jd){\
+                        field = ja_directive_get_integer (jd);  \
+                    }\
+                }\
+                if(field>0){\
+                    cfg->field=field;\
+                }\
+            }while(0)
+
 static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
-                                                     const gchar * group)
+                                                     const gchar * group,
+                                                     JaDirectiveGroup *
+                                                     core)
 {
     const gchar *name = group;
     gint port =
@@ -107,17 +129,11 @@ static inline JaServerConfig *ja_server_config_parse(GKeyFile * kf,
     }
     JaServerConfig *cfg = ja_server_config_default(name, port);
 
-    gint max_pending =
-        g_key_file_get_integer(kf, group, DIRECTIVE_MAX_PENDING, NULL);
-    if (max_pending > 0) {
-        cfg->max_pending = max_pending;
-    }
-    gint thread_count =
-        g_key_file_get_integer(kf, group, DIRECTIVE_THREAD_COUNT,
-                               NULL);
-    if (thread_count > 0) {
-        cfg->thread_count = thread_count;
-    }
+    ja_server_config_parse_integer(cfg, kf, group, DIRECTIVE_MAX_PENDING,
+                                   max_pending, core);
+    ja_server_config_parse_integer(cfg, kf, group, DIRECTIVE_THREAD_COUNT,
+                                   thread_count, core);
+
     return cfg;
 }
 
@@ -232,6 +248,10 @@ static inline void ja_server_initialize_workers(JaServer * server)
 #include <string.h>
 static inline void ja_server_main(JaServer * server)
 {
+    g_message
+        ("server %s starts! \n\t\tmax_pending=%d\n\t\tthread_count=%d",
+         server->cfg->name, server->cfg->max_pending,
+         server->cfg->thread_count);
     ja_server_initialize_workers(server);
     JSocket *conn = NULL;
     while ((conn = j_socket_accept(server->listen_sock))) {

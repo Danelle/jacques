@@ -17,6 +17,7 @@
  */
 
 #include "config.h"
+#include <stdlib.h>
 
 /**********************************/
 static inline JaConfig *ja_config_new();
@@ -124,6 +125,16 @@ static inline void ja_directive_free(JaDirective * jd)
     g_free(jd->name);
     g_free(jd->args);
     g_slice_free1(sizeof(JaDirective), jd);
+}
+
+gint ja_directive_get_integer(JaDirective * jd)
+{
+    return atoi(jd->args);
+}
+
+const gchar *ja_directive_get_string(JaDirective * jd)
+{
+    return jd->args;
 }
 
 static inline void ja_directive_set_args(JaDirective * jd,

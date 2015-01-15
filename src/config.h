@@ -64,6 +64,9 @@ typedef struct {
     gchar *args;                /* directive arguments */
 } JaDirective;
 
+gint ja_directive_get_integer(JaDirective * jd);
+const gchar *ja_directive_get_string(JaDirective * jd);
+
 
 typedef struct {
     gchar *name;                /* directive group name */
