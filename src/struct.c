@@ -17,14 +17,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "struct.h"
+#include <string.h>
 
 
-JaRequest *ja_request_new(const void *data, guint len, const gchar * addr)
+JaRequest *ja_request_new(const void *data, guint len,
+                          struct sockaddr *addr, socklen_t addrlen)
 {
     JaRequest *req = (JaRequest *) g_slice_alloc(sizeof(JaRequest));
-    req->addr = g_strdup(addr);
     req->request = g_byte_array_new();
     g_byte_array_append(req->request, data, len);
+
     req->response = g_byte_array_new();
+
+    if (addr) {
+        memcpy(&req->addr, addr, addrlen);
+        req->addrlen = addrlen;
+    } else {
+        req->addrlen = 0;
+        memset(&req->addr, 0, sizeof(struct sockaddr_storage));
+    }
     return req;
+}
+
+void ja_request_free(JaRequest * req)
+{
+    g_byte_array_free(req->request, TRUE);
+    g_byte_array_free(req->response, TRUE);
+    g_slice_free1(sizeof(JaRequest), req);
 }

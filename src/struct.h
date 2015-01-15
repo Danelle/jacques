@@ -19,38 +19,47 @@
 #ifndef __J_STRUCT_H__
 #define __J_STRUCT_H__
 
+
+#include <sys/uio.h>
+#include <netinet/in.h>
 #include <glib.h>
+
+
+typedef enum {
+    J_IGNORE = 0x0,             /* ignore the request */
+    J_RESPONSE = 0x1,           /* response client */
+
+    J_DROP = 0x2,               /* drop the connection */
+    J_KEEP = 0x4                /* keep the connection */
+} JaResponseAction;
 
 
 /* a client request */
 typedef struct {
-    gchar *addr;                /* client IP address */
-
     GByteArray *request;
     GByteArray *response;
+
+    struct sockaddr_storage addr;
+    socklen_t addrlen;
 } JaRequest;
 
-JaRequest *ja_request_new(const void *data, guint len, const gchar * addr);
+JaRequest *ja_request_new(const void *data, guint len,
+                          struct sockaddr *addr, socklen_t addrlen);
 
-#define j_request_data(req) (req)->request->data
-#define j_request_data_length(req)  (req)->request->len
+void ja_request_free(JaRequest * req);
 
-#define j_response_data(req)    (req)->response->data
-#define j_response_data_length(req) (req)->response->len
+#define ja_request_data(req) (req)->request->data
+#define ja_request_data_length(req)  (req)->request->len
 
-#define j_response_append(req,data,len)  g_byte_array_append( (req)->response, (data), (len) )
-#define j_response_set(req,data,len)    do{g_byte_array_set_size ((req)->response, 0);j_response_append(req,(data),(len));}while(0)
+#define ja_response_data(req)    (req)->response->data
+#define ja_response_data_length(req) (req)->response->len
 
-typedef enum {
-    J_RESPONSE = 0x1,           /* response client */
-    J_IGNORE = 0x2,             /* ignore the request */
-
-    J_DROP = 0x4,               /* drop the connection */
-    J_KEEP = 0x8                /* keep the connection */
-} JaResult;
+#define ja_response_append(req,data,len)  g_byte_array_append( (req)->response, (data), (len) )
+#define ja_response_set(req,data,len)    do{g_byte_array_set_size ((req)->response, 0);ja_response_append(req,(data),(len));}while(0)
 
 
-typedef JaResult(*JaRequestHandler) (JaRequest * req);
+
+typedef JaResponseAction(*JaRequestHandler) (JaRequest * req);
 
 typedef struct {
     JaRequestHandler req_handler;

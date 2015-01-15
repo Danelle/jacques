@@ -20,6 +20,7 @@
 
 #include "worker.h"
 #include "jio/jio.h"
+#include "mod.h"
 #include <pthread.h>
 
 
@@ -110,6 +111,40 @@ static inline gint ja_worker_send(JaWorker * jw, JSocket * jsock,
     return n;
 }
 
+static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
+{
+    const void *data = j_socket_data(jsock);
+    guint length = j_socket_data_length(jsock);
+    JaRequest *req = ja_request_new(data, length, NULL, 0);
+
+    GList *modules = ja_get_modules();
+
+    JaResponseAction act = J_IGNORE;
+
+    while (modules) {
+        JaModule *mod = (JaModule *) modules->data;
+        if (mod != NULL && mod->hooks.req_handler != NULL) {
+            JaRequestHandler handler = mod->hooks.req_handler;
+            act = handler(req);
+            if (act & J_DROP) {
+                ja_worker_remove(jw, jsock);
+                return;
+            }
+        }
+        modules = g_list_next(modules);
+    }
+
+    if (act & J_RESPONSE) {
+        data = ja_response_data(req);
+        length = ja_response_data_length(req);
+        if (ja_worker_send(jw, jsock, data, length) == 0) { /* just echo */
+            ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
+        }
+    }
+
+    ja_request_free(req);
+}
+
 
 /*
  * thread routine!!!
@@ -136,11 +171,7 @@ static void *ja_worker_main(void *arg)
                 if (n < 0) {    /* read error, EOF? whatever */
                     ja_worker_remove(self, jsock);
                 } else if (n > 0) {
-                    const void *data = j_socket_data(jsock);
-                    guint length = j_socket_data_length(jsock);
-                    if (ja_worker_send(self, jsock, data, length) == 0) {   /* just echo */
-                        ja_worker_modify(self, jsock, J_POLL_EVENT_OUT);
-                    }
+                    ja_worker_handle_request(self, jsock);
                 }
             } else if (type & J_POLL_EVENT_OUT) {   /* ready for writing */
                 ja_worker_send(self, jsock, NULL, 0);

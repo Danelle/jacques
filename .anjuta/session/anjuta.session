@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x1017+0+29
 
 [File Loader]
-Files=../../src/config.h#42%%%../../src/mod.c#34%%%../../src/mod.h#24%%%../../src/core.c#1%%%../../src/main.c#28%%%../../src/mod-pub.h#33%%%../../src/struct.h#33%%%../../src/struct.c#20
+Files=../../src/config.h#42%%%../../src/mod.c#34%%%../../src/mod.h#24%%%../../src/core.c#1%%%../../src/main.c#25%%%../../src/mod-pub.h#33%%%../../src/struct.h#48%%%../../src/struct.c#45%%%../../src/server.c#269%%%../../src/worker.c#138%%%../../src/jio/jsocket.c#220%%%../../src/jio/jsocket.h#23%%%../../src/client.c#53
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -14,10 +14,7 @@ Working directories=../../.
 
 [Project Manager]
 Shortcut=jacques//src
-Expand=jacques%%%jacques//src%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
-
-[Debugger]
-Stop at beginning=2
+Expand=jacques%%%jacques//src%%%jacques//src//jio%%%jacques//src//jio//libjio.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
@@ -26,3 +23,6 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2

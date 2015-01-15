@@ -217,7 +217,7 @@ int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
     guint32 size = j_socket_wdata_length(jsock);
     if (size == 0) {
         /* new data to write */
-        if (buf == NULL) {
+        if (buf == NULL || count == 0) {
             return 1;           /* no data? must be a mistake */
         }
         gchar *len = pack_length4(count);
@@ -305,4 +305,12 @@ int j_socket_read(JSocket * jsock)
     }
     j_socket_set_total_length(jsock, 0);    /* a whole package read successfully */
     return 1;
+}
+
+
+/*
+ * Gets the socket address
+ */
+const gchar *j_socket_address(JSocket * jsock)
+{
 }

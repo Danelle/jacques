@@ -18,6 +18,7 @@
  */
 #include "server.h"
 #include "worker.h"
+#include "mod.h"
 #include <unistd.h>
 
 

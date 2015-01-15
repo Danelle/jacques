@@ -114,5 +114,10 @@ int j_socket_write(JSocket * jsock, const void *buf, guint32 count);
  */
 int j_socket_read(JSocket * jsock);
 
+/*
+ * Gets the socket address
+ */
+const gchar *j_socket_address(JSocket * jsock);
+
 
 #endif                          /* __J_SOCKET_H__ */

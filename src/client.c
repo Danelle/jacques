@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-
+#include <errno.h>
 int main(int argc, const char *argv[])
 {
     const gchar *remote = "127.0.0.1";
@@ -49,6 +49,8 @@ int main(int argc, const char *argv[])
 
     while (j_socket_read(jsock) == 0) {
     }
+
+    /*g_message ("errno: %d",errno); */
 
     const gchar *data = (const gchar *) j_socket_data(jsock);
     g_message("%s", data);
