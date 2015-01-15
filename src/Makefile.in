@@ -101,7 +101,8 @@ am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
-	server.$(OBJEXT) worker.$(OBJEXT)
+	server.$(OBJEXT) worker.$(OBJEXT) mod.$(OBJEXT) \
+	struct.$(OBJEXT)
 jacques_OBJECTS = $(am_jacques_OBJECTS)
 jacques_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
 jacques_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -349,10 +350,15 @@ jacques_SOURCES = \
 	server.c \
 	server.h \
 	worker.c \
-	worker.h 
+	worker.h \
+	mod.c \
+	mod.h \
+	mod-pub.h \
+	struct.h \
+	struct.c
 
 jacques_LDFLAGS = 
-SUBLIBS = jio/libjio.a 
+SUBLIBS = jio/libjio.a  
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 client_SOURCES = \
 	client.c
@@ -463,7 +469,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/struct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/worker.Po@am__quote@
 
 .c.o:

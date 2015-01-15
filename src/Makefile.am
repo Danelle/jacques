@@ -25,11 +25,16 @@ jacques_SOURCES = \
 	server.c \
 	server.h \
 	worker.c \
-	worker.h 
+	worker.h \
+	mod.c \
+	mod.h \
+	mod-pub.h \
+	struct.h \
+	struct.c
 
 jacques_LDFLAGS = 
 
-SUBLIBS = jio/libjio.a 
+SUBLIBS = jio/libjio.a  
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 

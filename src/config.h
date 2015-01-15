@@ -38,6 +38,10 @@
 #define CONFIG_APP_LOCATION CONFIG_LOCATION "/app-enabled"
 
 
+/* the directory stores active modules */
+#define CONFIG_MOD_ENABLED_LOCATION CONFIG_LOCATION "/mod-enabled"
+
+
 /* the default log location */
 #ifndef DEFAULT_LOG_LOCATION
 #define DEFAULT_LOG_LOCATION "/var/log/jacques"

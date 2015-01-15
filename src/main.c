@@ -18,9 +18,16 @@
  */
 
 #include "core.h"
+#include "mod.h"
 
 int main(int argc, const char *argv[])
 {
+    ja_load_all_modules();
+
+    g_message("module count: %d", g_list_length(ja_get_modules()));
+    JaModule *mod = ja_get_modules()->data;
+    g_message("moduel name: %s", mod->name);
+
     JaCore *core = ja_core_create();
 
     ja_core_wait(core);
