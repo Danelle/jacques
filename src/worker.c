@@ -133,6 +133,7 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
         hooks = g_list_next(hooks);
     }
 
+    /* action */
     if (act & JA_ACTION_DROP) {
         ja_worker_remove(jw, jsock);
     } else if (act & JA_ACTION_RESPONSE) {

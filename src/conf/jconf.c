@@ -51,33 +51,38 @@ JDirectiveGroup *j_directive_group_new(const gchar * name)
     JDirectiveGroup *group =
         (JDirectiveGroup *) g_slice_alloc(sizeof(JDirectiveGroup));
     group->name = g_strdup(name);
-    group->directives =
-        g_hash_table_new_full(g_str_hash, g_str_equal,
-                              (GDestroyNotify) g_free,
-                              (GDestroyNotify) j_directive_free);
+    group->directives = NULL;
     return group;
 }
 
 void j_directive_group_insert(JDirectiveGroup * group,
                               const gchar * name, const gchar * value)
 {
-    g_hash_table_insert(group->directives, g_strdup(name),
-                        j_directive_new(name, value));
+    group->directives =
+        g_list_append(group->directives, j_directive_new(name, value));
 }
 
 void j_directive_group_insert_take(JDirectiveGroup * group,
                                    gchar * name, gchar * value)
 {
-    g_hash_table_insert(group->directives, g_strdup(name),
-                        j_directive_new_take(name, value));
+    group->directives =
+        g_list_append(group->directives,
+                      j_directive_new_take(name, value));
 }
 
 JDirective *j_directive_group_lookup(JDirectiveGroup * group,
                                      const gchar * name)
 {
-    JDirective *jd =
-        (JDirective *) g_hash_table_lookup(group->directives, name);
-    return jd;
+    GList *ptr = group->directives;
+    JDirective *ret = NULL;
+    while (ptr) {
+        JDirective *jd = (JDirective *) ptr->data;
+        if (g_strcmp0(name, jd->name) == 0) {
+            ret = jd;
+        }
+        ptr = g_list_next(ptr);
+    }
+    return ret;
 }
 
 gint j_directive_group_get_integer(JDirectiveGroup * group,
@@ -103,7 +108,7 @@ const gchar *j_directive_group_get_string(JDirectiveGroup * group,
 void j_directive_group_free(JDirectiveGroup * group)
 {
     g_free(group->name);
-    g_hash_table_unref(group->directives);
+    g_list_free_full(group->directives, (GDestroyNotify) j_directive_free);
     g_slice_free1(sizeof(JDirectiveGroup), group);
 }
 

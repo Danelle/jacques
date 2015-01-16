@@ -22,8 +22,6 @@
 
 int main(int argc, const char *argv[])
 {
-    ja_load_all_modules();
-
     JaCore *core = ja_core_create();
 
     ja_core_wait(core);

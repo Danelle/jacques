@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x1017+0+29
 
 [File Loader]
-Files=../../src/mod.c#75%%%../../src/mod.h#29%%%../../src/mod-pub.h#29%%%../../src/struct.h#55%%%../../src/hooks.c#33%%%../../src/hooks.h#38%%%../../src/worker.c#131
+Files=../../src/client.c#1%%%../../src/hooks.h#1%%%../../src/mod-pub.h#1%%%../../src/mod.h#1%%%../../src/struct.c#1%%%../../src/core.h#1%%%../../src/hooks.c#1%%%../../src/core.c#22%%%../../src/server.c#140%%%../../src/mod.c#91%%%../../src/main.c#24%%%../../src/conf/jconf.c#67%%%../../src/conf/jconf.h#42
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -13,8 +13,8 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Shortcut=jacques//src
-Expand=jacques%%%jacques//src%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
+Shortcut=src
+Expand=jacques%%%jacques//src%%%jacques//src//conf%%%jacques//src//conf//libjconf.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
