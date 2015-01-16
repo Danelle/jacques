@@ -18,14 +18,10 @@ a server program which focuses on mobile applications.
     
 有个主配置文件/etc/jacques/jacques.conf，内容如下
 
-	[core]
-
 	ThreadCount = 6		# 0 for default
 
 还需要在/etc/jacques/app-enabled目录下放置服务配置文件（文件名任意），（如apache的虚拟主机）
     一个服务配置文件如下,你可以放置多个
-    
-	[gandalf]
 	
 	ListenPort = 23432
 	NaxPending = 512
@@ -38,6 +34,10 @@ a server program which focuses on mobile applications.
 运行jacques后会在终端输入监听的端口号，于是就可以使用./client [端口号] 来测试服务器了，目前只是完全的回射服务。
 
 也可以运行./batch.sh来批量测试。
+
+
+##Module
+...
 
 
 ##Contact
