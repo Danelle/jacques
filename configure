@@ -11687,7 +11687,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/jio/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/io/Makefile src/conf/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -12696,7 +12696,8 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "src/jio/Makefile") CONFIG_FILES="$CONFIG_FILES src/jio/Makefile" ;;
+    "src/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/Makefile" ;;
+    "src/conf/Makefile") CONFIG_FILES="$CONFIG_FILES src/conf/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

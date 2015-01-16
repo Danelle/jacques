@@ -20,7 +20,7 @@
 #define __JA_SERVER_H__
 
 #include <glib.h>
-#include "jio/jio.h"
+#include "io/jio.h"
 #include "config.h"
 
 

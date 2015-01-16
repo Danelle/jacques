@@ -19,7 +19,7 @@
 
 
 #include "worker.h"
-#include "jio/jio.h"
+#include "io/jio.h"
 #include "mod.h"
 #include <pthread.h>
 

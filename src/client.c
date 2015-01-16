@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "jio/jio.h"
+#include "io/jio.h"
 #include <glib.h>
 #include <unistd.h>
 #include <stdlib.h>

@@ -27,5 +27,6 @@ AC_CHECK_FUNC(epoll_create,
 AC_OUTPUT([
 		   Makefile
 		   src/Makefile
-		   src/jio/Makefile
+		   src/io/Makefile
+src/conf/Makefile
 		   ])

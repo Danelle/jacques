@@ -34,7 +34,7 @@ jacques_SOURCES = \
 
 jacques_LDFLAGS = 
 
-SUBLIBS = jio/libjio.a  
+SUBLIBS = io/libjio.a  
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
@@ -46,4 +46,5 @@ client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 
 SUBDIRS = \
-	jio
+	io \
+	conf
