@@ -1,7 +1,7 @@
 #include "mod-pub.h"
 
 
-static JaResponseAction request_handler(JaRequest * req)
+static JaAction request_handler(JaRequest * req)
 {
     const void *data = ja_request_data(req);
     int len = ja_request_data_length(req);
@@ -10,18 +10,17 @@ static JaResponseAction request_handler(JaRequest * req)
         ja_response_append(req, "l", 1);
     }
     ja_response_append(req, "\0", 1);
-    return J_RESPONSE;
+    return JA_ACTION_RESPONSE;
 }
 
 
-static JaModule module = {
-    "hello world",
-    {
-     request_handler}
-};
-
-void JA_MODULE_INIT()
+void init()
 {
     g_message("hello world");
-    ja_module_register(&module);
+    ja_hook_register((void *) request_handler, JA_HOOK_TYPE_REQUEST);
 }
+
+JaModule hellomod_struct = {
+    "helloall",
+    init
+};

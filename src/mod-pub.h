@@ -19,18 +19,14 @@
 #ifndef __J_MOD_PUB_H__
 #define __J_MOD_PUB_H__
 
-#include "struct.h"
+#include "hooks.h"
 #include <gmodule.h>
 
 
 #define JA_MODULE_EXPORT G_MODULE_EXPORT
 
 
-#define JA_MODULE_INIT   jacques_module_init
-#define JA_MODULE_INIT_NAME  "jacques_module_init"
-
-
-void ja_module_register(JaModule * mod);
+void ja_hook_register(void *ptr, JaHookType type);
 
 
 #endif

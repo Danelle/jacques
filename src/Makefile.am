@@ -30,7 +30,9 @@ jacques_SOURCES = \
 	mod.h \
 	mod-pub.h \
 	struct.h \
-	struct.c
+	struct.c \
+	hooks.c \
+	hooks.h
 
 jacques_LDFLAGS = 
 

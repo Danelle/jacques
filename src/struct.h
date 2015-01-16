@@ -25,15 +25,6 @@
 #include <glib.h>
 
 
-typedef enum {
-    J_IGNORE = 0x0,             /* ignore the request */
-    J_RESPONSE = 0x1,           /* response client */
-
-    J_DROP = 0x2,               /* drop the connection */
-    J_KEEP = 0x4                /* keep the connection */
-} JaResponseAction;
-
-
 /* a client request */
 typedef struct {
     GByteArray *request;
@@ -59,18 +50,11 @@ void ja_request_free(JaRequest * req);
 
 
 
-typedef JaResponseAction(*JaRequestHandler) (JaRequest * req);
+typedef void (*JaModuleInit) ();
 
-typedef struct {
-    JaRequestHandler req_handler;
-} JHook;
-
-
-
-/* the structures of a module */
 typedef struct {
     gchar *name;
-    JHook hooks;
+    JaModuleInit init_func;
 } JaModule;
 
 

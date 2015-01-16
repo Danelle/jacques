@@ -23,6 +23,10 @@
 
 static GList *loaded_modules = NULL;
 
+static GList *all_hooks = NULL;
+
+static gchar *get_module_name(const gchar * name);
+
 
 typedef void (*ModuleInitFunc) ();
 
@@ -31,29 +35,52 @@ GList *ja_get_modules()
     return loaded_modules;
 }
 
+GList *ja_get_hooks()
+{
+    return all_hooks;
+}
+
 void ja_module_register(JaModule * mod)
 {
     loaded_modules = g_list_append(loaded_modules, mod);
+    mod->init_func();
 }
+
+void ja_hook_register(void *ptr, JaHookType type)
+{
+    all_hooks = g_list_append(all_hooks, ja_hook_new(ptr, type));
+}
+
+
 
 int ja_load_module(const gchar * name)
 {
+    gchar *mname = get_module_name(name);
+    if (mname == NULL) {
+        g_warning("invalid module name %s", name);
+        return 0;
+    }
     gchar path[1024];
     g_snprintf(path, sizeof(path), "%s/%s", CONFIG_MOD_ENABLED_LOCATION,
                name);
     GModule *mod =
         g_module_open(path, G_MODULE_BIND_LOCAL | G_MODULE_BIND_LAZY);
     if (mod == NULL) {
-        g_warning("%s", path);
+        g_free(mname);
         return 0;
     }
     g_module_make_resident(mod);
+
+    gchar sym_name[1024];
+    g_snprintf(sym_name, sizeof(sym_name), "%s_struct", mname);
+
     gpointer symbol;
-    gint ret = g_module_symbol(mod, JA_MODULE_INIT_NAME, &symbol);
+    gint ret = g_module_symbol(mod, sym_name, &symbol);
     if (ret) {
-        ((ModuleInitFunc) symbol) ();
+        ja_module_register((JaModule *) symbol);
     }
     g_module_close(mod);
+    g_free(mname);
 
     return ret;
 }
@@ -77,4 +104,28 @@ void ja_load_all_modules()
         }
     }
     g_dir_close(dir);
+}
+
+static gchar *get_module_name(const gchar * name)
+{
+    gint dot = -1, sp = -1;
+    gint i = 0;
+    while (name[i] != '\0') {
+        if (name[i] == '/') {
+            sp = i;
+        } else if (name[i] == '.') {
+            dot = i;
+        }
+        i++;
+    }
+    if (dot == -1 && sp == -1) {
+        return g_strdup(name);
+    } else if (dot > -1 && sp == -1) {
+        return g_strndup(name, dot);
+    } else if (dot > -1 && sp > -1 && dot > sp) {
+        return g_strndup(name + sp + 1, dot - sp - 1);
+    } else if (dot == -1 && sp > 0) {
+        return g_strdup(name + sp + 1);
+    }
+    return NULL;
 }

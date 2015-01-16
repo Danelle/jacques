@@ -1,5 +1,5 @@
 /*
- * mod.h
+ * hooks.c
  *
  * Copyright (C) 2015 - Wiky L <wiiiky@yeah.net>
  *
@@ -16,31 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef __JA_MOD_H__
-#define __JA_MOD_H__
+#include "hooks.h"
 
 
-#include "mod-pub.h"
 
+JaHook *ja_hook_new(void *ptr, JaHookType type)
+{
+    JaHook *hook = (JaHook *) g_slice_alloc(sizeof(JaHook));
+    hook->ptr = ptr;
+    hook->type = type;
+    return hook;
+}
 
-GList *ja_get_modules();
-
-GList *ja_get_hooks();
-
-void ja_module_register(JaModule * mod);
-
-
-/*
- * Loads a module
- * Returns 1 on success,otherwise 0
- */
-int ja_load_module(const gchar * filename);
-
-
-/*
- * Loads all modules under CONFIG_MOD_ENABLED_LOCATION
- */
-void ja_load_all_modules();
-
-#endif
+void ja_hook_free(JaHook * hook)
+{
+    g_slice_free1(sizeof(JaHook), hook);
+}

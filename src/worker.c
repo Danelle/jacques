@@ -117,26 +117,33 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
     guint length = j_socket_data_length(jsock);
     JaRequest *req = ja_request_new(data, length, NULL, 0);
 
-    GList *modules = ja_get_modules();
 
-    JaResponseAction act = J_IGNORE;
+    JaAction act = JA_ACTION_ECHO;
 
-    while (modules) {
-        JaModule *mod = (JaModule *) modules->data;
-        if (mod != NULL && mod->hooks.req_handler != NULL) {
-            JaRequestHandler handler = mod->hooks.req_handler;
-            act = handler(req);
-            if (act & J_DROP) {
-                ja_worker_remove(jw, jsock);
-                return;
+    GList *hooks = ja_get_hooks();
+
+    while (hooks) {
+        JaHook *hook = (JaHook *) hooks->data;
+        if (hook->type == JA_HOOK_TYPE_REQUEST) {
+            act = ((JaRequestHandler) hook->ptr) (req);
+            if (act & JA_ACTION_DROP || act & JA_ACTION_IGNORE) {
+                break;
             }
         }
-        modules = g_list_next(modules);
+        hooks = g_list_next(hooks);
     }
 
-    if (act & J_RESPONSE) {
+    if (act & JA_ACTION_DROP) {
+        ja_worker_remove(jw, jsock);
+    } else if (act & JA_ACTION_RESPONSE) {
         data = ja_response_data(req);
         length = ja_response_data_length(req);
+        if (ja_worker_send(jw, jsock, data, length) == 0) { /* response */
+            ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
+        }
+    } else if (act & JA_ACTION_ECHO) {
+        data = ja_request_data(req);
+        length = ja_request_data_length(req);
         if (ja_worker_send(jw, jsock, data, length) == 0) { /* just echo */
             ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
         }
