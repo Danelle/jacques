@@ -28,21 +28,9 @@
  */
 JaCore *ja_core_create()
 {
-    JaConfig *jcfg = ja_config_load();
-    if (jcfg == NULL) {
-        g_error("fail to parse configuration file\n");
-        return NULL;
-    }
+    JConfig *cfg = ja_config_load();
 
-    JaDirectiveGroup *jdg_core = ja_config_lookup(jcfg, "core");
-    if (jdg_core == NULL) {
-        g_error("you must set [core] in %s\n", CONFIG_FILEPATH);
-        ja_config_free(jcfg);
-        return NULL;
-    }
-
-
-    GList *scfgs = ja_server_config_load(jdg_core);
+    GList *scfgs = ja_server_config_load(j_config_lookup(cfg, NULL));
     GList *ptr = scfgs;
     GList *children = NULL;
     while (ptr) {
@@ -58,8 +46,7 @@ JaCore *ja_core_create()
     }
 
     JaCore *core = (JaCore *) g_slice_alloc(sizeof(JaCore));
-    core->cfg = jcfg;
-    core->scfg = scfgs;
+    core->cfg = cfg;
     core->children = children;
     return core;
 }
@@ -80,7 +67,6 @@ void ja_core_wait(JaCore * core)
 
 void ja_core_quit(JaCore * core)
 {
-    ja_server_config_free_all(core->scfg);
-    ja_config_free(core->cfg);
+    j_config_free(core->cfg);
     g_slice_free1(sizeof(JaCore), core);
 }

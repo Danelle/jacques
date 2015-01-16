@@ -34,7 +34,9 @@ jacques_SOURCES = \
 
 jacques_LDFLAGS = 
 
-SUBLIBS = io/libjio.a  
+SUBLIBS = \
+	conf/libjconf.a \
+	io/libjio.a
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 

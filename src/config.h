@@ -19,6 +19,7 @@
 #define __JA_CONFIG_H__
 
 #include <glib.h>
+#include "conf/jconf.h"
 
 /* absulote configuration directory */
 #ifndef CONFIG_LOCATION
@@ -62,60 +63,13 @@
 #endif
 
 
-
-typedef struct {
-    gchar *name;                /* directive name */
-    gchar *args;                /* directive arguments */
-} JaDirective;
-
-gint ja_directive_get_integer(JaDirective * jd);
-const gchar *ja_directive_get_string(JaDirective * jd);
-
-
-typedef struct {
-    gchar *name;                /* directive group name */
-    GHashTable *directives;
-} JaDirectiveGroup;
-
-/* all directive structure */
-typedef struct {
-    GHashTable *groups;
-    /* reserverd */
-} JaConfig;
-
-
 /*
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-JaConfig *ja_config_load();
-
-/*
- * Frees all the memory used by JaConfig
- */
-void ja_config_free(JaConfig * jcfg);
-
-
-/*
- * Looks up a JaDirectiveGroup with name
- */
-JaDirectiveGroup *ja_config_lookup(JaConfig * jcfg, const gchar * name);
-
-/*
- * Looks up a JaDirective with name
- */
-JaDirective *ja_directive_group_lookup(JaDirectiveGroup * jdg,
-                                       const gchar * name);
+JConfig *ja_config_load();
 
 
 
-typedef gint(*JaHFunc) (JaDirective * jd, void *user_data);
-/*
- * Calls the given function in every JaDirective in JaDirectiveGroup
- * Func returns 0 to stop iteration, and ja_directive_group_foreach() returns 0
- * Otherwise, ja_directive_group_foreach() returns 1
- */
-gint ja_directive_group_foreach(JaDirectiveGroup * jdg, JaHFunc func,
-                                void *user_data);
 
 #endif

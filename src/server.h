@@ -34,6 +34,8 @@ typedef struct {
     gushort listen_port;
     guint32 max_pending;        /*  maximum length to which the  queue  of pending  connections */
     guint32 thread_count;       /* count of workers */
+
+    JConfig *cfg;
 } JaServerConfig;
 
 #define DIRECTIVE_LISTEN_PORT "ListenPort"
@@ -48,7 +50,7 @@ typedef struct {
  * Parses every file in CONFIG_APP_LOCATION
  * Creates a list of JaServerConfig
  */
-GList *ja_server_config_load(JaDirectiveGroup * core);
+GList *ja_server_config_load(JDirectiveGroup * global);
 
 
 /*

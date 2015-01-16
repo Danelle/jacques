@@ -5,5 +5,5 @@
 for i in {1..10}
 do
 	./batch.sh &
-	sleep 0.4
+	sleep 0.6
 done

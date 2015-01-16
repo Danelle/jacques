@@ -358,7 +358,10 @@ jacques_SOURCES = \
 	struct.c
 
 jacques_LDFLAGS = 
-SUBLIBS = io/libjio.a  
+SUBLIBS = \
+	conf/libjconf.a \
+	io/libjio.a
+
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 client_SOURCES = \
 	client.c
