@@ -32,7 +32,9 @@ jacques_SOURCES = \
 	struct.h \
 	struct.c \
 	hooks.c \
-	hooks.h
+	hooks.h \
+	utils.c \
+	utils.h
 
 jacques_LDFLAGS = 
 

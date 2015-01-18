@@ -102,7 +102,7 @@ am__v_lt_0 = --silent
 am__v_lt_1 = 
 am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
 	server.$(OBJEXT) worker.$(OBJEXT) mod.$(OBJEXT) \
-	struct.$(OBJEXT) hooks.$(OBJEXT)
+	struct.$(OBJEXT) hooks.$(OBJEXT) utils.$(OBJEXT)
 jacques_OBJECTS = $(am_jacques_OBJECTS)
 jacques_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
 jacques_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -357,7 +357,9 @@ jacques_SOURCES = \
 	struct.h \
 	struct.c \
 	hooks.c \
-	hooks.h
+	hooks.h \
+	utils.c \
+	utils.h
 
 jacques_LDFLAGS = 
 SUBLIBS = \
@@ -479,6 +481,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/struct.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/worker.Po@am__quote@
 
 .c.o:
