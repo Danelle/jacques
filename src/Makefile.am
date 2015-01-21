@@ -19,7 +19,6 @@ bin_PROGRAMS = jacques \
 jacques_SOURCES = \
 	main.c \
 	config.h \
-	config.c \
 	core.c \
 	core.h \
 	server.c \

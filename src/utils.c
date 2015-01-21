@@ -17,15 +17,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "utils.h"
+#include "config.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 
+
+
+#define PID_FILE    RUNTIME_LOCATION "/jacqueas.pid"
+#define LOCKMODE    (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
+
+
+/* lock a file */
+int lockfile(int fd);
 
 /*
  * Daemonizes current process
@@ -76,4 +88,42 @@ int daemonize(void)
     }
 
     return 1;
+}
+
+/*
+ * Check if the process is already running
+ * Returns 1 if no
+ * Returns 0 if yes
+ * Returns -1 on error
+ */
+int already_running(void)
+{
+    int fd = open(PID_FILE, O_RDWR | O_CREAT, LOCKMODE);
+    if (fd < 0) {
+        return -1;
+    }
+    if (lockfile(fd) < 0) {
+        if (errno == EACCES || errno == EAGAIN) {
+            close(fd);
+            return 0;
+        }
+        return -1;
+    }
+    ftruncate(fd, 0);
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%ld", (long) getpid());
+    write(fd, buf, strlen(buf) + 1);
+    return 1;
+}
+
+
+int lockfile(int fd)
+{
+    struct flock fl;
+
+    fl.l_type = F_WRLCK;
+    fl.l_start = 0;
+    fl.l_whence = SEEK_SET;
+    fl.l_len = 0;
+    return fcntl(fd, F_SETLK, &fl);
 }

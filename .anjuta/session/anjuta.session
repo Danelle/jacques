@@ -1,16 +1,16 @@
 [Anjuta]
 Maximized=1
-Geometry=1366x705+0+29
-
-[File Loader]
-Files=../../src/core.c#38%%%../../src/utils.h#23%%%../../src/hooks.h#1%%%../../src/worker.c#171%%%../../src/utils.c#18%%%../../src/config.c#19%%%../../src/conf/jconf.c#30%%%../../src/server.c#233%%%../../src/core.h#1%%%../../src/main.c#1%%%../../src/mod.c#19%%%../../src/struct.c#1
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+Geometry=1920x1019+0+27
 
 [Execution]
 Run in terminal=2
 Working directories=../../.
+
+[File Loader]
+Files=../../src/core.c#1%%%../../src/main.c#1%%%../../src/mod.h#23
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Project Manager]
 Shortcut=jacques//src//conf//libjconf.a%%%jacques//src//io//libjio.a

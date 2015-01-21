@@ -67,9 +67,10 @@
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-JConfig *ja_config_load();
+#define ja_config_load()    j_conf_parse(CONFIG_FILEPATH)
 
 
+#define RUNTIME_LOCATION    "/var/run/jacques"
 
 
 #endif

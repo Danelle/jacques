@@ -23,7 +23,6 @@
 
 
 static void j_directive_list_free(GList * list);
-static void j_conf_parse_internal(const gchar * filepath, JConfig * cfg);
 
 
 JDirective *j_directive_new(const gchar * name, const gchar * value)
@@ -176,7 +175,7 @@ static void j_conf_parse_file(const gchar * file, JConfig * cfg)
     }
 }
 
-static void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
+void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
 {
     JFile *jf = j_file_open(filepath, "r");
     if (jf == NULL) {

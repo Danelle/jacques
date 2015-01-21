@@ -28,4 +28,13 @@
 int daemonize(void);
 
 
+/*
+ * Check if the process is already running
+ * Returns 1 if yes
+ * Returns 0 if no
+ * Returns -1 on error
+ */
+int already_running(void);
+
+
 #endif

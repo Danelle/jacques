@@ -81,6 +81,7 @@ const gchar *j_config_get_string(JConfig * cfg, const gchar * group,
                                  const gchar * name);
 
 
+void j_conf_parse_internal(const gchar * filepath, JConfig * cfg);
 /*
  * Returns a GHashTable, which has conf group as key, a list of JDirective as value
  */
