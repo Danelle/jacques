@@ -32,7 +32,7 @@
 
 
 
-#define PID_FILE    RUNTIME_LOCATION "/jacqueas.pid"
+#define PID_FILE    RUNTIME_LOCATION "/jacques.pid"
 #define LOCKMODE    (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
 
@@ -105,7 +105,7 @@ int already_running(void)
     if (lockfile(fd) < 0) {
         if (errno == EACCES || errno == EAGAIN) {
             close(fd);
-            return 0;
+            return 1;
         }
         return -1;
     }
@@ -113,7 +113,7 @@ int already_running(void)
     char buf[32];
     snprintf(buf, sizeof(buf), "%ld", (long) getpid());
     write(fd, buf, strlen(buf) + 1);
-    return 1;
+    return 0;
 }
 
 

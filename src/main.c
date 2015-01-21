@@ -19,9 +19,16 @@
 
 #include "core.h"
 #include "mod.h"
+#include "utils.h"
 
 int main(int argc, const char *argv[])
 {
+    int running = already_running();
+    if (running == 1) {
+        g_error("jacqueas is already running!!!");
+    } else if (running < 0) {
+        g_error("fail to open pid file!!!");
+    }
     JaCore *core = ja_core_create();
 
     ja_core_wait(core);
