@@ -19,38 +19,35 @@
 #include "server.h"
 #include "worker.h"
 #include "mod.h"
+#include "config.h"
 #include <unistd.h>
-
-
-static inline JaServerConfig *ja_server_config_default(const gchar * name,
-                                                       gushort port);
-static inline void ja_server_config_free(JaServerConfig * cfg);
 
 
 /*
  * Allocates memory for JaServer
  */
-static inline JaServer *ja_server_alloc(JSocket * jsock,
-                                        JaServerConfig * cfg);
+static inline JaServer *ja_server_alloc(const gchar * name,
+                                        gint port,
+                                        gint max_pending,
+                                        gint thread_count,
+                                        JSocket * jsock, JConfig * cfg);
+
 /*
  * The main loop of server process
  * This function will never return, if error occurs or signal catched, it may _exit() but not return
  */
 static inline void ja_server_main(JaServer * server);
 
-/*
- * Constructs a JaServerConfig
- */
-static inline JaServerConfig *ja_server_config_parse(JConfig * cfg,
-                                                     JDirectiveGroup *
-                                                     global);
+
+static inline void ja_server_create_from_file(const gchar * name,
+                                              JConfig * cfg);
 
 
 /*
- * Parses every file in CONFIG_APP_LOCATION
- * Creates a list of JaServerConfig
+ * Loads configuration of every server, and create server process
+ * Return the list of server process id
  */
-GList *ja_server_config_load(JDirectiveGroup * global)
+GList *ja_server_load(JConfig * cfg)
 {
     GError *err = NULL;
     GDir *dir = g_dir_open(CONFIG_APP_LOCATION, 0, &err);
@@ -60,121 +57,76 @@ GList *ja_server_config_load(JDirectiveGroup * global)
         g_error_free(err);
         return NULL;
     }
-    GList *ret = NULL;
+    GList *pids = NULL;
     const gchar *name = NULL;
-    gchar pathbuf[4096];        /* 4096 must be enough */
     while ((name = g_dir_read_name(dir))) {
-        g_snprintf(pathbuf, sizeof(pathbuf), "%s/%s", CONFIG_APP_LOCATION,
-                   name);
-        JConfig *cfg = j_conf_parse(pathbuf);
-        JaServerConfig *scfg = ja_server_config_parse(cfg, global);
-        if (scfg) {
-            ret = g_list_append(ret, scfg);
+        pid_t pid = fork();
+        if (pid < 0) {
+            g_warning("fail to create server %s", name);
+        } else if (pid == 0) {  /* server */
+            ja_server_create_from_file(name, cfg);
+        } else {                /* parent */
+            pids = g_list_append(pids, (void *) (gulong) pid);
         }
     }
     g_dir_close(dir);
-
-    return ret;
+    return pids;
 }
 
-/*
- * Free all the memory used by JaServerConfig GList 
- */
-void ja_server_config_free_all(GList * scfgs)
+static inline void ja_server_create_from_file(const gchar * name,
+                                              JConfig * cfg)
 {
-    g_list_free_full(scfgs, (GDestroyNotify) ja_server_config_free);
-}
-
-
-static inline JaServerConfig *ja_server_config_parse(JConfig * cfg,
-                                                     JDirectiveGroup *
-                                                     global)
-{
-    gint port = j_config_get_integer(cfg, NULL, DIRECTIVE_LISTEN_PORT);
-    if (port <= 0 || port > 65535) {
-        g_warning("%s not found in %s", DIRECTIVE_LISTEN_PORT, cfg->name);
-        return NULL;
+    gchar buf[4096];
+    g_snprintf(buf, sizeof(buf), "%s/%s", CONFIG_APP_LOCATION, name);
+    j_conf_parse_internal(buf, cfg);
+    gint listen_port =
+        j_config_get_integer(cfg, NULL, DIRECTIVE_LISTEN_PORT);
+    if (listen_port <= 0 || listen_port > 65536) {
+        g_error("%s: Invalid ListenPort", name);
     }
-    JaServerConfig *scfg = ja_server_config_default(cfg->name, port);
-    gint max_pending;
-    if ((max_pending =
-         j_config_get_integer(cfg, NULL, DIRECTIVE_MAX_PENDING)) > 0
-        || (max_pending =
-            j_directive_group_get_integer(global,
-                                          DIRECTIVE_MAX_PENDING)) > 0) {
-        scfg->max_pending = max_pending;
+    gint max_pending =
+        j_config_get_integer(cfg, NULL, DIRECTIVE_MAX_PENDING);
+    gint thread_count =
+        j_config_get_integer(cfg, NULL, DIRECTIVE_THREAD_COUNT);
+    if (max_pending <= 0) {
+        max_pending = DEFAULT_MAX_PENDING;
+    }
+    if (thread_count <= 0) {
+        thread_count = DEFAULT_THREAD_COUNT;
     }
 
-    gint thread_count;
-    if ((thread_count =
-         j_config_get_integer(cfg, NULL, DIRECTIVE_THREAD_COUNT)) > 0
-        || (thread_count =
-            j_directive_group_get_integer(global,
-                                          DIRECTIVE_THREAD_COUNT)) >= 0) {
-        scfg->thread_count = thread_count;
+    JSocket *jsock = j_server_socket_new(listen_port, max_pending);
+    if (jsock == NULL) {
+        g_error("%s: fail to create socket!", name);
     }
 
-    scfg->cfg = cfg;
-    return scfg;
-}
+    JaServer *server =
+        ja_server_alloc(name, listen_port, max_pending, thread_count,
+                        jsock, cfg);
 
+    ja_server_main(server);
 
-static inline JaServerConfig *ja_server_config_default(const gchar * name,
-                                                       gushort port)
-{
-    JaServerConfig *cfg = g_slice_alloc(sizeof(JaServerConfig));
-    cfg->name = g_strdup(name);
-    cfg->listen_port = port;
-    cfg->max_pending = DEFAULT_MAX_PENDING;
-    cfg->thread_count = DEFAULT_THREAD_COUNT;
-    cfg->cfg = NULL;
-    return cfg;
-}
-
-static inline void ja_server_config_free(JaServerConfig * cfg)
-{
-    g_free(cfg->name);
-    j_config_free(cfg->cfg);
-    g_slice_free1(sizeof(JaServerConfig), cfg);
+    _exit(-1);
+    /* no */
 }
 
 
 
-static inline JaServer *ja_server_alloc(JSocket * jsock,
-                                        JaServerConfig * cfg)
+static inline JaServer *ja_server_alloc(const gchar * name,
+                                        gint port,
+                                        gint max_pending,
+                                        gint thread_count,
+                                        JSocket * jsock, JConfig * cfg)
 {
     JaServer *server = (JaServer *) g_slice_alloc(sizeof(JaServer));
+    server->name = g_strdup(name);
+    server->listen_port = port;
+    server->max_pending = max_pending;
+    server->thread_count = thread_count;
     server->listen_sock = jsock;
     server->cfg = cfg;
     server->workers = NULL;
     return server;
-}
-
-
-/*
- * Creates a JaServer, (fork a new process)
- * Returns fork()
- */
-gint ja_server_create(JaServerConfig * cfg)
-{
-    pid_t pid = fork();
-    if (pid < 0) {
-        return (gint) pid;
-    } else if (pid > 0) {       /* parent */
-        return (gint) pid;
-    }
-
-    JSocket *jsock =
-        j_server_socket_new(cfg->listen_port, cfg->max_pending);
-    if (jsock == NULL) {
-        _exit(-1);
-    }
-
-    JaServer *server = ja_server_alloc(jsock, cfg);
-    ja_server_main(server);
-
-    /* never come here */
-    return -1;
 }
 
 /*
@@ -213,7 +165,7 @@ static inline JaWorker *ja_server_find_worker(JaServer * server)
 
 static inline void ja_server_initialize_workers(JaServer * server)
 {
-    gint count = server->cfg->thread_count;
+    gint count = server->thread_count;
     gint i = 0;
     for (i = 0; i < count; i++) {
         JaWorker *worker = ja_worker_create(server->cfg, i);
@@ -230,10 +182,10 @@ static inline void ja_server_initialize_workers(JaServer * server)
 #include <string.h>
 static inline void ja_server_main(JaServer * server)
 {
-    g_message
-        ("server %s starts! \n\t\tmax_pending=%d\n\t\tthread_count=%d",
-         server->cfg->name, server->cfg->max_pending,
-         server->cfg->thread_count);
+    g_message("server : %s", server->name);
+    g_message("\tListenPort:%d", server->listen_port);
+    g_message("\tMaxPending:%d", server->max_pending);
+    g_message("\tThreadCount:%d", server->thread_count);
     ja_server_initialize_workers(server);
     JSocket *conn = NULL;
     while ((conn = j_socket_accept(server->listen_sock))) {
@@ -246,6 +198,4 @@ static inline void ja_server_main(JaServer * server)
         ja_worker_add(worker, conn);
     }
     g_warning("server quits: %s", strerror(errno));
-    /* error */
-    _exit(0);
 }

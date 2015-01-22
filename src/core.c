@@ -30,21 +30,7 @@ JaCore *ja_core_create()
 {
     JConfig *cfg = ja_config_load();
 
-    GList *scfgs = ja_server_config_load(j_config_lookup(cfg, NULL));
-    GList *ptr = scfgs;
-    GList *children = NULL;
-    while (ptr) {
-        JaServerConfig *cfg = (JaServerConfig *) ptr->data;
-        g_message("%u,%s", cfg->listen_port, cfg->name);
-        gint pid = ja_server_create(cfg);
-        if (pid < 0) {
-            g_warning("fail to create server %s", cfg->name);
-        } else {
-            children = g_list_append(children, (void *) (glong) pid);
-        }
-        ptr = g_list_next(ptr);
-    }
-
+    GList *children = ja_server_load(cfg);
     JaCore *core = (JaCore *) g_slice_alloc(sizeof(JaCore));
     core->cfg = cfg;
     core->children = children;

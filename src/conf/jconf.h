@@ -38,7 +38,7 @@ void j_directive_free(JDirective * jd);
 
 
 typedef struct {
-    gchar *name;
+    gchar *name;                /* the name of JDirectiveGroup */
     GList *directives;
 } JDirectiveGroup;
 

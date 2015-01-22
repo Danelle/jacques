@@ -39,7 +39,7 @@ typedef struct _JaWorker JaWorker;
  * Creates an JaWorker, and run it
  * JaWorker is thread safe
  */
-JaWorker *ja_worker_create(JaServerConfig * cfg, gint id);
+JaWorker *ja_worker_create(JConfig * cfg, gint id);
 
 void ja_worker_free(JaWorker * jw);
 

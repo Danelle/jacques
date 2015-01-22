@@ -29,15 +29,6 @@
  */
 
 
-typedef struct {
-    gchar *name;                /* server name */
-    gushort listen_port;
-    guint32 max_pending;        /*  maximum length to which the  queue  of pending  connections */
-    guint32 thread_count;       /* count of workers */
-
-    JConfig *cfg;
-} JaServerConfig;
-
 #define DIRECTIVE_LISTEN_PORT "ListenPort"
 #define DIRECTIVE_MAX_PENDING "MaxPending"
 #define DIRECTIVE_THREAD_COUNT "ThreadCount"
@@ -47,23 +38,22 @@ typedef struct {
 
 
 /*
- * Parses every file in CONFIG_APP_LOCATION
- * Creates a list of JaServerConfig
+ * Loads configuration of every server, and create server process
+ * Return the list of server process id
  */
-GList *ja_server_config_load(JDirectiveGroup * global);
-
-
-/*
- * Free all the memory used by JaServerConfig GList 
- */
-void ja_server_config_free_all(GList * scfgs);
+GList *ja_server_load(JConfig * cfg);
 
 
 
 typedef struct {
+    gchar *name;
+    gint listen_port;
+    gint max_pending;
+    gint thread_count;
+
     JSocket *listen_sock;
     GList *workers;             /* the list of worker thread */
-    JaServerConfig *cfg;
+    JConfig *cfg;
 } JaServer;
 
 /*
@@ -71,7 +61,7 @@ typedef struct {
  * Returns fork()
  * Child process will not return
  */
-gint ja_server_create(JaServerConfig * cfg);
+gint ja_server_create(JConfig * cfg);
 
 
 
