@@ -29,10 +29,9 @@ int main(int argc, const char *argv[])
     } else if (running < 0) {
         g_error("fail to open pid file!!!");
     }
+
     JaCore *core = ja_core_create();
-
     ja_core_wait(core);
-
     ja_core_quit(core);
 
     return (0);

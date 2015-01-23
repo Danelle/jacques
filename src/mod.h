@@ -26,7 +26,8 @@
 
 GList *ja_get_modules();
 
-GList *ja_get_hooks();
+
+GList *ja_get_request_hooks();
 
 void ja_module_register(JaModule * mod);
 
@@ -37,10 +38,5 @@ void ja_module_register(JaModule * mod);
  */
 int ja_load_module(const gchar * filename);
 
-
-/*
- * Loads all modules under CONFIG_MOD_ENABLED_LOCATION
- */
-void ja_load_all_modules();
 
 #endif

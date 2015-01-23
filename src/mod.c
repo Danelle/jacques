@@ -23,7 +23,7 @@
 
 static GList *loaded_modules = NULL;
 
-static GList *all_hooks = NULL;
+static GList *request_hooks = NULL;
 
 static gchar *get_module_name(const gchar * name);
 
@@ -35,10 +35,12 @@ GList *ja_get_modules()
     return loaded_modules;
 }
 
-GList *ja_get_hooks()
+
+GList *ja_get_request_hooks()
 {
-    return all_hooks;
+    return request_hooks;
 }
+
 
 void ja_module_register(JaModule * mod)
 {
@@ -48,7 +50,11 @@ void ja_module_register(JaModule * mod)
 
 void ja_hook_register(void *ptr, JaHookType type)
 {
-    all_hooks = g_list_append(all_hooks, ja_hook_new(ptr, type));
+    switch (type) {
+    case JA_HOOK_TYPE_REQUEST:
+        request_hooks = g_list_append(request_hooks, ptr);
+        break;
+    }
 }
 
 
@@ -83,27 +89,6 @@ int ja_load_module(const gchar * name)
     g_free(mname);
 
     return ret;
-}
-
-/*
- * Loads all modules under CONFIG_MOD_ENABLED_LOCATION
- */
-void ja_load_all_modules()
-{
-    GDir *dir = g_dir_open(CONFIG_MOD_ENABLED_LOCATION, 0, NULL);
-    if (!dir) {
-        g_warning("fail to open modules directory: %s",
-                  CONFIG_MOD_ENABLED_LOCATION);
-        return;
-    }
-
-    const gchar *name;
-    while ((name = g_dir_read_name(dir))) {
-        if (!ja_load_module(name)) {
-            g_warning("fail to load %s", name);
-        }
-    }
-    g_dir_close(dir);
 }
 
 static gchar *get_module_name(const gchar * name)

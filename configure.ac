@@ -28,5 +28,5 @@ AC_OUTPUT([
 		   Makefile
 		   src/Makefile
 		   src/io/Makefile
-src/conf/Makefile
+		   src/conf/Makefile
 		   ])

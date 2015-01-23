@@ -120,15 +120,13 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
 
     JaAction act = JA_ACTION_ECHO;
 
-    GList *hooks = ja_get_hooks();
+    GList *hooks = ja_get_request_hooks();
 
     while (hooks) {
-        JaHook *hook = (JaHook *) hooks->data;
-        if (hook->type == JA_HOOK_TYPE_REQUEST) {
-            act = ((JaRequestHandler) hook->ptr) (req);
-            if (act & JA_ACTION_DROP || act & JA_ACTION_IGNORE) {
-                break;
-            }
+        JaRequestHandler func = (JaRequestHandler) hooks->data;
+        act = func(req);
+        if (act & JA_ACTION_DROP || act & JA_ACTION_IGNORE) {
+            break;
         }
         hooks = g_list_next(hooks);
     }

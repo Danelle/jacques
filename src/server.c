@@ -79,11 +79,16 @@ static inline void ja_server_create_from_file(const gchar * name,
     gchar buf[4096];
     g_snprintf(buf, sizeof(buf), "%s/%s", CONFIG_APP_LOCATION, name);
     j_conf_parse_internal(buf, cfg);
+
+    /* ListenPort must be set */
     gint listen_port =
         j_config_get_integer(cfg, NULL, DIRECTIVE_LISTEN_PORT);
     if (listen_port <= 0 || listen_port > 65536) {
         g_error("%s: Invalid ListenPort", name);
     }
+
+    /* if MaxPending and ThreadCount are not set or invalid value is set
+     * use default value instead */
     gint max_pending =
         j_config_get_integer(cfg, NULL, DIRECTIVE_MAX_PENDING);
     gint thread_count =

@@ -51,10 +51,14 @@ void ja_request_free(JaRequest * req);
 
 
 typedef void (*JaModuleInit) ();
+typedef void (*JaModuleParseConfig) (const gchar * group,
+                                     const gchar * name,
+                                     const gchar * value);
 
 typedef struct {
     gchar *name;
     JaModuleInit init_func;
+    JaModuleParseConfig config_func;
 } JaModule;
 
 

@@ -2,9 +2,6 @@
 Maximized=1
 Geometry=1920x1019+0+27
 
-[File Loader]
-Files=../../src/main.c#30%%%../../src/utils.h#33%%%../../src/utils.c#115%%%../../src/config.h#1
-
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
