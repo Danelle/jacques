@@ -14,7 +14,7 @@ static JaAction request_handler(JaRequest * req)
 }
 
 
-void init()
+void init(JConfig * cfg)
 {
     g_message("hello world");
     ja_hook_register((void *) request_handler, JA_HOOK_TYPE_REQUEST);

@@ -22,6 +22,7 @@
 
 
 #include "mod-pub.h"
+#include "config.h"
 
 
 GList *ja_get_modules();
@@ -29,14 +30,12 @@ GList *ja_get_modules();
 
 GList *ja_get_request_hooks();
 
-void ja_module_register(JaModule * mod);
-
 
 /*
  * Loads a module
  * Returns 1 on success,otherwise 0
  */
-int ja_load_module(const gchar * filename);
+int ja_load_module(const gchar * filename, JConfig * cfg);
 
 
 #endif

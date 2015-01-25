@@ -40,7 +40,7 @@
 
 
 /* the directory stores active modules */
-#define CONFIG_MOD_ENABLED_LOCATION CONFIG_LOCATION "/mod-enabled"
+#define CONFIG_MOD_ENABLED_LOCATION CONFIG_LOCATION "/modules"
 
 
 /* the default log location */

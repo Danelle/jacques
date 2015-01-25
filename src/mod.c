@@ -26,6 +26,7 @@ static GList *loaded_modules = NULL;
 static GList *request_hooks = NULL;
 
 static gchar *get_module_name(const gchar * name);
+static void ja_module_register(JaModule * mod, JConfig * cfg);
 
 
 typedef void (*ModuleInitFunc) ();
@@ -42,9 +43,11 @@ GList *ja_get_request_hooks()
 }
 
 
-void ja_module_register(JaModule * mod)
+static void ja_module_register(JaModule * mod, JConfig * cfg)
 {
     loaded_modules = g_list_append(loaded_modules, mod);
+
+    mod->init_func(cfg);
 }
 
 void ja_hook_register(void *ptr, JaHookType type)
@@ -58,7 +61,7 @@ void ja_hook_register(void *ptr, JaHookType type)
 
 
 
-int ja_load_module(const gchar * name)
+int ja_load_module(const gchar * name, JConfig * cfg)
 {
     gchar *mname = get_module_name(name);
     if (mname == NULL) {
@@ -82,7 +85,7 @@ int ja_load_module(const gchar * name)
     gpointer symbol;
     gint ret = g_module_symbol(mod, sym_name, &symbol);
     if (ret) {
-        ja_module_register((JaModule *) symbol);
+        ja_module_register((JaModule *) symbol, cfg);
     }
     g_module_close(mod);
     g_free(mname);
