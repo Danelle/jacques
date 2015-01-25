@@ -100,9 +100,9 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_jacques_OBJECTS = main.$(OBJEXT) core.$(OBJEXT) server.$(OBJEXT) \
-	worker.$(OBJEXT) mod.$(OBJEXT) struct.$(OBJEXT) \
-	hooks.$(OBJEXT) utils.$(OBJEXT)
+am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
+	server.$(OBJEXT) worker.$(OBJEXT) mod.$(OBJEXT) \
+	struct.$(OBJEXT) hooks.$(OBJEXT) utils.$(OBJEXT)
 jacques_OBJECTS = $(am_jacques_OBJECTS)
 jacques_DEPENDENCIES = $(SUBLIBS) $(am__DEPENDENCIES_1)
 jacques_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -345,6 +345,7 @@ AM_CFLAGS = \
 jacques_SOURCES = \
 	main.c \
 	config.h \
+	config.c \
 	core.c \
 	core.h \
 	server.c \
@@ -474,6 +475,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hooks.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@

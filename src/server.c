@@ -105,6 +105,7 @@ static inline void ja_server_create_from_file(const gchar * name,
         g_error("%s: fail to create socket!", name);
     }
 
+
     JaServer *server =
         ja_server_alloc(name, listen_port, max_pending, thread_count,
                         jsock, cfg);

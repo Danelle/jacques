@@ -73,4 +73,15 @@
 #define RUNTIME_LOCATION    "/var/run/jacques"
 
 
+
+
+
+#define DIRECTIVE_LOADMODULE	"LoadModule"
+
+/*
+ * Loads modules based on configuration
+ */
+void ja_config_load_modules(JConfig * cfg);
+
+
 #endif

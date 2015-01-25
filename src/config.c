@@ -17,13 +17,22 @@
  */
 
 #include "config.h"
+#include "mod.h"
 #include <stdlib.h>
 
 /*
- * Parses configuration file CONFIG_FILEPATH
- * Returns NULL on error
+ * Loads modules based on configuration
  */
-JConfig *ja_config_load()
+void ja_config_load_modules(JConfig * cfg)
 {
-    return j_conf_parse(CONFIG_FILEPATH);
+    JDirectiveGroup *global = j_config_lookup(cfg, NULL);
+
+    GList *ptr = global->directives;
+    while (ptr) {
+        JDirective *jd = (JDirective *) ptr->data;
+        if (g_strcmp0(jd->name, DIRECTIVE_LOADMODULE) == 0) {
+            ja_load_module(jd->value, cfg);
+        }
+        ptr = g_list_next(ptr);
+    }
 }

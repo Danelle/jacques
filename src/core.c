@@ -18,8 +18,8 @@
  */
 #include "core.h"
 #include "server.h"
+#include "config.h"
 #include <sys/wait.h>
-
 
 
 /*
@@ -29,6 +29,7 @@
 JaCore *ja_core_create()
 {
     JConfig *cfg = ja_config_load();
+    ja_config_load_modules(cfg);
 
     GList *children = ja_server_load(cfg);
     JaCore *core = (JaCore *) g_slice_alloc(sizeof(JaCore));
