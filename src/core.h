@@ -49,4 +49,5 @@ void ja_core_quit(JaCore * core);
 
 
 
+
 #endif                          /* __JA_CORE_H__ */

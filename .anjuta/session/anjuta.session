@@ -1,9 +1,9 @@
 [Anjuta]
 Maximized=1
-Geometry=1920x1019+0+27
+Geometry=1366x707+0+27
 
 [File Loader]
-Files=../../src/main.c#1%%%../../src/server.c#86%%%../../src/mod-pub.h#1%%%../../src/struct.h#26%%%../../src/conf/jconf.h#1%%%../../src/config.h#22%%%../../src/mod.c#24
+Files=../../src/main.c#1%%%../../src/server.c#86%%%../../src/mod-pub.h#1%%%../../src/struct.h#26%%%../../src/conf/jconf.h#1%%%../../src/mod.c#24%%%../../src/conf/jconf.c#238%%%../../src/config.h#1
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

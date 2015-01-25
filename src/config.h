@@ -19,7 +19,7 @@
 #define __JA_CONFIG_H__
 
 #include <glib.h>
-#include <jconf.h>
+#include <jac.h>
 
 /* absulote configuration directory */
 #ifndef CONFIG_LOCATION
@@ -82,6 +82,12 @@
  * Loads modules based on configuration
  */
 void ja_config_load_modules(JConfig * cfg);
+
+/*
+ * Loads a module
+ * Returns 1 on success,otherwise 0
+ */
+int ja_load_module(const gchar * filename, JConfig * cfg);
 
 
 #endif

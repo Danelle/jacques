@@ -1,7 +1,7 @@
 /*
- * mod-pub.h
+ * mod.c
  *
- * Copyright (C) 2015 - Wiky L
+ * Copyright (C) 2015 - Wiky L <wiiiky@yeah.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __J_MOD_PUB_H__
-#define __J_MOD_PUB_H__
-
-#include "hooks.h"
+#include "mod.h"
+#include "config.h"
 #include <gmodule.h>
 
 
-#define JA_MODULE_EXPORT G_MODULE_EXPORT
+static GList *loaded_modules = NULL;
+
+static GList *request_hooks = NULL;
 
 
-void ja_hook_register(void *ptr, JaHookType type);
+typedef void (*ModuleInitFunc) ();
+
+GList *ja_get_modules()
+{
+    return loaded_modules;
+}
 
 
-#endif
+GList *ja_get_request_hooks()
+{
+    return request_hooks;
+}
+
+
+void ja_module_register(JaModule * mod, JConfig * cfg)
+{
+    loaded_modules = g_list_append(loaded_modules, mod);
+
+    mod->init_func(cfg);
+}
+
+void ja_hook_register(void *ptr, JaHookType type)
+{
+    switch (type) {
+    case JA_HOOK_TYPE_REQUEST:
+        request_hooks = g_list_append(request_hooks, ptr);
+        break;
+    }
+}

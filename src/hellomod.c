@@ -1,4 +1,4 @@
-#include "mod-pub.h"
+#include <jac.h>
 
 
 static JaAction request_handler(JaRequest * req)

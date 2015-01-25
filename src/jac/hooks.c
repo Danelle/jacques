@@ -1,5 +1,5 @@
 /*
- * mod.h
+ * hooks.c
  *
  * Copyright (C) 2015 - Wiky L <wiiiky@yeah.net>
  *
@@ -16,25 +16,4 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef __JA_MOD_H__
-#define __JA_MOD_H__
-
-
 #include "hooks.h"
-#include <gmodule.h>
-
-
-GList *ja_get_modules();
-
-
-GList *ja_get_request_hooks();
-
-
-#define JA_MODULE_EXPORT G_MODULE_EXPORT
-
-
-void ja_hook_register(void *ptr, JaHookType type);
-
-
-#endif

@@ -11,7 +11,8 @@ AM_CPPFLAGS = \
 AM_CFLAGS =\
 	 -Wall\
 	 -pthread \
-	 -Iconf \
+	 -Ijac \
+	 -Iio \
 	 -g
 
 bin_PROGRAMS = jacques \
@@ -27,20 +28,13 @@ jacques_SOURCES = \
 	server.h \
 	worker.c \
 	worker.h \
-	mod.c \
-	mod.h \
-	mod-pub.h \
-	struct.h \
-	struct.c \
-	hooks.c \
-	hooks.h \
 	utils.c \
 	utils.h
 
 jacques_LDFLAGS = 
 
 SUBLIBS = \
-	conf/libjconf.a \
+	jac/libjac.a \
 	io/libjio.a
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
@@ -54,4 +48,4 @@ client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 SUBDIRS = \
 	io \
-	conf
+	jac

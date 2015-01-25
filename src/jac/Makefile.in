@@ -78,7 +78,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = src/conf
+subdir = src/jac
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -123,10 +123,11 @@ AM_V_AR = $(am__v_AR_@AM_V@)
 am__v_AR_ = $(am__v_AR_@AM_DEFAULT_V@)
 am__v_AR_0 = @echo "  AR      " $@;
 am__v_AR_1 = 
-libjconf_a_AR = $(AR) $(ARFLAGS)
-libjconf_a_LIBADD =
-am_libjconf_a_OBJECTS = libjconf_a-jconf.$(OBJEXT)
-libjconf_a_OBJECTS = $(am_libjconf_a_OBJECTS)
+libjac_a_AR = $(AR) $(ARFLAGS)
+libjac_a_LIBADD =
+am_libjac_a_OBJECTS = libjac_a-jconf.$(OBJEXT) libjac_a-mod.$(OBJEXT) \
+	libjac_a-hooks.$(OBJEXT) libjac_a-struct.$(OBJEXT)
+libjac_a_OBJECTS = $(am_libjac_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -165,8 +166,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libjconf_a_SOURCES)
-DIST_SOURCES = $(libjconf_a_SOURCES)
+SOURCES = $(libjac_a_SOURCES)
+DIST_SOURCES = $(libjac_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -205,6 +206,10 @@ CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
@@ -265,6 +270,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_AR = @ac_ct_AR@
 ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
 ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
@@ -312,14 +318,20 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LIBRARIES = \
-	libjconf.a \
-	libjconf.a
+	libjac.a 
 
-libjconf_a_SOURCES = \
+libjac_a_SOURCES = \
 	jconf.c \
-	jconf.h
+	jconf.h \
+	mod.c \
+	mod.h \
+	hooks.c \
+	hooks.h \
+	struct.c \
+	struct.h \
+	jac.h
 
-libjconf_a_CPPFLAGS = $(JACQUES_CFLAGS)
+libjac_a_CPPFLAGS = $(JACQUES_CFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -333,9 +345,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/conf/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/jac/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/conf/Makefile
+	  $(AUTOMAKE) --gnu src/jac/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -386,10 +398,10 @@ uninstall-libLIBRARIES:
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
 
-libjconf.a: $(libjconf_a_OBJECTS) $(libjconf_a_DEPENDENCIES) $(EXTRA_libjconf_a_DEPENDENCIES) 
-	$(AM_V_at)-rm -f libjconf.a
-	$(AM_V_AR)$(libjconf_a_AR) libjconf.a $(libjconf_a_OBJECTS) $(libjconf_a_LIBADD)
-	$(AM_V_at)$(RANLIB) libjconf.a
+libjac.a: $(libjac_a_OBJECTS) $(libjac_a_DEPENDENCIES) $(EXTRA_libjac_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libjac.a
+	$(AM_V_AR)$(libjac_a_AR) libjac.a $(libjac_a_OBJECTS) $(libjac_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libjac.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -397,7 +409,10 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjconf_a-jconf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjac_a-hooks.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjac_a-jconf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjac_a-mod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjac_a-struct.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -420,19 +435,61 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-libjconf_a-jconf.o: jconf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjconf_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjconf_a-jconf.o -MD -MP -MF $(DEPDIR)/libjconf_a-jconf.Tpo -c -o libjconf_a-jconf.o `test -f 'jconf.c' || echo '$(srcdir)/'`jconf.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjconf_a-jconf.Tpo $(DEPDIR)/libjconf_a-jconf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jconf.c' object='libjconf_a-jconf.o' libtool=no @AMDEPBACKSLASH@
+libjac_a-jconf.o: jconf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-jconf.o -MD -MP -MF $(DEPDIR)/libjac_a-jconf.Tpo -c -o libjac_a-jconf.o `test -f 'jconf.c' || echo '$(srcdir)/'`jconf.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-jconf.Tpo $(DEPDIR)/libjac_a-jconf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jconf.c' object='libjac_a-jconf.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjconf_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjconf_a-jconf.o `test -f 'jconf.c' || echo '$(srcdir)/'`jconf.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-jconf.o `test -f 'jconf.c' || echo '$(srcdir)/'`jconf.c
 
-libjconf_a-jconf.obj: jconf.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjconf_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjconf_a-jconf.obj -MD -MP -MF $(DEPDIR)/libjconf_a-jconf.Tpo -c -o libjconf_a-jconf.obj `if test -f 'jconf.c'; then $(CYGPATH_W) 'jconf.c'; else $(CYGPATH_W) '$(srcdir)/jconf.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjconf_a-jconf.Tpo $(DEPDIR)/libjconf_a-jconf.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jconf.c' object='libjconf_a-jconf.obj' libtool=no @AMDEPBACKSLASH@
+libjac_a-jconf.obj: jconf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-jconf.obj -MD -MP -MF $(DEPDIR)/libjac_a-jconf.Tpo -c -o libjac_a-jconf.obj `if test -f 'jconf.c'; then $(CYGPATH_W) 'jconf.c'; else $(CYGPATH_W) '$(srcdir)/jconf.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-jconf.Tpo $(DEPDIR)/libjac_a-jconf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='jconf.c' object='libjac_a-jconf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjconf_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjconf_a-jconf.obj `if test -f 'jconf.c'; then $(CYGPATH_W) 'jconf.c'; else $(CYGPATH_W) '$(srcdir)/jconf.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-jconf.obj `if test -f 'jconf.c'; then $(CYGPATH_W) 'jconf.c'; else $(CYGPATH_W) '$(srcdir)/jconf.c'; fi`
+
+libjac_a-mod.o: mod.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-mod.o -MD -MP -MF $(DEPDIR)/libjac_a-mod.Tpo -c -o libjac_a-mod.o `test -f 'mod.c' || echo '$(srcdir)/'`mod.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-mod.Tpo $(DEPDIR)/libjac_a-mod.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mod.c' object='libjac_a-mod.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-mod.o `test -f 'mod.c' || echo '$(srcdir)/'`mod.c
+
+libjac_a-mod.obj: mod.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-mod.obj -MD -MP -MF $(DEPDIR)/libjac_a-mod.Tpo -c -o libjac_a-mod.obj `if test -f 'mod.c'; then $(CYGPATH_W) 'mod.c'; else $(CYGPATH_W) '$(srcdir)/mod.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-mod.Tpo $(DEPDIR)/libjac_a-mod.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='mod.c' object='libjac_a-mod.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-mod.obj `if test -f 'mod.c'; then $(CYGPATH_W) 'mod.c'; else $(CYGPATH_W) '$(srcdir)/mod.c'; fi`
+
+libjac_a-hooks.o: hooks.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-hooks.o -MD -MP -MF $(DEPDIR)/libjac_a-hooks.Tpo -c -o libjac_a-hooks.o `test -f 'hooks.c' || echo '$(srcdir)/'`hooks.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-hooks.Tpo $(DEPDIR)/libjac_a-hooks.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hooks.c' object='libjac_a-hooks.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-hooks.o `test -f 'hooks.c' || echo '$(srcdir)/'`hooks.c
+
+libjac_a-hooks.obj: hooks.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-hooks.obj -MD -MP -MF $(DEPDIR)/libjac_a-hooks.Tpo -c -o libjac_a-hooks.obj `if test -f 'hooks.c'; then $(CYGPATH_W) 'hooks.c'; else $(CYGPATH_W) '$(srcdir)/hooks.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-hooks.Tpo $(DEPDIR)/libjac_a-hooks.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hooks.c' object='libjac_a-hooks.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-hooks.obj `if test -f 'hooks.c'; then $(CYGPATH_W) 'hooks.c'; else $(CYGPATH_W) '$(srcdir)/hooks.c'; fi`
+
+libjac_a-struct.o: struct.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-struct.o -MD -MP -MF $(DEPDIR)/libjac_a-struct.Tpo -c -o libjac_a-struct.o `test -f 'struct.c' || echo '$(srcdir)/'`struct.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-struct.Tpo $(DEPDIR)/libjac_a-struct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='struct.c' object='libjac_a-struct.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-struct.o `test -f 'struct.c' || echo '$(srcdir)/'`struct.c
+
+libjac_a-struct.obj: struct.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libjac_a-struct.obj -MD -MP -MF $(DEPDIR)/libjac_a-struct.Tpo -c -o libjac_a-struct.obj `if test -f 'struct.c'; then $(CYGPATH_W) 'struct.c'; else $(CYGPATH_W) '$(srcdir)/struct.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjac_a-struct.Tpo $(DEPDIR)/libjac_a-struct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='struct.c' object='libjac_a-struct.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjac_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libjac_a-struct.obj `if test -f 'struct.c'; then $(CYGPATH_W) 'struct.c'; else $(CYGPATH_W) '$(srcdir)/struct.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

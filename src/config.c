@@ -17,8 +17,10 @@
  */
 
 #include "config.h"
-#include "mod.h"
 #include <stdlib.h>
+
+
+static gchar *get_module_name(const gchar * name);
 
 /*
  * Loads modules based on configuration
@@ -35,4 +37,61 @@ void ja_config_load_modules(JConfig * cfg)
         }
         ptr = g_list_next(ptr);
     }
+}
+
+
+int ja_load_module(const gchar * name, JConfig * cfg)
+{
+    gchar *mname = get_module_name(name);
+    if (mname == NULL) {
+        g_warning("invalid module name %s", name);
+        return 0;
+    }
+    gchar path[1024];
+    g_snprintf(path, sizeof(path), "%s/%s", CONFIG_MOD_ENABLED_LOCATION,
+               name);
+    GModule *mod =
+        g_module_open(path, G_MODULE_BIND_LOCAL | G_MODULE_BIND_LAZY);
+    if (mod == NULL) {
+        g_free(mname);
+        return 0;
+    }
+    g_module_make_resident(mod);
+
+    gchar sym_name[1024];
+    g_snprintf(sym_name, sizeof(sym_name), "%s_struct", mname);
+
+    gpointer symbol;
+    gint ret = g_module_symbol(mod, sym_name, &symbol);
+    if (ret) {
+        ja_module_register((JaModule *) symbol, cfg);
+    }
+    g_module_close(mod);
+    g_free(mname);
+
+    return ret;
+}
+
+static gchar *get_module_name(const gchar * name)
+{
+    gint dot = -1, sp = -1;
+    gint i = 0;
+    while (name[i] != '\0') {
+        if (name[i] == '/') {
+            sp = i;
+        } else if (name[i] == '.') {
+            dot = i;
+        }
+        i++;
+    }
+    if (dot == -1 && sp == -1) {
+        return g_strdup(name);
+    } else if (dot > -1 && sp == -1) {
+        return g_strndup(name, dot);
+    } else if (dot > -1 && sp > -1 && dot > sp) {
+        return g_strndup(name + sp + 1, dot - sp - 1);
+    } else if (dot == -1 && sp > 0) {
+        return g_strdup(name + sp + 1);
+    }
+    return NULL;
 }

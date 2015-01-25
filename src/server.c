@@ -18,7 +18,6 @@
  */
 #include "server.h"
 #include "worker.h"
-#include "mod.h"
 #include "config.h"
 #include <unistd.h>
 

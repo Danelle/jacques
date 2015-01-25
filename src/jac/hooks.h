@@ -1,5 +1,5 @@
 /*
- * mod.h
+ * hooks.h
  *
  * Copyright (C) 2015 - Wiky L <wiiiky@yeah.net>
  *
@@ -16,25 +16,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef __JA_HOOKS_H__
+#define __JA_HOOKS_H__
 
-#ifndef __JA_MOD_H__
-#define __JA_MOD_H__
-
-
-#include "hooks.h"
-#include <gmodule.h>
+#include "struct.h"
 
 
-GList *ja_get_modules();
+typedef enum {
+    JA_ACTION_IGNORE = 0x00,
+    JA_ACTION_ECHO = 0x01,
+    JA_ACTION_RESPONSE = 0x02,
+    JA_ACTION_DROP = 0x04,      /* drop the connection */
+    JA_ACTION_KEEP = 0x08,      /* keep the connection */
+} JaAction;
+
+/* handle request hook */
+typedef JaAction(*JaRequestHandler) (JaRequest * req);
 
 
-GList *ja_get_request_hooks();
+typedef enum {
+    JA_HOOK_TYPE_REQUEST,
+} JaHookType;
 
 
-#define JA_MODULE_EXPORT G_MODULE_EXPORT
-
-
-void ja_hook_register(void *ptr, JaHookType type);
-
-
-#endif
+#endif                          /* __JA_HOOKS_H__ */

@@ -19,8 +19,8 @@
 
 
 #include "worker.h"
-#include "io/jio.h"
-#include "mod.h"
+#include "config.h"
+#include <jio.h>
 #include <pthread.h>
 
 
