@@ -23,6 +23,7 @@
 #include <sys/uio.h>
 #include <netinet/in.h>
 #include <glib.h>
+#include <jconf.h>
 
 
 /* a client request */
@@ -50,15 +51,12 @@ void ja_request_free(JaRequest * req);
 
 
 
-typedef void (*JaModuleInit) ();
-typedef void (*JaModuleParseConfig) (const gchar * group,
-                                     const gchar * name,
-                                     const gchar * value);
+typedef void (*JaModuleInit) (JConfig * cfg);
+
 
 typedef struct {
     gchar *name;
     JaModuleInit init_func;
-    JaModuleParseConfig config_func;
 } JaModule;
 
 

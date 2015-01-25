@@ -339,6 +339,7 @@ AM_CPPFLAGS = \
 AM_CFLAGS = \
 	 -Wall\
 	 -pthread \
+	 -Iconf \
 	 -g
 
 jacques_SOURCES = \

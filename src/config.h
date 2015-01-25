@@ -19,7 +19,7 @@
 #define __JA_CONFIG_H__
 
 #include <glib.h>
-#include "conf/jconf.h"
+#include <jconf.h>
 
 /* absulote configuration directory */
 #ifndef CONFIG_LOCATION

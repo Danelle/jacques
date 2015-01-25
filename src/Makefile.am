@@ -11,6 +11,7 @@ AM_CPPFLAGS = \
 AM_CFLAGS =\
 	 -Wall\
 	 -pthread \
+	 -Iconf \
 	 -g
 
 bin_PROGRAMS = jacques \

@@ -45,7 +45,6 @@ GList *ja_get_request_hooks()
 void ja_module_register(JaModule * mod)
 {
     loaded_modules = g_list_append(loaded_modules, mod);
-    mod->init_func();
 }
 
 void ja_hook_register(void *ptr, JaHookType type)

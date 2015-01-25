@@ -34,7 +34,7 @@ static inline JaServer *ja_server_alloc(const gchar * name,
 
 /*
  * The main loop of server process
- * This function will never return, if error occurs or signal catched, it may _exit() but not return
+ * This function will never return, if error occurs or signal catched, it will call _exit() but not return
  */
 static inline void ja_server_main(JaServer * server);
 
