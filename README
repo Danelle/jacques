@@ -18,15 +18,17 @@ a server program which focuses on mobile applications.
     
 有个主配置文件/etc/jacques/jacques.conf，内容如下
 
-	ThreadCount = 6		# 0 for default
+	ThreadCount  6		# 0 for default
 
 还需要在/etc/jacques/app-enabled目录下放置服务配置文件（文件名任意），（如apache的虚拟主机）
     一个服务配置文件如下,你可以放置多个
 	
-	ListenPort = 23432
-	NaxPending = 512
+	ListenPort  23432
+	NaxPending  512
+	
+	KeepAlive	30		# 0 for forever, -1 for no keepalive
 
-	ThreadCount = 6		# 0 for default
+	ThreadCount 6		# 0 for default
 
 注意，目前这些配置并没有完全用到。但是必须有。
 有了配置文件后就可以运行jacques了。
@@ -37,7 +39,7 @@ a server program which focuses on mobile applications.
 
 
 ##Module
-...
+现在已经支持一些模块，在更加完善后跟进文档。
 
 
 ##Contact
