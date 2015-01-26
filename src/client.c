@@ -42,7 +42,11 @@ int main(int argc, const char *argv[])
         return -1;
     }
 
-    while (j_socket_write(jsock, (const void *) "hello world", 12) == 0) {
+    const gchar *hello = "hello";
+    while (j_socket_write(jsock, (const void *) hello, 5) == 0) {
+    }
+    const gchar *world = "world";
+    while (j_socket_write(jsock, (const void *) world, 5) == 0) {
     }
 
     sleep(1);
