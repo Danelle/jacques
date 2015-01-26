@@ -24,10 +24,9 @@
 
 typedef enum {
     JA_ACTION_IGNORE = 0x00,
-    JA_ACTION_ECHO = 0x01,
-    JA_ACTION_RESPONSE = 0x02,
-    JA_ACTION_DROP = 0x04,      /* drop the connection */
-    JA_ACTION_KEEP = 0x08,      /* keep the connection */
+    JA_ACTION_RESPONSE = 0x01,
+    JA_ACTION_DROP = 0x02,      /* drop the connection */
+    JA_ACTION_KEEP = 0x04,      /* keep the connection */
 } JaAction;
 
 /* handle request hook */

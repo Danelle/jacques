@@ -1,9 +1,9 @@
 [Anjuta]
 Maximized=1
-Geometry=1366x707+0+27
+Geometry=1920x1019+0+27
 
 [File Loader]
-Files=../../src/main.c#1%%%../../src/server.c#86%%%../../src/mod-pub.h#1%%%../../src/struct.h#26%%%../../src/conf/jconf.h#1%%%../../src/mod.c#24%%%../../src/conf/jconf.c#238%%%../../src/config.h#1
+Files=../../src/main.c#1%%%../../src/server.c#86%%%../../src/config.h#29%%%../../README#37%%%../../src/worker.c#176%%%../../src/io/jsocket.c#292%%%../../src/io/jpoll.h#113%%%../../src/config.c#1%%%../../src/jac/hooks.h#29%%%../../src/io/jsocket.h#60%%%../../src/io/jpoll.c#209%%%../../src/client.c#1%%%../../src/jac/mod.c#19
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -13,11 +13,8 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Shortcut=jacques//src//conf//libjconf.a%%%jacques//src//io//libjio.a
-Expand=jacques%%%jacques//src%%%jacques//src//conf%%%jacques//src//conf//libjconf.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
-
-[Debugger]
-Stop at beginning=2
+Shortcut=
+Expand=jacques%%%jacques//src%%%jacques//src//io%%%jacques//src//io//libjio.a%%%jacques//src//jac%%%jacques//src//jac//libjac.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized
@@ -26,3 +23,6 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2

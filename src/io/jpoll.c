@@ -17,6 +17,7 @@
  */
 
 #include "jpoll.h"
+#include <time.h>
 #include <glib.h>
 #include <errno.h>
 
@@ -220,4 +221,31 @@ static inline JPollEvent *j_poll_event_new(struct epoll_event *event)
 static inline void j_poll_event_free(JPollEvent * jpe)
 {
     g_slice_free1(sizeof(JPollEvent), jpe);
+}
+
+/*
+ * Removes all JSockets that are not active during last timeout seconds
+ */
+void j_poll_remove_timeout(JPoll * jp, guint64 timeout)
+{
+    guint64 now = (guint64) time(NULL);
+    GList *ptr = jp->jsocks;
+    while (ptr) {
+        JSocket *jsock = (JSocket *) ptr->data;
+        GList *next = g_list_next(ptr);
+        if (j_socket_active_time(jsock) + timeout < now) {
+            GList *prev = ptr->prev;
+            if (prev) {
+                prev->next = next;
+            } else {
+                jp->jsocks = next;
+            }
+            if (next) {
+                next->prev = prev;
+            }
+            g_list_free1(ptr);
+            jp->count--;
+        }
+        ptr = next;
+    }
 }

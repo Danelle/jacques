@@ -110,4 +110,11 @@ gint j_poll_close_all(JPoll * jp);
 
 
 
+/*
+ * Removes all JSockets that are not active during last timeout seconds
+ */
+void j_poll_remove_timeout(JPoll * jp, guint64 timeout);
+
+
+
 #endif                          /* __J_POLL_H__ */

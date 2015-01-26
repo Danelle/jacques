@@ -20,6 +20,7 @@
 #include "jsocket.h"
 #include "pack.h"
 #include <glib.h>
+#include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <string.h>
@@ -44,6 +45,9 @@
 #define j_socket_wdata_pop(jsock,len)   g_byte_array_remove_range((jsock)->wbuf,0,len)
 #define j_socket_wdata_append(jsock,data,len)   g_byte_array_append((jsock)->wbuf,(data),(len))
 
+
+#define j_socket_update_active(jsock)   (jsock)->active=(guint64)time(NULL)
+
 /*
  * Creates a new JSocket from a native socket descriptor
  */
@@ -55,6 +59,7 @@ JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
     jsock->rbuf = g_byte_array_new();
     jsock->wbuf = g_byte_array_new();
     jsock->total_len = 0;
+    j_socket_update_active(jsock);
 
     if (addr) {
         memcpy(&(jsock->addr), addr, addrlen);
@@ -139,6 +144,7 @@ JSocket *j_socket_accept(JSocket * jsock)
     if (fd < 0) {
         return NULL;
     }
+    j_socket_update_active(jsock);
     return j_socket_new_fromfd(fd, (struct sockaddr *) &addr, addrlen);
 }
 
@@ -214,6 +220,7 @@ int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
  */
 int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
 {
+    j_socket_update_active(jsock);
     guint32 size = j_socket_wdata_length(jsock);
     if (size == 0) {
         /* new data to write */
@@ -282,6 +289,7 @@ int j_socket_read(JSocket * jsock)
         /* error */
         return -1;
     }
+    j_socket_update_active(jsock);
 
     gchar databuf[4096];
     gint32 left = j_socket_left_length(jsock);
@@ -313,4 +321,5 @@ int j_socket_read(JSocket * jsock)
  */
 const gchar *j_socket_address(JSocket * jsock)
 {
+    return NULL;
 }

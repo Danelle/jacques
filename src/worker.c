@@ -24,11 +24,17 @@
 #include <pthread.h>
 
 
+#define DIRECTIVE_KEEPALIVE "KeepAlive"
+#define DEFAULT_KEEPALIVE   15
+
+
 struct _JaWorker {
     gint id;
     GThread *thread;
     JPoll *poller;
     gboolean running;
+
+    gint keepalive;             /* zero means keepalive as long as possible, negative means no keepalive */
 
     GMutex lock;
 };
@@ -118,7 +124,7 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
     JaRequest *req = ja_request_new(data, length, NULL, 0);
 
 
-    JaAction act = JA_ACTION_ECHO;
+    JaAction act = JA_ACTION_IGNORE;
 
     GList *hooks = ja_get_request_hooks();
 
@@ -132,23 +138,35 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
     }
 
     /* action */
-    if (act & JA_ACTION_DROP) {
-        ja_worker_remove(jw, jsock);
-    } else if (act & JA_ACTION_RESPONSE) {
+    if (act & JA_ACTION_RESPONSE) {
         data = ja_response_data(req);
         length = ja_response_data_length(req);
         if (ja_worker_send(jw, jsock, data, length) == 0) { /* response */
             ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
         }
-    } else if (act & JA_ACTION_ECHO) {
-        data = ja_request_data(req);
-        length = ja_request_data_length(req);
-        if (ja_worker_send(jw, jsock, data, length) == 0) { /* just echo */
-            ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
-        }
+    }
+
+    if ((!(act & JA_ACTION_KEEP) && jw->keepalive < 0) || (act & JA_ACTION_DROP)) { /* should not keep the connection */
+        ja_worker_remove(jw, jsock);
     }
 
     ja_request_free(req);
+}
+
+
+/*
+ * Removes all connections that is timeout
+ */
+static inline void ja_worker_timeout(JaWorker * jw)
+{
+    if (jw->keepalive == 0) {
+        return;
+    }
+    ja_worker_lock(jw);
+    guint64 timeout =
+        jw->keepalive > 0 ? jw->keepalive : DEFAULT_KEEPALIVE;
+    j_poll_remove_timeout(jw->poller, timeout);
+    ja_worker_unlock(jw);
 }
 
 
@@ -164,11 +182,11 @@ static void *ja_worker_main(void *arg)
     JPollEvent events[128];
     while ((n =
             j_poll_wait(poller, events,
-                        sizeof(events) / sizeof(JPollEvent), -1)) >= 0) {
-        g_message("poll %d", n);
+                        sizeof(events) / sizeof(JPollEvent), 1000)) >= 0) {
         if (n == 0) {
             continue;
         }
+        g_message("poll %d", n);
         for (i = 0; i < n; i++) {
             JSocket *jsock = events[i].jsock;
             guint32 type = events[i].type;
@@ -217,6 +235,7 @@ static inline JaWorker *ja_worker_alloc(JConfig * cfg, gint id)
     jw->id = id;
     jw->poller = poller;
     jw->running = TRUE;
+    jw->keepalive = j_config_get_integer(cfg, NULL, DIRECTIVE_KEEPALIVE);
     g_mutex_init(&jw->lock);
     return jw;
 }

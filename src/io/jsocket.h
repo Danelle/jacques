@@ -46,6 +46,8 @@ struct _JSocket {
 
     struct sockaddr_storage addr;
     socklen_t addrlen;
+
+    guint64 active;             /* the timestamp of last action */
 };
 /* use macros to access the members */
 
@@ -53,6 +55,10 @@ struct _JSocket {
 /* get read buffer data & length */
 #define j_socket_data(jsock) ((void*)((jsock)->rbuf)->data)
 #define j_socket_data_length(jsock) (((jsock)->rbuf)->len)
+
+
+/* get the timestamp of JSocket last action */
+#define j_socket_active_time(jsock) ((jsock)->active)
 
 /*
  * Creates a new passive IPv4 socket, which listens on port
