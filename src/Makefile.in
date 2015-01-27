@@ -372,7 +372,8 @@ client_SOURCES = \
 client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 SUBDIRS = \
 	io \
-	jac
+	jac \
+	modules
 
 all: all-recursive
 

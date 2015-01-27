@@ -53,6 +53,7 @@ int ja_load_module(const gchar * name, JConfig * cfg)
     GModule *mod =
         g_module_open(path, G_MODULE_BIND_LOCAL | G_MODULE_BIND_LAZY);
     if (mod == NULL) {
+        g_warning("fail to load module %s", name);
         g_free(mname);
         return 0;
     }
@@ -65,6 +66,8 @@ int ja_load_module(const gchar * name, JConfig * cfg)
     gint ret = g_module_symbol(mod, sym_name, &symbol);
     if (ret) {
         ja_module_register((JaModule *) symbol, cfg);
+    } else {
+        g_warning("fail to load module %s", name);
     }
     g_module_close(mod);
     g_free(mname);

@@ -48,4 +48,5 @@ client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 SUBDIRS = \
 	io \
-	jac
+	jac \
+	modules
