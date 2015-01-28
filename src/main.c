@@ -19,20 +19,116 @@
 
 #include "core.h"
 #include "utils.h"
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <glib/gprintf.h>
+#include <getopt.h>
+
+static void inline show_version(void);
+static void inline show_help(void);
+
+static void inline start_jacques(void);
+static void inline stop_jacques(void);
+static void inline restart_jacques(void);
 
 int main(int argc, const char *argv[])
 {
+    static struct option long_options[] = {
+        {"version", 0, NULL, 'v'},
+        {"help", 0, NULL, 'h'},
+        {"signal", 1, NULL, 's'},
+        {NULL, 0, NULL, 0}
+    };
+
+    int ch;
+    while ((ch =
+            getopt_long(argc, (char *const *) argv, "s:vh", long_options,
+                        NULL)) != -1) {
+        switch (ch) {
+        case 'v':
+            show_version();
+            break;
+        case 's':
+            if (g_strcmp0(optarg, "stop") == 0) {
+                stop_jacques();
+            }
+            break;
+        case 'h':
+        default:
+            show_help();
+            break;
+        }
+    }
+
+    if (optind != argc) {
+        show_help();
+    }
+
+    start_jacques();
+
+    return (0);
+}
+
+static void inline show_version(void)
+{
+    g_printf("jacques version: %u.%u\n\n", JACQUES_VERSION_MAJOR,
+             JACQUES_VERSION_MINOR);
+    g_printf("Build Infomation:\n");
+    g_printf("\tConfiguration Location: %s\n", CONFIG_LOCATION);
+    g_printf("\tLog Location: %s\n", DEFAULT_LOG_LOCATION);
+    g_printf("\tRuntime Location: %s\n", RUNTIME_LOCATION);
+    exit(0);
+}
+
+static void inline show_help(void)
+{
+    g_printf("Usage: jacques [option]\n\n");
+    g_printf("Options:\n");
+    g_printf("\t--help\t\t-h\tshow this help info.\n");
+    g_printf("\t--version\t-v\tshow the version of jacques.\n");
+    g_printf
+        ("\t--signal\t-s\tsend signal to the master process: stop, retart.\n");
+    exit(0);
+}
+
+static void inline start_jacques(void)
+{
     daemonize();
+
     int running = already_running();
-    if (running == 1) {
+    if (running > 0) {
         g_error("jacqueas is already running!!!");
+        exit(0);
     } else if (running < 0) {
         g_error("fail to open pid file!!!");
+        exit(0);
     }
 
     JaCore *core = ja_core_create();
     ja_core_wait(core);
     ja_core_quit(core);
+}
 
-    return (0);
+static void inline stop_jacques(void)
+{
+    int running = already_running();
+    if (running == 0) {
+        g_printf("jacques is not running!!!");
+        exit(0);
+    } else if (running < 0) {
+        g_printf("fail to open pid file!!!");
+        exit(0);
+    }
+    if (kill(running, SIGINT)) {
+        g_printf("fail to send signal SIGINT to process %d:%s", running,
+                 strerror(errno));
+    } else {
+        g_printf("send signal SIGINT to process %d", running);
+    }
+    exit(0);
+}
+
+static void inline restart_jacques(void)
+{
 }

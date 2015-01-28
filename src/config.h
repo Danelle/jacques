@@ -21,6 +21,12 @@
 #include <glib.h>
 #include <jac.h>
 
+
+#define JACQUES_VERSION_MAJOR   0
+#define JACQUES_VERSION_MINOR   1
+
+#define JACQUES_VERSION 0.1
+
 /* absulote configuration directory */
 #ifndef CONFIG_LOCATION
 #define CONFIG_LOCATION "/etc/jacques"

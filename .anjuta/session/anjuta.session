@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1366x734+1920+312
 
 [File Loader]
-Files=../../src/modules/hello.c#31%%%../../src/jac/mod.c#1%%%../../src/jac/struct.h#49%%%../../src/config.c#56%%%../../src/jac/jac.h#1%%%../../src/jac/mod.h#40
+Files=../../src/main.c#110%%%../../src/core.c#108%%%../../src/utils.c#111%%%../../src/config.h#54%%%../../src/utils.h#38
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -13,8 +13,7 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Shortcut=jacques//src//modules//libhello.la
-Expand=jacques%%%jacques//src%%%jacques//src//io%%%jacques//src//io//libjio.a%%%jacques//src//jac%%%jacques//src//jac//libjac.a%%%jacques//src//modules%%%jacques//src//modules//libhello.la%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
+Expand=jacques%%%jacques//src%%%jacques//src//io%%%jacques//src//io//libjio.a%%%jacques//src//jac%%%jacques//src//jac//libjac.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Debugger]
 Stop at beginning=2

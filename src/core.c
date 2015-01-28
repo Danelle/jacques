@@ -103,9 +103,9 @@ static void sigint_handler(void)
         ptr = g_list_next(ptr);
     }
 
-    g_message("start waiting");
     while (wait(NULL) > 0) {
     }
+    g_list_free(gCore->children);
+    gCore->children = NULL;
     g_message("CORE QUIT");
-    _exit(SIGINT);
 }

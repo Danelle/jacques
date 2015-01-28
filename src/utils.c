@@ -101,10 +101,11 @@ int close_fds(void)
     return 1;
 }
 
+
 /*
  * Check if the process is already running
- * Returns 1 if no
- * Returns 0 if yes
+ * Returns 1 if yes
+ * Returns 0 if no
  * Returns -1 on error
  */
 int already_running(void)
@@ -115,9 +116,19 @@ int already_running(void)
     }
     if (lockfile(fd) < 0) {
         if (errno == EACCES || errno == EAGAIN) {
-            close(fd);
-            return 1;
+            char buf[16];
+            int n = read(fd, buf, sizeof(buf) / sizeof(char));
+            if (n > 0) {
+                buf[n] = '\0';
+                close(fd);
+                int pid = atoi(buf);
+                if (pid > 0) {
+                    return pid;
+                }
+                return -1;
+            }
         }
+        close(fd);
         return -1;
     }
     ftruncate(fd, 0);
