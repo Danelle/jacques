@@ -113,7 +113,13 @@ static inline gint ja_worker_send(JaWorker * jw, JSocket * jsock,
         ja_worker_remove(jw, jsock);
     } else if (n == 1) {
         ja_worker_modify(jw, jsock, J_POLL_EVENT_IN);
+    } else {
+        JaAction act = j_socket_get_extend_data1(jsock);
+        if ((!(act & JA_ACTION_KEEP) && jw->keepalive < 0) || (act & JA_ACTION_DROP)) { /* should not keep the connection */
+            ja_worker_remove(jw, jsock);
+        }
     }
+
     return n;
 }
 
@@ -143,6 +149,9 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
         length = ja_response_data_length(req);
         if (ja_worker_send(jw, jsock, data, length) == 0) { /* response */
             ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
+            j_socket_set_extend_data1(jsock, act);  /* set JaAction after writing completely */
+            ja_request_free(req);
+            return;
         }
     }
 

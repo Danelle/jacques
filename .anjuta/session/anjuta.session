@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1366x734+1920+312
 
 [File Loader]
-Files=../../src/main.c#110%%%../../src/core.c#108%%%../../src/utils.c#111%%%../../src/config.h#54%%%../../src/utils.h#38
+Files=../../src/main.c#110%%%../../src/core.c#108%%%../../src/utils.c#111%%%../../src/config.h#54%%%../../src/utils.h#38%%%../../src/worker.c#144%%%../../src/io/jsocket.h#68
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
