@@ -50,18 +50,13 @@
 
 /* default user & group */
 #ifndef DEFAULT_USER
-#define DEFAULT_USER "jacques-app"
-#endif
-
-#ifndef DEFAULT_GROUP
-#define DEFAULT_GROUP "jacques-app"
+#define DEFAULT_USER "jacques-user"
 #endif
 
 /* default listen() backlog */
 #ifndef DEFAULT_BACKLOG
 #define DEFAULT_BACKLOG 512
 #endif
-
 
 /*
  * Parses configuration file CONFIG_FILEPATH

@@ -29,6 +29,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <pwd.h>
 
 
 
@@ -136,4 +137,21 @@ int lockfile(int fd)
     fl.l_whence = SEEK_SET;
     fl.l_len = 0;
     return fcntl(fd, F_SETLK, &fl);
+}
+
+/*
+ * Sets the current process effective user as name
+ * Returns 1 on success
+ * 0 otherwise
+ */
+int setuser(const char *name)
+{
+    struct passwd *pw = getpwnam(name);
+    if (pw == NULL) {
+        return 0;
+    }
+    if (setuid(pw->pw_uid) || seteuid(pw->pw_uid)) {
+        return 0;
+    }
+    return 1;
 }

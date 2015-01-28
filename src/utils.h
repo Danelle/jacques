@@ -45,4 +45,12 @@ int close_fds(void);
 int already_running(void);
 
 
+/*
+ * Sets the current process effective user as name
+ * Returns 1 on success
+ * 0 otherwise
+ */
+int setuser(const char *name);
+
+
 #endif

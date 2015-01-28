@@ -214,6 +214,9 @@ static inline void ja_server_main(JaServer * server)
 
 static void inline ja_server_initialize(JaServer * server)
 {
+    if (!setuser(DEFAULT_USER)) {
+        g_error("fail to set user as %s", DEFAULT_USER);
+    }
     signal_initialize();
     ja_server_initialize_workers(server);
     //close_fds();
