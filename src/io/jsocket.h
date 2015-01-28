@@ -51,8 +51,8 @@ struct _JSocket {
 
 
     /* extend data */
-    gint64 data1;
-    gpointer data2;
+    gint64 flag;
+    gpointer ptr;
 };
 /* use macros to access the members */
 
@@ -62,10 +62,10 @@ struct _JSocket {
 #define j_socket_data_length(jsock) (((jsock)->rbuf)->len)
 
 
-#define j_socket_set_extend_data1(jsock,data)   ((jsock)->data1=data)
-#define J_socket_set_extend_data2(jsock,data)   ((jsock)->data2=data)
-#define j_socket_get_extend_data1(jsock)        ((jsock)->data1)
-#define j_socket_get_extend_data2(jsock)        ((jsock)->data2)
+#define j_socket_set_flag(jsock,f)   ((jsock)->flag=f)
+#define j_socket_set_pointer(jsock,ptr)   ((jsock)->ptr=ptr)
+#define j_socket_get_flag(jsock)        ((jsock)->flag)
+#define j_socket_get_pointer(jsock)        ((jsock)->ptr)
 
 
 /* get the timestamp of JSocket last action */
