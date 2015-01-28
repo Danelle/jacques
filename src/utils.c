@@ -47,16 +47,13 @@ int lockfile(int fd);
 int daemonize(void)
 {
     umask(0);
-    //获取文件描述符最大值
-    struct rlimit r1;
-    getrlimit(RLIMIT_NOFILE, &r1);
 
     //创建子进程
     pid_t pid;
     if ((pid = fork()) < 0) {
         return 0;
     } else if (pid) {           /* parent */
-        exit(0);
+        _exit(0);
     }
 
     setsid();                   /* create session */
@@ -68,9 +65,23 @@ int daemonize(void)
     sigaction(SIGHUP, &sa, NULL);
     if ((pid = fork()) < 0) {
         return 0;
+    } else if (pid) {
+        _exit(0);
     }
 
     chdir("/");
+
+    return 1;
+}
+
+/*
+ * Closes all open file descriptor
+ */
+int close_fds(void)
+{
+    //获取文件描述符最大值
+    struct rlimit r1;
+    getrlimit(RLIMIT_NOFILE, &r1);
 
     /* close file descriptor */
     if (r1.rlim_max == RLIM_INFINITY) {
@@ -86,7 +97,6 @@ int daemonize(void)
     if (fd0 != 0 || fd1 != 0 || fd2 != 0) {
         return 0;
     }
-
     return 1;
 }
 

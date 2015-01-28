@@ -22,10 +22,18 @@
 
 /*
  * Daemonizes current process
- * Returns 1 on success
- * Otherwise 0
+ * Returns pid in parent
+ * Returns 0 in child
+ * Returns -1 on error
  */
 int daemonize(void);
+
+
+
+/*
+ * Closes all open file descriptor
+ */
+int close_fds(void);
 
 
 /*

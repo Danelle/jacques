@@ -19,17 +19,20 @@
 #include "server.h"
 #include "worker.h"
 #include "config.h"
+#include "utils.h"
+#include <signal.h>
 #include <unistd.h>
 
+
+static JaServer *gServer = NULL;
 
 /*
  * Allocates memory for JaServer
  */
 static inline JaServer *ja_server_alloc(const gchar * name,
-                                        gint port,
+                                        gint listen_port,
                                         gint max_pending,
-                                        gint thread_count,
-                                        JSocket * jsock, JConfig * cfg);
+                                        gint thread_count, JConfig * cfg);
 
 /*
  * The main loop of server process
@@ -41,6 +44,13 @@ static inline void ja_server_main(JaServer * server);
 static inline void ja_server_create_from_file(const gchar * name,
                                               JConfig * cfg);
 
+
+
+/* Initialize signal handlers */
+static void inline signal_initialize(void);
+/* handle signals */
+static void signal_handler(int signum);
+static void sigint_handler(void);
 
 /*
  * Loads configuration of every server, and create server process
@@ -99,17 +109,11 @@ static inline void ja_server_create_from_file(const gchar * name,
         thread_count = DEFAULT_THREAD_COUNT;
     }
 
-    JSocket *jsock = j_server_socket_new(listen_port, max_pending);
-    if (jsock == NULL) {
-        g_error("%s: fail to create socket!", name);
-    }
 
+    gServer =
+        ja_server_alloc(name, listen_port, max_pending, thread_count, cfg);
 
-    JaServer *server =
-        ja_server_alloc(name, listen_port, max_pending, thread_count,
-                        jsock, cfg);
-
-    ja_server_main(server);
+    ja_server_main(gServer);
 
     _exit(-1);
     /* no */
@@ -118,17 +122,16 @@ static inline void ja_server_create_from_file(const gchar * name,
 
 
 static inline JaServer *ja_server_alloc(const gchar * name,
-                                        gint port,
+                                        gint listen_port,
                                         gint max_pending,
-                                        gint thread_count,
-                                        JSocket * jsock, JConfig * cfg)
+                                        gint thread_count, JConfig * cfg)
 {
     JaServer *server = (JaServer *) g_slice_alloc(sizeof(JaServer));
     server->name = g_strdup(name);
-    server->listen_port = port;
+    server->listen_port = listen_port;
     server->max_pending = max_pending;
     server->thread_count = thread_count;
-    server->listen_sock = jsock;
+    server->listen_sock = NULL;
     server->cfg = cfg;
     server->workers = NULL;
     return server;
@@ -183,6 +186,8 @@ static inline void ja_server_initialize_workers(JaServer * server)
 }
 
 
+static void inline ja_server_initialize(JaServer * server);
+
 #include <errno.h>
 #include <string.h>
 static inline void ja_server_main(JaServer * server)
@@ -191,7 +196,9 @@ static inline void ja_server_main(JaServer * server)
     g_message("\tListenPort:%d", server->listen_port);
     g_message("\tMaxPending:%d", server->max_pending);
     g_message("\tThreadCount:%d", server->thread_count);
-    ja_server_initialize_workers(server);
+
+    ja_server_initialize(server);
+
     JSocket *conn = NULL;
     while ((conn = j_socket_accept(server->listen_sock))) {
         JaWorker *worker = ja_server_find_worker(server);
@@ -203,4 +210,42 @@ static inline void ja_server_main(JaServer * server)
         ja_worker_add(worker, conn);
     }
     g_warning("server quits: %s", strerror(errno));
+}
+
+static void inline ja_server_initialize(JaServer * server)
+{
+    signal_initialize();
+    ja_server_initialize_workers(server);
+    //close_fds();
+    JSocket *jsock =
+        j_server_socket_new(server->listen_port, server->max_pending);
+    if (jsock == NULL) {
+        _exit(-1);
+    }
+    server->listen_sock = jsock;
+}
+
+static void inline signal_initialize(void)
+{
+    if (signal(SIGINT, signal_handler) == SIG_ERR) {
+        g_warning("fail to set SIGINT handler");
+    }
+}
+
+static void signal_handler(int signum)
+{
+    switch (signum) {
+    case SIGINT:
+        sigint_handler();
+        break;
+    }
+}
+
+static void sigint_handler(void)
+{
+    if (gServer == NULL) {
+        return;
+    }
+    g_message("SERVER QUIT");
+    _exit(SIGINT);
 }

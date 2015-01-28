@@ -67,6 +67,9 @@ typedef struct {
 } JConfig;
 
 JConfig *j_config_new(const gchar * name);
+/*
+ * Frees all memory used by JConfig
+ */
 void j_config_free(JConfig * cfg);
 
 

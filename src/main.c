@@ -22,6 +22,7 @@
 
 int main(int argc, const char *argv[])
 {
+    daemonize();
     int running = already_running();
     if (running == 1) {
         g_error("jacqueas is already running!!!");

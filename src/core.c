@@ -19,8 +19,21 @@
 #include "core.h"
 #include "server.h"
 #include "config.h"
+#include "utils.h"
+#include <errno.h>
+#include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 
+static JaCore *gCore = NULL;
+
+static void signal_handler(int signum);
+static void sigint_handler(void);
+
+/*
+ * initialize the signal handlers
+ */
+static void signal_initialize(void);
 
 /*
  * Starts the core process of jacques
@@ -32,21 +45,24 @@ JaCore *ja_core_create()
     ja_config_load_modules(cfg);
 
     GList *children = ja_server_load(cfg);
-    JaCore *core = (JaCore *) g_slice_alloc(sizeof(JaCore));
-    core->cfg = cfg;
-    core->children = children;
-    return core;
+    gCore = (JaCore *) g_slice_alloc(sizeof(JaCore));
+    gCore->cfg = cfg;
+    gCore->children = children;
+    return gCore;
 }
 
 void ja_core_wait(JaCore * core)
 {
+    signal_initialize();
     GList *children = core->children;
     int status;
-    while (g_list_length(children) > 0) {
-        gint pid = wait(&status);
+    while (1) {
+        pid_t pid = wait(&status);
         if (pid > 0) {
-            children = g_list_remove(children, (void *) (glong) pid);
+            children = g_list_remove(children, (void *) (gulong) pid);
             g_warning("server %d: status %d", pid, status);
+        } else if (pid < 0 && errno == ECHILD) {
+            break;
         }
     }
     core->children = NULL;
@@ -56,4 +72,40 @@ void ja_core_quit(JaCore * core)
 {
     j_config_free(core->cfg);
     g_slice_free1(sizeof(JaCore), core);
+}
+
+
+static void signal_initialize(void)
+{
+    if (signal(SIGINT, signal_handler) == SIG_ERR) {
+        g_warning("fail to set SIGINT handler!");
+    }
+}
+
+static void signal_handler(int signum)
+{
+    switch (signum) {
+    case SIGINT:
+        sigint_handler();
+        break;
+    }
+}
+
+static void sigint_handler(void)
+{
+    if (gCore == NULL) {
+        return;
+    }
+    GList *ptr = gCore->children;
+    while (ptr) {
+        pid_t pid = (pid_t) (gulong) ptr->data;
+        kill(pid, SIGINT);
+        ptr = g_list_next(ptr);
+    }
+
+    g_message("start waiting");
+    while (wait(NULL) > 0) {
+    }
+    g_message("CORE QUIT");
+    _exit(SIGINT);
 }
