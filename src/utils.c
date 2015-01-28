@@ -33,7 +33,7 @@
 
 
 
-#define PID_FILE    RUNTIME_LOCATION "/jacques.pid"
+#define PID_FILE    CONFIG_RUNTIME_LOCATION "/jacques.pid"
 #define LOCKMODE    (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
 

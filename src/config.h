@@ -50,18 +50,13 @@
 
 
 /* the default log location */
-#ifndef DEFAULT_LOG_LOCATION
-#define DEFAULT_LOG_LOCATION "/var/log/jacques"
+#ifndef CONFIG_LOG_LOCATION
+#define CONFIG_LOG_LOCATION "/var/log/jacques"
 #endif
 
 /* default user & group */
-#ifndef DEFAULT_USER
-#define DEFAULT_USER "jacques-user"
-#endif
-
-/* default listen() backlog */
-#ifndef DEFAULT_BACKLOG
-#define DEFAULT_BACKLOG 512
+#ifndef CONFIG_USER
+#define CONFIG_USER "jacques-user"
 #endif
 
 /*
@@ -71,9 +66,7 @@
 #define ja_config_load()    j_conf_parse(CONFIG_FILEPATH)
 
 
-#define RUNTIME_LOCATION    "/var/run/jacques"
-
-
+#define CONFIG_RUNTIME_LOCATION    "/var/run/jacques"
 
 
 

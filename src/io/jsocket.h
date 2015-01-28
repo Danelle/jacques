@@ -50,7 +50,7 @@ struct _JSocket {
     guint64 active;             /* the timestamp of last action */
 
 
-    /* extend data */
+    /* extra data */
     gint64 flag;
     gpointer ptr;
 };
@@ -62,6 +62,7 @@ struct _JSocket {
 #define j_socket_data_length(jsock) (((jsock)->rbuf)->len)
 
 
+/* extra */
 #define j_socket_set_flag(jsock,f)   ((jsock)->flag=f)
 #define j_socket_set_pointer(jsock,ptr)   ((jsock)->ptr=ptr)
 #define j_socket_get_flag(jsock)        ((jsock)->flag)

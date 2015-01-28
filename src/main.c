@@ -76,8 +76,8 @@ static void inline show_version(void)
              JACQUES_VERSION_MINOR);
     g_printf("Build Infomation:\n");
     g_printf("\tConfiguration Location: %s\n", CONFIG_LOCATION);
-    g_printf("\tLog Location: %s\n", DEFAULT_LOG_LOCATION);
-    g_printf("\tRuntime Location: %s\n", RUNTIME_LOCATION);
+    g_printf("\tLog Location: %s\n", CONFIG_LOG_LOCATION);
+    g_printf("\tRuntime Location: %s\n", CONFIG_RUNTIME_LOCATION);
     exit(0);
 }
 
