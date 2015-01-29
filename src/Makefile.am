@@ -29,7 +29,9 @@ jacques_SOURCES = \
 	worker.c \
 	worker.h \
 	utils.c \
-	utils.h
+	utils.h \
+	log.c \
+	log.h
 
 jacques_LDFLAGS = 
 
@@ -50,3 +52,6 @@ SUBDIRS = \
 	io \
 	jac \
 	modules
+
+bin_SCRIPTS = flood.sh \
+	batch.sh

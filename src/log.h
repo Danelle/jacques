@@ -1,5 +1,5 @@
 /*
- * utils.h
+ * log.h
  *
  * Copyright (C) 2015 - Wiky L <wiiiky@yeah.net>
  *
@@ -16,48 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __JA_UTILS_H__
-#define __JA_UTILS_H__
-
-
-/*
- * Daemonizes current process
- * Returns pid in parent
- * Returns 0 in child
- * Returns -1 on error
- */
-int daemonize(void);
+#ifndef __JA_LOG_H__
+#define __JA_LOG_H__
 
 
 
-/*
- * Closes all open file descriptor
- */
-int close_fds(void);
+void log_init(void);
 
 
-/*
- * Check if the process is already running
- * Returns 1 if yes
- * Returns 0 if no
- * Returns -1 on error
- */
-int already_running(void);
 
-
-/*
- * Sets the current process effective user as name
- * Returns 1 on success
- * 0 otherwise
- */
-int setuser(const char *name);
-
-
-/*
- * Opens a file for writing
- * Returns NULL on error
- */
-int open_appendable(const char *name);
-
-
-#endif
+#endif                          /* __JA_LOG_H__ */

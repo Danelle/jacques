@@ -1,19 +1,23 @@
 [Anjuta]
 Maximized=1
-Geometry=1366x734+1920+312
+Geometry=1920x1019+0+27
 
 [File Loader]
-Files=../../src/main.c#110%%%../../src/core.c#108%%%../../src/utils.c#111%%%../../src/config.h#54%%%../../src/utils.h#38%%%../../src/worker.c#144%%%../../src/io/jsocket.h#68
+Files=../../src/utils.h#36%%%../../src/main.c#106%%%../../src/config.h#40%%%../../src/utils.c#73%%%../../src/log.h#24%%%../../src/worker.c#1%%%../../src/server.c#221%%%../../src/log.c#94%%%../../src/jac/jconf.c#201
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
+[Search Box]
+Case Sensitive=1
+Highlight Match=1
 
 [Execution]
 Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Expand=jacques%%%jacques//src%%%jacques//src//io%%%jacques//src//io//libjio.a%%%jacques//src//jac%%%jacques//src//jac//libjac.a%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
+Expand=jacques%%%jacques//src%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
 
 [Debugger]
 Stop at beginning=2

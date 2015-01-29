@@ -32,8 +32,6 @@
 #include <pwd.h>
 
 
-
-#define PID_FILE    CONFIG_RUNTIME_LOCATION "/jacques.pid"
 #define LOCKMODE    (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)
 
 
@@ -72,7 +70,7 @@ int daemonize(void)
 
     chdir("/");
 
-    return 1;
+    return close_fds();
 }
 
 /*
@@ -110,7 +108,7 @@ int close_fds(void)
  */
 int already_running(void)
 {
-    int fd = open(PID_FILE, O_RDWR | O_CREAT, LOCKMODE);
+    int fd = open(CONFIG_PID_FILE, O_RDWR | O_CREAT, LOCKMODE);
     if (fd < 0) {
         return -1;
     }
@@ -165,4 +163,17 @@ int setuser(const char *name)
         return 0;
     }
     return 1;
+}
+
+
+/*
+ * Opens a file for writing
+ * Returns NULL on error
+ */
+int open_appendable(const char *name)
+{
+    int fd =
+        open(name, O_WRONLY | O_APPEND | O_CREAT,
+             S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    return fd;
 }

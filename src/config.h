@@ -48,27 +48,51 @@
 /* the directory stores active modules */
 #define CONFIG_MOD_ENABLED_LOCATION CONFIG_LOCATION "/modules"
 
+/* default user & group */
+#ifndef CONFIG_USER
+#define CONFIG_USER "jacques-user"
+#endif
+
+
+#ifndef CONFIG_RUNTIME_LOCATION
+#define CONFIG_RUNTIME_LOCATION    "/var/run/jacques"
+#endif
+
+
+#ifndef CONFIG_PID_NAME
+#define CONFIG_PID_NAME    "jacques.pid"
+#endif
+
+
+/* the file to save daemon's process id */
+#define CONFIG_PID_FILE    CONFIG_RUNTIME_LOCATION "/" CONFIG_PID_NAME
 
 /* the default log location */
 #ifndef CONFIG_LOG_LOCATION
 #define CONFIG_LOG_LOCATION "/var/log/jacques"
 #endif
 
-/* default user & group */
-#ifndef CONFIG_USER
-#define CONFIG_USER "jacques-user"
+
+#ifndef CONFIG_LOG_NAME
+#define CONFIG_LOG_NAME "normal.log"
 #endif
+
+#ifndef CONFIG_LOG_ERROR_NAME
+#define CONFIG_LOG_ERROR_NAME "error.log"
+#endif
+
+
+#define CONFIG_LOG_FILE CONFIG_LOG_LOCATION "/" CONFIG_LOG_NAME
+#define CONFIG_LOG_ERROR_FILE CONFIG_LOG_LOCATION "/" CONFIG_LOG_ERROR_NAME
+
+
+
 
 /*
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
 #define ja_config_load()    j_conf_parse(CONFIG_FILEPATH)
-
-
-#define CONFIG_RUNTIME_LOCATION    "/var/run/jacques"
-
-
 
 #define DIRECTIVE_LOADMODULE	"LoadModule"
 

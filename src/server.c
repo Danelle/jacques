@@ -219,7 +219,6 @@ static void inline ja_server_initialize(JaServer * server)
     }
     signal_initialize();
     ja_server_initialize_workers(server);
-    //close_fds();
     JSocket *jsock =
         j_server_socket_new(server->listen_port, server->max_pending);
     if (jsock == NULL) {
@@ -231,7 +230,7 @@ static void inline ja_server_initialize(JaServer * server)
 static void inline signal_initialize(void)
 {
     if (signal(SIGINT, signal_handler) == SIG_ERR) {
-        g_warning("fail to set SIGINT handler");
+        g_error("fail to set SIGINT handler");
     }
 }
 

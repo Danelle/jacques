@@ -45,9 +45,9 @@ int main(int argc, const char *argv[])
     const gchar *hello = "hello";
     while (j_socket_write(jsock, (const void *) hello, 5) == 0) {
     }
-    const gchar *world = "world";
-    while (j_socket_write(jsock, (const void *) world, 5) == 0) {
-    }
+    // const gchar *world = "world";
+    // while (j_socket_write(jsock, (const void *) world, 5) == 0) {
+    // }
 
     sleep(1);
 

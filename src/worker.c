@@ -149,7 +149,7 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
         length = ja_response_data_length(req);
         if (ja_worker_send(jw, jsock, data, length) == 0) { /* response */
             ja_worker_modify(jw, jsock, J_POLL_EVENT_OUT);
-            j_socket_set_flag(jsock, act);  /* set JaAction after writing completely */
+            j_socket_set_flag(jsock, act);  /* JaAction after writing completely */
             ja_request_free(req);
             return;
         }

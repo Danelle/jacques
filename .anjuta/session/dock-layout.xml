@@ -46,8 +46,8 @@
   </layout>
   <layout name="__default__">
     <dock name="__dock_1" floating="no" width="-1" height="-1" floatx="0" floaty="0" skip-taskbar="yes">
-      <paned orientation="vertical" locked="no" iconified="no" closed="no" position="326">
-        <paned orientation="horizontal" locked="no" iconified="no" closed="no" position="233">
+      <paned orientation="vertical" locked="no" iconified="no" closed="no" position="562">
+        <paned orientation="horizontal" locked="no" iconified="no" closed="no" position="509">
           <notebook orientation="vertical" locked="no" iconified="no" closed="no" page="1">
             <item name="AnjutaFileManager" orientation="vertical" locked="no" iconified="no" closed="yes"/>
             <item name="AnjutaProjectManager" orientation="vertical" locked="no" iconified="no" closed="no"/>
@@ -77,13 +77,14 @@
             <notebook orientation="vertical" locked="no" iconified="no" closed="yes" page="-1"/>
           </paned>
         </paned>
-        <notebook orientation="vertical" locked="no" iconified="no" closed="yes" page="-1">
+        <notebook orientation="vertical" locked="no" iconified="no" closed="yes" page="6">
           <item name="AnjutaTerminal" orientation="horizontal" locked="no" iconified="no" closed="yes"/>
-          <item name="AnjutaMessageView" orientation="horizontal" locked="no" iconified="no" closed="yes"/>
           <item name="AnjutaDebuggerStack" orientation="horizontal" locked="no" iconified="no" closed="yes"/>
           <item name="AnjutaDebuggerLocals" orientation="horizontal" locked="no" iconified="no" closed="yes"/>
           <item name="AnjutaDebuggerWatch" orientation="vertical" locked="no" iconified="no" closed="yes"/>
           <item name="AnjutaDebuggerBreakpoints" orientation="vertical" locked="no" iconified="no" closed="yes"/>
+          <item name="AnjutaMessageView" orientation="vertical" locked="no" iconified="no" closed="yes"/>
+          <item name="search_files" orientation="vertical" locked="no" iconified="no" closed="yes"/>
         </notebook>
       </paned>
     </dock>
