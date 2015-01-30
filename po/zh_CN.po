@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jacques 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-30 15:12+0800\n"
-"PO-Revision-Date: 2015-01-30 15:17+0800\n"
+"POT-Creation-Date: 2015-01-30 16:36+0800\n"
+"PO-Revision-Date: 2015-01-30 16:14+0800\n"
 "Last-Translator: Wiky L <wiiiky@yeah.net>\n"
 "Language-Team: Chinese (simplified)\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/main.c:80
+#: ../src/main.c:81
 #, c-format
 msgid ""
 "jacques version: %u.%u\n"
@@ -26,27 +26,70 @@ msgstr ""
 "jacques 版本: %u.%u\n"
 "\n"
 
-#: ../src/main.c:82
+#: ../src/main.c:83
 #, c-format
 msgid "Build Infomation:\n"
 msgstr "构建信息:\n"
 
-#: ../src/main.c:83
+#: ../src/main.c:84
 #, c-format
 msgid "\tConfiguration Location: %s\n"
 msgstr "\t配置目录: %s\n"
 
-#: ../src/main.c:84
+#: ../src/main.c:85
 #, c-format
 msgid "\tLog Location: %s\n"
-msgstr "\t日至目录: %s\n"
+msgstr "\t日志目录: %s\n"
 
-#: ../src/main.c:85
+#: ../src/main.c:86
 #, c-format
 msgid "\tRuntime Location: %s\n"
 msgstr "\t运行时目录: %s\n"
 
+#: ../src/main.c:92
+#, c-format
+msgid ""
+"Usage: jacques [option]\n"
+"\n"
+msgstr ""
+"使用方式: jacques [选项]\n"
+"\n"
+
+#: ../src/main.c:93
+#, c-format
+msgid "Options:\n"
+msgstr "选项:\n"
+
+#: ../src/main.c:94
+#, c-format
+msgid "\t--help\t\t-h\tshow this help info.\n"
+msgstr "\t--help\t\t-h\t显示本帮助.\n"
+
+#: ../src/main.c:95
+#, c-format
+msgid "\t--version\t-v\tshow the version of jacques.\n"
+msgstr "\t--version\t-v\t显示jacques的版本信息.\n"
+
 #: ../src/main.c:96
 #, c-format
 msgid "\t--signal\t-s\tsend signal to the master process: stop, retart.\n"
-msgstr "\t--signal\t-s\t给主控进程发送一个信号：stop,restart.\n"
+msgstr "\t--signal\t-s\t给jacques主进程发送信号: stop, restart.\n"
+
+#: ../src/main.c:117
+msgid "jacqueas is already running!!!"
+msgstr "jacques已经在运行!!!"
+
+#: ../src/main.c:132
+#, c-format
+msgid "jacques is not running!!!\n"
+msgstr "jacques没有运行!!!\n"
+
+#: ../src/main.c:135
+#, c-format
+msgid "unable to get jacques process id!!!\n"
+msgstr "无法获取jacques进程的进程ID!!!\n"
+
+#: ../src/main.c:139
+#, c-format
+msgid "fail to send signal SIGINT to process %d: %s\n"
+msgstr "给进程 %d 发送信号失败: %s\n"

@@ -89,13 +89,12 @@ static void inline show_version(void)
 
 static void inline show_help(void)
 {
-    g_printf("Usage: jacques [option]\n\n");
-    g_printf("Options:\n");
-    g_printf("\t--help\t\t-h\tshow this help info.\n");
-    g_printf("\t--version\t-v\tshow the version of jacques.\n");
-    g_printf
-        (_
-         ("\t--signal\t-s\tsend signal to the master process: stop, retart.\n"));
+    g_printf(_("Usage: jacques [option]\n\n"));
+    g_printf(_("Options:\n"));
+    g_printf(_("\t--help\t\t-h\tshow this help info.\n"));
+    g_printf(_("\t--version\t-v\tshow the version of jacques.\n"));
+    g_printf(_("\t--signal\t-s\tsend signal to the "
+               "master process: stop, retart.\n"));
     exit(0);
 }
 
@@ -115,10 +114,9 @@ static void inline start_jacques(void)
 
     int running = already_running();
     if (running > 0) {
-        g_error("jacqueas is already running!!!");
-        exit(0);
+        g_error(_("jacqueas is already running!!!"));
     } else if (running < 0) {
-        perror("");
+        g_error("unable to create pid file!!!");
         exit(0);
     }
 
@@ -131,17 +129,17 @@ static void inline stop_jacques(void)
 {
     int running = already_running();
     if (running == 0) {
-        g_printf("jacques is not running!!!\n");
+        g_printf(_("jacques is not running!!!\n"));
         exit(0);
     } else if (running < 0) {
-        perror("fail to stop jacques");
+        g_printf(_("unable to get jacques process id!!!\n"));
         exit(0);
     }
     if (kill(running, SIGINT)) {
-        g_printf("fail to send signal SIGINT to process %d: %s\n", running,
-                 strerror(errno));
+        g_printf(_("fail to send signal SIGINT to process %d: %s\n"),
+                 running, strerror(errno));
     } else {
-        g_printf("send signal SIGINT to jacques: %d\n", running);
+        g_printf(("send signal SIGINT to jacques: %d\n"), running);
     }
     exit(0);
 }
