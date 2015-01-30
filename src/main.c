@@ -66,6 +66,8 @@ int main(int argc, const char *argv[])
         case 's':
             if (g_strcmp0(optarg, "stop") == 0) {
                 stop_jacques();
+            } else if (g_strcmp0(optarg, "restart") == 0) {
+                restart_jacques();
             }
             break;
         case 'h':
@@ -109,13 +111,13 @@ static void inline show_help(void)
 
 static void inline initialize_jacques(void)
 {
+    g_mkdir_with_parents(CONFIG_RUNTIME_LOCATION, 0755);
+    g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
+    g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
     if (!daemonize() || !log_init()) {
         g_printf(_("Unable to initialize jacques:%s\n"), strerror(errno));
         exit(-1);
     }
-    g_mkdir_with_parents(CONFIG_RUNTIME_LOCATION, 0755);
-    g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
-    g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
 }
 
 static void inline start_jacques(void)

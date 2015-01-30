@@ -22,7 +22,10 @@
 
 static GList *loaded_modules = NULL;
 
+
+/* List of all different hooks */
 static GList *request_hooks = NULL;
+static GList *server_quit_hooks = NULL;
 
 
 typedef void (*ModuleInitFunc) ();
@@ -33,9 +36,15 @@ GList *ja_get_modules()
 }
 
 
-GList *ja_get_request_hooks()
+GList *ja_get_request_hooks(void)
 {
     return request_hooks;
+}
+
+
+GList *ja_get_server_quit_hooks(void)
+{
+    return server_quit_hooks;
 }
 
 
@@ -51,6 +60,9 @@ void ja_hook_register(void *ptr, JaHookType type)
     switch (type) {
     case JA_HOOK_TYPE_REQUEST:
         request_hooks = g_list_append(request_hooks, ptr);
+        break;
+    case JA_HOOK_TYPE_SERVER_QUIT:
+        server_quit_hooks = g_list_append(server_quit_hooks, ptr);
         break;
     }
 }

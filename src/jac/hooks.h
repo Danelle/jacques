@@ -21,6 +21,14 @@
 
 #include "struct.h"
 
+/*
+ * All hooks
+ */
+typedef enum {
+    JA_HOOK_TYPE_REQUEST,
+    JA_HOOK_TYPE_SERVER_QUIT,
+} JaHookType;
+
 
 typedef enum {
     JA_ACTION_IGNORE = 0x00,
@@ -33,9 +41,11 @@ typedef enum {
 typedef JaAction(*JaRequestHandler) (JaRequest * req);
 
 
-typedef enum {
-    JA_HOOK_TYPE_REQUEST,
-} JaHookType;
+/*
+ * @param name: the server's name
+ * @param listen_port: the port that server listens on
+ */
+typedef void (*JaServerQuitHandler) (const gchar *name,gushort listen_port);
 
 
 #endif                          /* __JA_HOOKS_H__ */

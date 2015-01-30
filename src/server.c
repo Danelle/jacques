@@ -40,6 +40,11 @@ static inline JaServer *ja_server_alloc(const gchar * name,
  */
 static inline void ja_server_main(JaServer * server);
 
+/*
+ * Invoke all hooks register as JA_HOOK_TYPE_SERVER_QUIT before exiting
+ */
+static inline void ja_server_quit(JaServer * server);
+
 
 static inline void ja_server_create_from_file(const gchar * name,
                                               JConfig * cfg);
@@ -209,7 +214,9 @@ static inline void ja_server_main(JaServer * server)
         }
         ja_worker_add(worker, conn);
     }
-    g_warning("server quits: %s", strerror(errno));
+    g_warning("server %s quits unexpectedly: %s",
+              server->name, strerror(errno));
+    ja_server_quit(server);
 }
 
 static void inline ja_server_initialize(JaServer * server)
@@ -248,6 +255,18 @@ static void sigint_handler(void)
     if (gServer == NULL) {
         return;
     }
-    g_message("SERVER QUIT");
-    _exit(SIGINT);
+    g_message("server %s quits", gServer->name);
+    ja_server_quit(gServer);
+}
+
+
+static inline void ja_server_quit(JaServer * server)
+{
+    GList *hooks = ja_get_server_quit_hooks();
+    while (hooks) {
+        JaServerQuitHandler handler = (JaServerQuitHandler) hooks->data;
+        handler(server->name, server->listen_port);
+        hooks = g_list_next(hooks);
+    }
+    _exit(0);
 }

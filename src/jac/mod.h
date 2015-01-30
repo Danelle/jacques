@@ -31,12 +31,16 @@ void ja_module_register(JaModule * mod, JConfig * cfg);
 GList *ja_get_modules();
 
 
-GList *ja_get_request_hooks();
+/* Functions to get all different hook lists */
+GList *ja_get_request_hooks(void);
+GList *ja_get_server_quit_hooks(void);
 
 
+/* */
 #define JA_MODULE_EXPORT G_MODULE_EXPORT
 
 
+/* Register a hook */
 void ja_hook_register(void *ptr, JaHookType type);
 
 
