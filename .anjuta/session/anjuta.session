@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1920x1019+0+27
 
 [File Loader]
-Files=../../src/utils.h#36%%%../../src/main.c#106%%%../../src/config.h#40%%%../../src/utils.c#73%%%../../src/log.h#24%%%../../src/worker.c#1%%%../../src/server.c#221%%%../../src/log.c#94%%%../../src/jac/jconf.c#201
+Files=../../src/log.c#24
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -17,7 +17,8 @@ Run in terminal=2
 Working directories=../../.
 
 [Project Manager]
-Expand=jacques%%%jacques//src%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc
+Shortcut=jacques//src//io//libjio.a%%%jacques//src//jac//libjac.a
+Expand=jacques%%%jacques//src%%%jacques//src//client%%%jacques//src//jacques%%%jacques//dist_doc%%%jacques//JACQUES
 
 [Debugger]
 Stop at beginning=2

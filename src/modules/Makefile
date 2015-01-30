@@ -12,3 +12,8 @@ clean:
 	rm -f *~ *.so
 
 distclean: clean
+
+install:
+
+
+uninstall:

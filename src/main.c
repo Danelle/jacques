@@ -25,6 +25,7 @@
 #include <string.h>
 #include <glib/gprintf.h>
 #include <getopt.h>
+#include <glib/gi18n-lib.h>
 
 
 static void inline show_version(void);
@@ -38,6 +39,7 @@ static void inline restart_jacques(void);
 
 int main(int argc, const char *argv[])
 {
+    setlocale(LC_ALL, "");
     static struct option long_options[] = {
         {"version", 0, NULL, 'v'},
         {"help", 0, NULL, 'h'},
@@ -76,12 +78,12 @@ int main(int argc, const char *argv[])
 
 static void inline show_version(void)
 {
-    g_printf("jacques version: %u.%u\n\n", JACQUES_VERSION_MAJOR,
+    g_printf(_("jacques version: %u.%u\n\n"), JACQUES_VERSION_MAJOR,
              JACQUES_VERSION_MINOR);
-    g_printf("Build Infomation:\n");
-    g_printf("\tConfiguration Location: %s\n", CONFIG_LOCATION);
-    g_printf("\tLog Location: %s\n", CONFIG_LOG_LOCATION);
-    g_printf("\tRuntime Location: %s\n", CONFIG_RUNTIME_LOCATION);
+    g_printf(_("Build Infomation:\n"));
+    g_printf(_("\tConfiguration Location: %s\n"), CONFIG_LOCATION);
+    g_printf(_("\tLog Location: %s\n"), CONFIG_LOG_LOCATION);
+    g_printf(_("\tRuntime Location: %s\n"), CONFIG_RUNTIME_LOCATION);
     exit(0);
 }
 
@@ -92,12 +94,13 @@ static void inline show_help(void)
     g_printf("\t--help\t\t-h\tshow this help info.\n");
     g_printf("\t--version\t-v\tshow the version of jacques.\n");
     g_printf
-        ("\t--signal\t-s\tsend signal to the master process: stop, retart.\n");
+        (_
+         ("\t--signal\t-s\tsend signal to the master process: stop, retart.\n"));
     exit(0);
 }
 
 
-static void inline initialize(void)
+static void inline initialize_jacques(void)
 {
     daemonize();
     g_mkdir_with_parents(CONFIG_RUNTIME_LOCATION, 0755);
@@ -108,7 +111,7 @@ static void inline initialize(void)
 
 static void inline start_jacques(void)
 {
-    initialize();
+    initialize_jacques();
 
     int running = already_running();
     if (running > 0) {

@@ -1,0 +1,9 @@
+# List of source files containing translatable strings.
+
+src/main.c
+src/config.c
+src/core.c
+src/log.c
+src/server.c
+src/utils.c
+src/worker.c

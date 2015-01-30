@@ -1,0 +1,52 @@
+# Chinese translations for jacques package
+# jacques 软件包的简体中文翻译.
+# Copyright (C) 2015 THE jacques'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the jacques package.
+# Wiky L <wiiiky@yeah.net>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: jacques 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-30 15:12+0800\n"
+"PO-Revision-Date: 2015-01-30 15:17+0800\n"
+"Last-Translator: Wiky L <wiiiky@yeah.net>\n"
+"Language-Team: Chinese (simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/main.c:80
+#, c-format
+msgid ""
+"jacques version: %u.%u\n"
+"\n"
+msgstr ""
+"jacques 版本: %u.%u\n"
+"\n"
+
+#: ../src/main.c:82
+#, c-format
+msgid "Build Infomation:\n"
+msgstr "构建信息:\n"
+
+#: ../src/main.c:83
+#, c-format
+msgid "\tConfiguration Location: %s\n"
+msgstr "\t配置目录: %s\n"
+
+#: ../src/main.c:84
+#, c-format
+msgid "\tLog Location: %s\n"
+msgstr "\t日至目录: %s\n"
+
+#: ../src/main.c:85
+#, c-format
+msgid "\tRuntime Location: %s\n"
+msgstr "\t运行时目录: %s\n"
+
+#: ../src/main.c:96
+#, c-format
+msgid "\t--signal\t-s\tsend signal to the master process: stop, retart.\n"
+msgstr "\t--signal\t-s\t给主控进程发送一个信号：stop,restart.\n"

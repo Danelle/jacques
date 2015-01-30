@@ -172,8 +172,7 @@ int setuser(const char *name)
  */
 int open_appendable(const char *name)
 {
-    int fd =
-        open(name, O_WRONLY | O_APPEND | O_CREAT,
-             S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    int fd = open(name, O_WRONLY | O_APPEND | O_CREAT,
+                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     return fd;
 }

@@ -22,6 +22,18 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_PREFIX_DEFAULT(/usr)
+
+
+# i18n
+IT_PROG_INTLTOOL([0.35.0])
+
+GETTEXT_PACKAGE=jacques
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
+
+AM_GLIB_GNU_GETTEXT
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -51,4 +63,5 @@ AC_OUTPUT([
 		   src/Makefile
 		   src/io/Makefile
 		   src/jac/Makefile
+           po/Makefile.in
 		   ])
