@@ -20,8 +20,12 @@
 #define __JA_LOG_H__
 
 
-
-void log_init(void);
+/*
+ * Initializes log handlers
+ * Returns 1 on success
+ * Returns 0 on error
+ */
+int log_init(void);
 
 
 

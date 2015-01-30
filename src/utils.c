@@ -70,7 +70,7 @@ int daemonize(void)
 
     chdir("/");
 
-    return close_fds();
+    return 1;
 }
 
 /*
@@ -78,16 +78,8 @@ int daemonize(void)
  */
 int close_fds(void)
 {
-    //获取文件描述符最大值
-    struct rlimit r1;
-    getrlimit(RLIMIT_NOFILE, &r1);
-
-    /* close file descriptor */
-    if (r1.rlim_max == RLIM_INFINITY) {
-        r1.rlim_max = 1024;
-    }
     int i;
-    for (i = 0; i < r1.rlim_max; i++) {
+    for (i = 0; i < 3; i++) {
         close(i);
     }
     int fd0 = open("/dev/null", O_RDWR);

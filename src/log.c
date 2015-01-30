@@ -37,7 +37,7 @@ static int error_fd = -1;
 static int message_fd = -1;
 
 
-void log_init(void)
+int log_init(void)
 {
     g_log_set_handler(NULL, G_LOG_LEVEL_WARNING | G_LOG_FLAG_FATAL
                       | G_LOG_FLAG_RECURSION, warning_log_handler, NULL);
@@ -48,6 +48,11 @@ void log_init(void)
 
     error_fd = open_appendable(CONFIG_LOG_ERROR_FILE);
     message_fd = open_appendable(CONFIG_LOG_FILE);
+
+    if (error_fd < 0 || message_fd < 0) {
+        return 0;
+    }
+    return 1;
 }
 
 

@@ -23,8 +23,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <glib/gprintf.h>
 #include <getopt.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <glib/gprintf.h>
 #include <glib/gi18n-lib.h>
 
 
@@ -37,9 +39,15 @@ static void inline start_jacques(void);
 static void inline stop_jacques(void);
 static void inline restart_jacques(void);
 
-int main(int argc, const char *argv[])
+
+static void initialize(void)
 {
     setlocale(LC_ALL, "");
+}
+
+int main(int argc, const char *argv[])
+{
+    initialize();
     static struct option long_options[] = {
         {"version", 0, NULL, 'v'},
         {"help", 0, NULL, 'h'},
@@ -101,11 +109,13 @@ static void inline show_help(void)
 
 static void inline initialize_jacques(void)
 {
-    daemonize();
+    if (!daemonize() || !log_init()) {
+        g_printf(_("Unable to initialize jacques:%s\n"), strerror(errno));
+        exit(-1);
+    }
     g_mkdir_with_parents(CONFIG_RUNTIME_LOCATION, 0755);
     g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
     g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
-    log_init();
 }
 
 static void inline start_jacques(void)
@@ -114,15 +124,16 @@ static void inline start_jacques(void)
 
     int running = already_running();
     if (running > 0) {
-        g_error(_("jacqueas is already running!!!"));
+        g_printf(_("jacqueas is already running!!!\n"));
     } else if (running < 0) {
-        g_error("unable to create pid file!!!");
-        exit(0);
-    }
+        g_printf(_("Unable to create pid file:%s\n"), strerror(errno));
+    } else {
+        close_fds();
 
-    JaCore *core = ja_core_create();
-    ja_core_wait(core);
-    ja_core_quit(core);
+        JaCore *core = ja_core_create();
+        ja_core_wait(core);
+        ja_core_quit(core);
+    }
 }
 
 static void inline stop_jacques(void)
@@ -132,14 +143,15 @@ static void inline stop_jacques(void)
         g_printf(_("jacques is not running!!!\n"));
         exit(0);
     } else if (running < 0) {
-        g_printf(_("unable to get jacques process id!!!\n"));
+        g_printf(_("Unable to get jacques process id:%s\n"),
+                 strerror(errno));
         exit(0);
     }
     if (kill(running, SIGINT)) {
-        g_printf(_("fail to send signal SIGINT to process %d: %s\n"),
+        g_printf(_("Fail to send signal SIGINT to process %d:%s\n"),
                  running, strerror(errno));
     } else {
-        g_printf(("send signal SIGINT to jacques: %d\n"), running);
+        g_printf(("Send signal SIGINT to jacques: %d\n"), running);
     }
     exit(0);
 }
