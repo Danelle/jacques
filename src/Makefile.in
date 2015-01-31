@@ -101,7 +101,7 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) core.$(OBJEXT) \
+am_jacques_OBJECTS = main.$(OBJEXT) config.$(OBJEXT) master.$(OBJEXT) \
 	server.$(OBJEXT) worker.$(OBJEXT) utils.$(OBJEXT) \
 	log.$(OBJEXT)
 jacques_OBJECTS = $(am_jacques_OBJECTS)
@@ -411,8 +411,8 @@ jacques_SOURCES = \
 	main.c \
 	config.h \
 	config.c \
-	core.c \
-	core.h \
+	master.h \
+	master.c \
 	server.c \
 	server.h \
 	worker.c \
@@ -575,9 +575,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/core.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/master.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/worker.Po@am__quote@

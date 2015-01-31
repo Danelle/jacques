@@ -1,5 +1,5 @@
 /*
- * core.h
+ * master.h
  *
  * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
  *
@@ -21,7 +21,7 @@
 
 
 /*
- * JaCore, the controller of servers
+ * JaMaster, the controller of servers
  */
 
 #include <glib.h>
@@ -32,20 +32,20 @@ typedef struct {
     JConfig *cfg;
     GList *scfg;
     GList *children;
-} JaCore;
+} JaMaster;
 
 
 /*
  * Starts the core process of jacques
  * If fail, will call g_error() to terminate the process
  */
-JaCore *ja_core_create();
+JaMaster *ja_master_create();
 
 
-void ja_core_wait(JaCore * core);
+void ja_master_wait(JaMaster * core);
 
 
-void ja_core_quit(JaCore * core);
+void ja_master_quit(JaMaster * core);
 
 
 

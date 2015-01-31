@@ -2,7 +2,7 @@
 
 src/main.c
 src/config.c
-src/core.c
+src/master.h
 src/log.c
 src/server.c
 src/utils.c

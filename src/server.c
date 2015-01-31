@@ -254,9 +254,6 @@ static void signal_handler(int signum)
 
 static void sigint_handler(void)
 {
-    if (gServer == NULL) {
-        return;
-    }
     g_message("server %s quits", gServer->name);
     ja_server_quit(gServer);
 }

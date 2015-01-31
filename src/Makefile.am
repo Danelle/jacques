@@ -23,8 +23,8 @@ jacques_SOURCES = \
 	main.c \
 	config.h \
 	config.c \
-	core.c \
-	core.h \
+	master.h \
+	master.c \
 	server.c \
 	server.h \
 	worker.c \
@@ -34,7 +34,7 @@ jacques_SOURCES = \
 	log.c \
 	log.h
 
-jacques_LDFLAGS = 
+jacques_LDFLAGS =
 
 SUBLIBS = \
 	jac/libjac.a \

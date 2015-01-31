@@ -1,5 +1,5 @@
 /*
- * core.c
+ * master.h
  *
  * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include "core.h"
+#include "master.h"
 #include "server.h"
 #include "config.h"
 #include "utils.h"
@@ -25,7 +25,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-static JaCore *gCore = NULL;
+static JaMaster *gMaster = NULL;
 
 static void signal_handler(int signum);
 static void sigint_handler(void);
@@ -36,25 +36,25 @@ static void sigint_handler(void);
 static void signal_initialize(void);
 
 /*
- * Starts the core process of jacques
+ * Starts the master process of jacques
  * If fail, will call g_error() to terminate the process
  */
-JaCore *ja_core_create()
+JaMaster *ja_master_create()
 {
     JConfig *cfg = ja_config_load();
     ja_config_load_modules(cfg);
 
     GList *children = ja_server_load(cfg);
-    gCore = (JaCore *) g_slice_alloc(sizeof(JaCore));
-    gCore->cfg = cfg;
-    gCore->children = children;
-    return gCore;
+    gMaster = (JaMaster *) g_slice_alloc(sizeof(JaMaster));
+    gMaster->cfg = cfg;
+    gMaster->children = children;
+    return gMaster;
 }
 
-void ja_core_wait(JaCore * core)
+void ja_master_wait(JaMaster * master)
 {
     signal_initialize();
-    GList *children = core->children;
+    GList *children = master->children;
     int status;
     while (1) {
         pid_t pid = wait(&status);
@@ -65,13 +65,13 @@ void ja_core_wait(JaCore * core)
             break;
         }
     }
-    core->children = NULL;
+    master->children = NULL;
 }
 
-void ja_core_quit(JaCore * core)
+void ja_master_quit(JaMaster * master)
 {
-    j_config_free(core->cfg);
-    g_slice_free1(sizeof(JaCore), core);
+    j_config_free(master->cfg);
+    g_slice_free1(sizeof(JaMaster), master);
 }
 
 
@@ -93,10 +93,7 @@ static void signal_handler(int signum)
 
 static void sigint_handler(void)
 {
-    if (gCore == NULL) {
-        return;
-    }
-    GList *ptr = gCore->children;
+    GList *ptr = gMaster->children;
     while (ptr) {
         pid_t pid = (pid_t) (gulong) ptr->data;
         kill(pid, SIGINT);
@@ -105,7 +102,7 @@ static void sigint_handler(void)
 
     while (wait(NULL) > 0) {
     }
-    g_list_free(gCore->children);
-    gCore->children = NULL;
+    g_list_free(gMaster->children);
+    gMaster->children = NULL;
     g_message("CORE QUIT");
 }

@@ -34,7 +34,7 @@
 #define DIRECTIVE_THREAD_COUNT "ThreadCount"
 
 #define DEFAULT_MAX_PENDING 256
-#define DEFAULT_THREAD_COUNT  6
+#define DEFAULT_THREAD_COUNT  1
 
 
 /*

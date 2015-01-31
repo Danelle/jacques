@@ -17,7 +17,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core.h"
+#include "master.h"
 #include "utils.h"
 #include "log.h"
 #include <stdlib.h>
@@ -133,9 +133,9 @@ static void inline start_jacques(void)
     } else {
         close_fds();
 
-        JaCore *core = ja_core_create();
-        ja_core_wait(core);
-        ja_core_quit(core);
+        JaMaster *master = ja_master_create();
+        ja_master_wait(master);
+        ja_master_quit(master);
     }
 }
 
