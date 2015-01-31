@@ -27,7 +27,7 @@
 
 static JaMaster *gMaster = NULL;
 
-static void signal_handler(int signum);
+static void signal_handler(gint signum);
 static void sigint_handler(void);
 
 /*
@@ -82,7 +82,7 @@ static void signal_initialize(void)
     }
 }
 
-static void signal_handler(int signum)
+static void signal_handler(gint signum)
 {
     switch (signum) {
     case SIGINT:

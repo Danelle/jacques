@@ -19,21 +19,21 @@
 #ifndef __JA_UTILS_H__
 #define __JA_UTILS_H__
 
+#include <glib.h>
 
 /*
  * Daemonizes current process
- * Returns pid in parent
- * Returns 0 in child
- * Returns -1 on error
+ * Returns TRUE on success
+ * Returns FALSE on error
  */
-int daemonize(void);
+gboolean daemonize(void);
 
 
 
 /*
  * Closes all open file descriptor
  */
-int close_fds(void);
+gboolean close_fds(void);
 
 
 /*
@@ -42,31 +42,31 @@ int close_fds(void);
  * Returns 0 if no
  * Returns -1 on error
  */
-int already_running(void);
+gint already_running(void);
 
 
 /*
  * Sets the current process effective user as name
- * Returns 1 on success
- * 0 otherwise
+ * Returns TRUE on success
+ * FALSE otherwise
  */
-int setuser(const char *name);
+gboolean setuser(const gchar * name);
 
 
 /*
  * Opens a file for writing
  * Returns NULL on error
  */
-int open_appendable(const char *name);
+gint open_appendable(const gchar * name);
 
 
 /*
  * Sets the process title
  * http://www.codecodex.com/wiki/Set_Process_Title
  */
-void set_proctitle(char **argv,
+void set_proctitle(gchar ** argv,
                    /* argv as passed to main, so args can be moved if necessary */
-                   const char *fmt, /* printf(3)-style format string for process title */
+                   const gchar * fmt,   /* printf(3)-style format string for process title */
                    ... /* args to format string */ );
 
 

@@ -54,7 +54,7 @@ static inline void ja_server_create_from_file(const gchar * name,
 /* Initialize signal handlers */
 static void inline signal_initialize(void);
 /* handle signals */
-static void signal_handler(int signum);
+static void signal_handler(gint signum);
 static void sigint_handler(void);
 
 /*
@@ -74,17 +74,27 @@ GList *ja_server_load(JConfig * cfg)
     GList *pids = NULL;
     const gchar *name = NULL;
     while ((name = g_dir_read_name(dir))) {
-        pid_t pid = fork();
+        pid_t pid = ja_server_create(name, cfg);
         if (pid < 0) {
             g_warning("fail to create server %s", name);
-        } else if (pid == 0) {  /* server */
-            ja_server_create_from_file(name, cfg);
         } else {                /* parent */
             pids = g_list_append(pids, (void *) (gulong) pid);
         }
     }
     g_dir_close(dir);
     return pids;
+}
+
+pid_t ja_server_create(const gchar * name, JConfig * cfg)
+{
+    pid_t pid = fork();
+    if (pid < 0) {
+        return (pid_t) - 1;
+    } else if (pid > 0) {
+        return pid;
+    }
+    ja_server_create_from_file(name, cfg);
+    exit(-1);
 }
 
 static inline void ja_server_create_from_file(const gchar * name,
@@ -119,9 +129,6 @@ static inline void ja_server_create_from_file(const gchar * name,
         ja_server_alloc(name, listen_port, max_pending, thread_count, cfg);
 
     ja_server_main(gServer);
-
-    _exit(-1);
-    /* no */
 }
 
 
@@ -233,7 +240,7 @@ static void inline ja_server_initialize(JaServer * server)
     }
     server->listen_sock = jsock;
 
-    set_proctitle((char **) NULL, "jacques: server");
+    set_proctitle((gchar **) NULL, "jacques: server");
 }
 
 static void inline signal_initialize(void)
@@ -243,7 +250,7 @@ static void inline signal_initialize(void)
     }
 }
 
-static void signal_handler(int signum)
+static void signal_handler(gint signum)
 {
     switch (signum) {
     case SIGINT:

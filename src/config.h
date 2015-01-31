@@ -103,9 +103,9 @@ void ja_config_load_modules(JConfig * cfg);
 
 /*
  * Loads a module
- * Returns 1 on success,otherwise 0
+ * Returns TRUE on success,otherwise FALSE
  */
-int ja_load_module(const gchar * filename, JConfig * cfg);
+gboolean ja_load_module(const gchar * filename, JConfig * cfg);
 
 
 #endif

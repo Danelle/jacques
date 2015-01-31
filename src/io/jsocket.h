@@ -26,16 +26,16 @@
 
 /*
  * JSocket - IPv4 stream socket that receives/sends packaged data
- * 
+ *
  * Every package starts with 4 bytes which means the length of rest data
- * When JSocket writes data, it preppend the 4 bytes, 
+ * When JSocket writes data, it preppend the 4 bytes,
  * When JSocket reads data, it parses the first 4 bytes and reads the real data,
- * in a non-blocking way 
+ * in a non-blocking way
  */
 typedef struct _JSocket JSocket;
 
 struct _JSocket {
-    int sockfd;                 /* native socket descriptor */
+    gint sockfd;                /* native socket descriptor */
 
     /* read buffer */
     GByteArray *rbuf;
@@ -88,7 +88,7 @@ JSocket *j_client_socket_new(const gchar * remote, gushort port);
  * Creates a new JSocket from a native socket descriptor
  * @param addr must be type of struct sockaddr_in
  */
-JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
+JSocket *j_socket_new_fromfd(gint sockfd, struct sockaddr *addr,
                              socklen_t addrlen);
 
 /*
@@ -104,21 +104,21 @@ void j_socket_close(JSocket * jsock);
 
 
 /* wrappers for syscalls, non-blocking */
-int j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count);
-int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count);
+gint j_socket_write_raw(JSocket * jsock, const void *buf, guint32 count);
+gint j_socket_read_raw(JSocket * jsock, void *buf, guint32 count);
 /* blocking */
-int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
-                        socklen_t * addrlen);
+gint j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
+                         socklen_t * addrlen);
 
 /*
  * Packs up the buf and write to socket in non-blocking way
  * If all data is writen, return 1
  * If only part of data is writen, return 0, should continue next time
  * If error occurs, return -1
- * 
+ *
  * Note, if j_socket_write() returns 0, then you can it with buf NULL next time, until all data is writen
  */
-int j_socket_write(JSocket * jsock, const void *buf, guint32 count);
+gint j_socket_write(JSocket * jsock, const void *buf, guint32 count);
 
 /*
  * Reads a whole package
@@ -126,11 +126,11 @@ int j_socket_write(JSocket * jsock, const void *buf, guint32 count);
  * Returns 1 if all data recevied
  * Returns -1 if error occurs
  *
- * After a successful read (a whole package data recevied), 
+ * After a successful read (a whole package data recevied),
  * call j_socket_data() to get the data
  * call j_socket_data_length() to get the data length
  */
-int j_socket_read(JSocket * jsock);
+gint j_socket_read(JSocket * jsock);
 
 /*
  * Gets the socket address

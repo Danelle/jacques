@@ -45,7 +45,7 @@ static void initialize(void)
     setlocale(LC_ALL, "");
 }
 
-int main(int argc, const char *argv[])
+int main(gint argc, const gchar * argv[])
 {
     initialize();
     static struct option long_options[] = {
@@ -55,7 +55,7 @@ int main(int argc, const char *argv[])
         {NULL, 0, NULL, 0}
     };
 
-    int ch;
+    gint ch;
     while ((ch =
             getopt_long(argc, (char *const *) argv, "s:vh", long_options,
                         NULL)) != -1) {
@@ -81,7 +81,7 @@ int main(int argc, const char *argv[])
         show_help();
     }
 
-    set_proctitle((char **) argv, "jacques: master");
+    set_proctitle((gchar **) argv, "jacques: master");
     start_jacques();
 
     return (0);
@@ -125,7 +125,7 @@ static void inline start_jacques(void)
 {
     initialize_jacques();
 
-    int running = already_running();
+    gint running = already_running();
     if (running > 0) {
         g_printf(_("jacqueas is already running!!!\n"));
     } else if (running < 0) {
@@ -141,7 +141,7 @@ static void inline start_jacques(void)
 
 static void inline stop_jacques(void)
 {
-    int running = already_running();
+    gint running = already_running();
     if (running == 0) {
         g_printf(_("jacques is not running!!!\n"));
         exit(0);

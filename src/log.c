@@ -22,7 +22,6 @@
 #include "utils.h"
 #include <unistd.h>
 #include <string.h>
-#include <glib.h>
 
 
 static void warning_log_handler(const gchar * domain,
@@ -33,11 +32,11 @@ static void message_log_handler(const gchar * domain,
                                 const gchar * message, gpointer user_data);
 
 
-static int error_fd = -1;
-static int message_fd = -1;
+static gint error_fd = -1;
+static gint message_fd = -1;
 
 
-int log_init(void)
+gboolean log_init(void)
 {
     g_log_set_handler(NULL, G_LOG_LEVEL_WARNING | G_LOG_FLAG_FATAL
                       | G_LOG_FLAG_RECURSION, warning_log_handler, NULL);
@@ -50,14 +49,14 @@ int log_init(void)
     message_fd = open_appendable(CONFIG_LOG_FILE);
 
     if (error_fd < 0 || message_fd < 0) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 
 
 
-static void inline log_write(int output, const gchar * message)
+static void inline log_write(gint output, const gchar * message)
 {
     GDateTime *dt = g_date_time_new_now_local();
     gchar *time = g_date_time_format(dt, "[%x %X]");

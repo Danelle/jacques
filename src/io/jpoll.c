@@ -1,17 +1,17 @@
 /*
  * jpoll.c
  * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
- * 
+ *
  * Jacques is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Jacques is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,7 +23,7 @@
 
 
 struct _JPoll {
-    int epollfd;
+    gint epollfd;
     GList *jsocks;              /* the list of JSockets registered */
     gint count;                 /* the length of jsocks */
 };
@@ -54,7 +54,7 @@ GList *j_poll_all(JPoll * jp)
 }
 
 /*
- * Gets the count of JSockets 
+ * Gets the count of JSockets
  */
 gint j_poll_count(JPoll * jp)
 {
@@ -66,7 +66,7 @@ static inline JPollEvent *j_poll_event_new(struct epoll_event *event);
 static inline void j_poll_event_free(JPollEvent * event);
 
 /* Creates a JPoll from a existing file descriptor */
-static inline JPoll *j_poll_new_fromfd(int fd);
+static inline JPoll *j_poll_new_fromfd(gint fd);
 
 /*
  * Creates a JPoll
@@ -74,7 +74,7 @@ static inline JPoll *j_poll_new_fromfd(int fd);
  */
 JPoll *j_poll_new()
 {
-    int fd = epoll_create(1);   /* size must be greater than zero, but not used */
+    gint fd = epoll_create(1);  /* size must be greater than zero, but not used */
     if (fd < 0) {
         return NULL;
     }
@@ -82,7 +82,7 @@ JPoll *j_poll_new()
 }
 
 
-static inline JPoll *j_poll_new_fromfd(int fd)
+static inline JPoll *j_poll_new_fromfd(gint fd)
 {
     JPoll *jp = (JPoll *) g_slice_alloc(sizeof(JPoll));
     jp->epollfd = fd;
@@ -92,7 +92,7 @@ static inline JPoll *j_poll_new_fromfd(int fd)
 }
 
 /*
- * Waits for events on JPoll instance. Up to maxevents 
+ * Waits for events on JPoll instance. Up to maxevents
  * When successfully, j_poll_wait() returns a number of ready JSocket.
  * or zero if no JSocket became ready during the request timeout milliseconds
  * When an error occurs, returns -1
@@ -106,8 +106,8 @@ gint j_poll_wait(JPoll * jp, JPollEvent * jevents, guint maxevents,
     } else if (maxevents == 0) {
         return 0;
     }
-    int epollfd = j_poll_fd(jp);
-    int n;
+    gint epollfd = j_poll_fd(jp);
+    gint n;
   AGAIN:
     n = epoll_wait(epollfd, events, maxevents, timeout);
     if (n < 0) {
@@ -119,7 +119,7 @@ gint j_poll_wait(JPoll * jp, JPollEvent * jevents, guint maxevents,
         return 0;
     }
 
-    int i;
+    gint i;
     for (i = 0; i < n; i++) {
         jevents[i].type = events[i].events;
         jevents[i].jsock = (JSocket *) events[i].data.ptr;
@@ -131,8 +131,8 @@ gint j_poll_wait(JPoll * jp, JPollEvent * jevents, guint maxevents,
 /* Registers a JSocket */
 gint j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
 {
-    int epollfd = j_poll_fd(jp);
-    int sockfd = j_socket_fd(jsock);
+    gint epollfd = j_poll_fd(jp);
+    gint sockfd = j_socket_fd(jsock);
 
     struct epoll_event event;
     event.events = events;      /* epoll_wait will always wait for EPOLLERR and EPOLLHUP, not necessary to set here */
@@ -149,8 +149,8 @@ gint j_poll_register(JPoll * jp, JSocket * jsock, guint32 events)
  */
 gint j_poll_modify(JPoll * jp, JSocket * jsock, guint32 events)
 {
-    int epollfd = j_poll_fd(jp);
-    int sockfd = j_socket_fd(jsock);
+    gint epollfd = j_poll_fd(jp);
+    gint sockfd = j_socket_fd(jsock);
 
     struct epoll_event event;
     event.events = events;
@@ -165,8 +165,8 @@ gint j_poll_modify(JPoll * jp, JSocket * jsock, guint32 events)
  */
 gint j_poll_delete(JPoll * jp, JSocket * jsock)
 {
-    int epollfd = j_poll_fd(jp);
-    int sockfd = j_socket_fd(jsock);
+    gint epollfd = j_poll_fd(jp);
+    gint sockfd = j_socket_fd(jsock);
 
     j_poll_remove_jsocket(jp, jsock);
 
@@ -192,9 +192,9 @@ gint j_poll_delete_close(JPoll * jp, JSocket * jsock)
  */
 gint j_poll_close(JPoll * jp)
 {
-    int epollfd = j_poll_fd(jp);
+    gint epollfd = j_poll_fd(jp);
 
-    int ret = close(epollfd);
+    gint ret = close(epollfd);
     g_slice_free1(sizeof(JPoll), jp);
 
     return ret;

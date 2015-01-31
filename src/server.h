@@ -21,6 +21,7 @@
 
 #include <glib.h>
 #include <jio.h>
+#include <pthread.h>
 #include "config.h"
 
 
@@ -56,14 +57,8 @@ typedef struct {
     JConfig *cfg;
 } JaServer;
 
-/*
- * Creates a JaServer, (fork a new process)
- * Returns fork()
- * Child process will not return
- */
-gint ja_server_create(JConfig * cfg);
-
-
+/* Forks a server, Returns the server pid on success, otherwise returns -1 */
+pid_t ja_server_create(const gchar * name, JConfig * cfg);
 
 
 #endif                          /* __JA_SERVER_H__ */

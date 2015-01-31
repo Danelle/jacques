@@ -1,17 +1,17 @@
 /*
  * config.c
  * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
- * 
+ *
  * Jacques is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Jacques is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,12 +40,12 @@ void ja_config_load_modules(JConfig * cfg)
 }
 
 
-int ja_load_module(const gchar * name, JConfig * cfg)
+gboolean ja_load_module(const gchar * name, JConfig * cfg)
 {
     gchar *mname = get_module_name(name);
     if (mname == NULL) {
         g_warning("invalid module name %s", name);
-        return 0;
+        return FALSE;
     }
     gchar path[1024];
     g_snprintf(path, sizeof(path), "%s/%s", CONFIG_MOD_ENABLED_LOCATION,
@@ -55,7 +55,7 @@ int ja_load_module(const gchar * name, JConfig * cfg)
     if (mod == NULL) {
         g_warning("fail to load module %s", name);
         g_free(mname);
-        return 0;
+        return FALSE;
     }
     g_module_make_resident(mod);
 
@@ -72,7 +72,7 @@ int ja_load_module(const gchar * name, JConfig * cfg)
     g_module_close(mod);
     g_free(mname);
 
-    return ret;
+    return ret ? TRUE : FALSE;
 }
 
 static gchar *get_module_name(const gchar * name)

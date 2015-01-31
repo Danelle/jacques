@@ -19,13 +19,14 @@
 #ifndef __JA_LOG_H__
 #define __JA_LOG_H__
 
+#include <glib.h>
 
 /*
  * Initializes log handlers
  * Returns 1 on success
  * Returns 0 on error
  */
-int log_init(void);
+gboolean log_init(void);
 
 
 

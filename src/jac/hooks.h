@@ -45,7 +45,8 @@ typedef JaAction(*JaRequestHandler) (JaRequest * req);
  * @param name: the server's name
  * @param listen_port: the port that server listens on
  */
-typedef void (*JaServerQuitHandler) (const gchar *name,gushort listen_port);
+typedef void (*JaServerQuitHandler) (const gchar * name,
+                                     gushort listen_port);
 
 
 #endif                          /* __JA_HOOKS_H__ */

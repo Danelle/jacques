@@ -51,7 +51,7 @@
 /*
  * Creates a new JSocket from a native socket descriptor
  */
-JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
+JSocket *j_socket_new_fromfd(gint sockfd, struct sockaddr *addr,
                              socklen_t addrlen)
 {
     JSocket *jsock = (JSocket *) g_slice_alloc(sizeof(JSocket));
@@ -72,18 +72,18 @@ JSocket *j_socket_new_fromfd(int sockfd, struct sockaddr *addr,
 
 /*
  * Creates a new passive IPv4 socket, which listens on port
- * 
+ *
  * Returns NULL on error;
  */
 JSocket *j_server_socket_new(gushort port, guint32 backlog)
 {
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    gint sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         return NULL;
     }
 
-    int set = 1;
-    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *) &set,
+    gint set = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const gchar *) &set,
                sizeof(set));
 
     struct sockaddr_in addr;
@@ -111,7 +111,7 @@ JSocket *j_server_socket_new(gushort port, guint32 backlog)
  */
 JSocket *j_client_socket_new(const gchar * remote, gushort port)
 {
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    gint sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         return NULL;
     }
@@ -139,7 +139,7 @@ JSocket *j_socket_accept(JSocket * jsock)
     struct sockaddr_storage addr;
     socklen_t addrlen;
 
-    int fd =
+    gint fd =
         j_socket_accept_raw(jsock, (struct sockaddr *) &addr, &addrlen);
     if (fd < 0) {
         return NULL;
@@ -159,11 +159,11 @@ void j_socket_close(JSocket * jsock)
     g_slice_free1(sizeof(JSocket), jsock);
 }
 
-int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
-                        socklen_t * addrlen)
+gint j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
+                         socklen_t * addrlen)
 {
-    int sockfd = j_socket_fd(jsock);
-    int fd;
+    gint sockfd = j_socket_fd(jsock);
+    gint fd;
   AGAIN:
     errno = 0;
     fd = accept(sockfd, addr, addrlen);
@@ -184,10 +184,10 @@ int j_socket_accept_raw(JSocket * jsock, struct sockaddr *addr,
  * Wrappers for system calls
  * recall if interrupted by signal
  */
-int j_socket_write_raw(JSocket * jsock, const void *rbuf, guint32 count)
+gint j_socket_write_raw(JSocket * jsock, const void *rbuf, guint32 count)
 {
-    int sockfd = j_socket_fd(jsock);
-    int n;
+    gint sockfd = j_socket_fd(jsock);
+    gint n;
   AGAIN:
     errno = 0;
     n = send(sockfd, rbuf, count, MSG_DONTWAIT);    /* Run! Don't wait for me! You're the hope of human */
@@ -197,10 +197,10 @@ int j_socket_write_raw(JSocket * jsock, const void *rbuf, guint32 count)
     return n;
 }
 
-int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
+gint j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
 {
-    int sockfd = j_socket_fd(jsock);
-    int n;
+    gint sockfd = j_socket_fd(jsock);
+    gint n;
   AGAIN:
     errno = 0;
     n = recv(sockfd, buf, count, MSG_DONTWAIT); /* Hold on! I'll be back! */
@@ -215,10 +215,10 @@ int j_socket_read_raw(JSocket * jsock, void *buf, guint32 count)
  * If all data is writen, return 1
  * If only part of data is writen, return 0, to be continue next time
  * If error occurs, return -1
- * 
+ *
  * Note, if j_socket_write() returns 0, then you can call it with NULL in buf next time, until all data is writen
  */
-int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
+gint j_socket_write(JSocket * jsock, const void *buf, guint32 count)
 {
     j_socket_update_active(jsock);
     guint32 size = j_socket_wdata_length(jsock);
@@ -257,10 +257,10 @@ int j_socket_write(JSocket * jsock, const void *buf, guint32 count)
  * Reads the length of a package
  * Returns 1 if success, 0 otherwise
  */
-static int j_socket_read_length(JSocket * jsock)
+static gint j_socket_read_length(JSocket * jsock)
 {
     gchar lenbuf[4];
-    int n = j_socket_read_raw(jsock, lenbuf, 4);
+    gint n = j_socket_read_raw(jsock, lenbuf, 4);
     if (n != 4) {               /* error */
         return 0;
     }
@@ -279,11 +279,11 @@ static int j_socket_read_length(JSocket * jsock)
  * Returns 1 if all data recevied
  * Returns -1 if error occurs
  *
- * After a successful read (a whole package data recevied), 
+ * After a successful read (a whole package data recevied),
  * call j_socket_data() to get the data
  * call j_socket_data_length() to get the data length
  */
-int j_socket_read(JSocket * jsock)
+gint j_socket_read(JSocket * jsock)
 {
     if (j_socket_total_length(jsock) == 0 && j_socket_read_length(jsock) == 0) {    /* read the length of a new package */
         /* error */
@@ -295,7 +295,7 @@ int j_socket_read(JSocket * jsock)
     gint32 left = j_socket_left_length(jsock);
     guint32 count = sizeof(databuf) > left ? left : sizeof(databuf);
     while (left > 0) {
-        int n = j_socket_read_raw(jsock, databuf, count);   /* in non-blocking way */
+        gint n = j_socket_read_raw(jsock, databuf, count);  /* in non-blocking way */
         if (n < 0) {
             if (errno == EAGAIN) {
                 return 0;
