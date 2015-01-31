@@ -232,6 +232,8 @@ static void inline ja_server_initialize(JaServer * server)
         _exit(-1);
     }
     server->listen_sock = jsock;
+
+    set_proctitle((char **) NULL, "jacques: server");
 }
 
 static void inline signal_initialize(void)

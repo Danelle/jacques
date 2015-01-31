@@ -81,6 +81,7 @@ int main(int argc, const char *argv[])
         show_help();
     }
 
+    set_proctitle((char **) argv, "jacques: master");
     start_jacques();
 
     return (0);

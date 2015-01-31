@@ -60,4 +60,14 @@ int setuser(const char *name);
 int open_appendable(const char *name);
 
 
+/*
+ * Sets the process title
+ * http://www.codecodex.com/wiki/Set_Process_Title
+ */
+void set_proctitle(char **argv,
+                   /* argv as passed to main, so args can be moved if necessary */
+                   const char *fmt, /* printf(3)-style format string for process title */
+                   ... /* args to format string */ );
+
+
 #endif
