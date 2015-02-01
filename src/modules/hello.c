@@ -25,13 +25,15 @@ static gint request(JaRequest * req)
     return JA_ACTION_RESPONSE;
 }
 
-static void init(JConfig * cfg)
+static gpointer init(JConfig * cfg)
 {
     g_message("hello all");
     ja_hook_register(request, JA_HOOK_TYPE_REQUEST);
+    return NULL;
 }
 
 JA_MODULE_EXPORT JaModule hello_struct = {
     "hello all",
-    init
+    init,
+    NULL
 };

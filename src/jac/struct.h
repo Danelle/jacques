@@ -51,12 +51,17 @@ void ja_request_free(JaRequest * req);
 
 
 
-typedef void (*JaModuleInit) (JConfig * cfg);
+/* Returns the module configuration structure */
+typedef gpointer (*JaModuleInit) (JConfig * cfg);
+/* Registers hooks */
+typedef void (*JaModuleHooksInit)(void);
 
 
 typedef struct {
     gchar *name;
+
     JaModuleInit init_func;
+    JaModuleHooksInit hooks_init_func;
 } JaModule;
 
 
