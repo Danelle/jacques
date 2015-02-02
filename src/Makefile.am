@@ -48,6 +48,13 @@ client_SOURCES =  \
 client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 
+nobase_include_HEADERS = \
+	jac/jconf.h \
+	jac/mod.h \
+	jac/hooks.h \
+	jac/struct.h \
+	jac/jac.h
+
 
 SUBDIRS = \
 	io \

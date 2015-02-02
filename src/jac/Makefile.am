@@ -6,13 +6,9 @@ lib_LIBRARIES =  \
 
 libjac_a_SOURCES =  \
 	jconf.c \
-	jconf.h \
 	mod.c \
-	mod.h \
 	hooks.c \
-	hooks.h \
-	struct.c \
-	struct.h \
-	jac.h
+	struct.c 
+
 
 libjac_a_CPPFLAGS =  $(JACQUES_CFLAGS)
