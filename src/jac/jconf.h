@@ -1,7 +1,7 @@
 /*
  * jconf.h
  *
- * Copyright (C) 2015 - Wiky L <wiiiky@yeah.net>
+ * Copyright (C) 2015 - Wiky L <wiiiky@outlook.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ void j_config_free(JConfig * cfg);
 
 JDirectiveGroup *j_config_lookup(JConfig * cfg, const gchar * name);
 
-/* 
+/*
  * group is optional NULl for global
  */
 gint j_config_get_integer(JConfig * cfg, const gchar * group,

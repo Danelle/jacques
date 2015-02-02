@@ -1,17 +1,17 @@
 /*
  * jpoll.h
- * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
- * 
+ * Copyright (C) 2015 Wiky L <wiiiky@outlook.com>
+ *
  * Jacques is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Jacques is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -53,13 +53,13 @@ GList *j_poll_all(JPoll * jp);
 
 
 /*
- * Gets the count of JSockets 
+ * Gets the count of JSockets
  */
 gint j_poll_count(JPoll * jp);
 
 
 /*
- * Waits for events on JPoll instance. Up to maxevents 
+ * Waits for events on JPoll instance. Up to maxevents
  * When successfully, j_poll_wait() returns a number of ready JSocket.
  * then you can call j_poll_ready() to get the ready JSocket
  * or zero if no JSocket became ready during the request timeout milliseconds

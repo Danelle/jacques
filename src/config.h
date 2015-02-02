@@ -1,6 +1,6 @@
 /*
  * config.h
- * Copyright (C) 2015 Wiky L <wiiiky@yeah.net>
+ * Copyright (C) 2015 Wiky L <wiiiky@outlook.com>
  *
  * Jacques is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

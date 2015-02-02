@@ -15,17 +15,17 @@ a server program which focuses on mobile applications.
  jacques是服务器程序，client是测试用的客户端。
 
 要运行服务器，需要有相应的配置文件，默认的配置文件目录在/etc/jacques/下，（你也可以通过修改config.h中的定义来改变配置文件的位置）
-    
+
 有个主配置文件/etc/jacques/jacques.conf，内容如下
 
 	ThreadCount  6		# 0 for default
 
 还需要在/etc/jacques/app-enabled目录下放置服务配置文件（文件名任意），（如apache的虚拟主机）
     一个服务配置文件如下,你可以放置多个
-	
+
 	ListenPort  23432
 	NaxPending  512
-	
+
 	KeepAlive	30		# 0 for forever, -1 for no keepalive
 
 	ThreadCount 6		# 0 for default
@@ -43,7 +43,7 @@ a server program which focuses on mobile applications.
 
 
 ##Contact
-欢迎和我联系 Wiky L <wiiiky@yeah.net>
+欢迎和我联系 Wiky L <wiiiky@outlook.com>
 
 Be free to email me
-    
+
