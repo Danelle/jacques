@@ -33,14 +33,41 @@ void ja_config_load_modules(JConfig * cfg)
     while (ptr) {
         JDirective *jd = (JDirective *) ptr->data;
         if (g_strcmp0(jd->name, DIRECTIVE_LOADMODULE) == 0) {
-            ja_load_module(jd->value, cfg);
+            ja_load_module(jd->value);
+        }
+        ptr = g_list_next(ptr);
+    }
+
+    /* handles module configurations */
+    ptr = ja_get_modules();
+    while (ptr) {
+        JaModule *mod = (JaModule *) ptr->data;
+        JaModuleConfigurationHandler handler = mod->cfg_handler;
+        if (handler) {
+            JDirectiveGroup *group = j_config_lookup(cfg, mod->name);
+            if (group) {
+                handler(global->directives, group->directives);
+            } else {
+                handler(global->directives, NULL);
+            }
+        }
+        ptr = g_list_next(ptr);
+    }
+
+    /* register hooks */
+    ptr = ja_get_modules();
+    while (ptr) {
+        JaModule *mod = (JaModule *) ptr->data;
+        JaModuleHooksInit hook_init = mod->hooks_init_func;
+        if (hook_init) {
+            hook_init();
         }
         ptr = g_list_next(ptr);
     }
 }
 
 
-gboolean ja_load_module(const gchar * name, JConfig * cfg)
+gboolean ja_load_module(const gchar * name)
 {
     gchar *mname = get_module_name(name);
     if (mname == NULL) {
@@ -65,7 +92,7 @@ gboolean ja_load_module(const gchar * name, JConfig * cfg)
     gpointer symbol;
     gint ret = g_module_symbol(mod, sym_name, &symbol);
     if (ret) {
-        ja_module_register((JaModule *) symbol, cfg);
+        ja_module_register((JaModule *) symbol);
     } else {
         g_warning("fail to load module %s", name);
     }

@@ -50,17 +50,21 @@ void ja_request_free(JaRequest * req);
 #define ja_response_set(req,data,len)    do{g_byte_array_set_size ((req)->response, 0);ja_response_append(req,(data),(len));}while(0)
 
 
+/*******************************************************************/
+typedef void (*JaModuleConfigurationHandler) (GList * global_directives,
+                                              GList * directives);
 
 /* Returns the module configuration structure */
-typedef gpointer (*JaModuleInit) (JConfig * cfg);
+typedef void (*JaModuleInit) (void);
 /* Registers hooks */
-typedef void (*JaModuleHooksInit)(void);
+typedef void (*JaModuleHooksInit) (void);
 
 
 typedef struct {
     gchar *name;
 
     JaModuleInit init_func;
+    JaModuleConfigurationHandler cfg_handler;
     JaModuleHooksInit hooks_init_func;
 } JaModule;
 

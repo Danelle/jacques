@@ -42,7 +42,6 @@ static void signal_initialize(void);
 JaMaster *ja_master_create()
 {
     JConfig *cfg = ja_config_load();
-    ja_config_load_modules(cfg);
 
     GList *children = ja_server_load(cfg);
     gMaster = (JaMaster *) g_slice_alloc(sizeof(JaMaster));

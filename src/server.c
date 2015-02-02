@@ -128,6 +128,9 @@ static inline void ja_server_create_from_file(const gchar * name,
     gServer =
         ja_server_alloc(name, listen_port, max_pending, thread_count, cfg);
 
+    /* Loads modules */
+    ja_config_load_modules(cfg);
+
     ja_server_main(gServer);
 }
 
@@ -216,7 +219,7 @@ static inline void ja_server_main(JaServer * server)
         JaWorker *worker = ja_server_find_worker(server);
         if (!worker) {
             j_socket_close(conn);
-            g_warning("~~~~~");
+            g_warning("no worker found");
             continue;
         }
         ja_worker_add(worker, conn);

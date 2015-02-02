@@ -25,7 +25,7 @@
 #include <gmodule.h>
 
 
-void ja_module_register(JaModule * mod, JConfig * cfg);
+void ja_module_register(JaModule * mod);
 
 
 GList *ja_get_modules();

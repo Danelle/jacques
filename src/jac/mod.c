@@ -48,11 +48,11 @@ GList *ja_get_server_quit_hooks(void)
 }
 
 
-void ja_module_register(JaModule * mod, JConfig * cfg)
+void ja_module_register(JaModule * mod)
 {
     loaded_modules = g_list_append(loaded_modules, mod);
 
-    mod->init_func(cfg);
+    mod->init_func();
 }
 
 void ja_hook_register(void *ptr, JaHookType type)
