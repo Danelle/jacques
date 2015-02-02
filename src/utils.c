@@ -70,25 +70,34 @@ gboolean daemonize(void)
 
     chdir("/");
 
+    close_fds();
+
     return TRUE;
 }
 
 /*
  * Closes all open file descriptor
  */
-gint close_fds(void)
+gboolean close_fds(void)
 {
+    struct rlimit rl;
+    if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
+        return FALSE;
+    }
     gint i;
-    for (i = 0; i < 3; i++) {
+    if (rl.rlim_max == RLIM_INFINITY) {
+        rl.rlim_max = 1024;
+    }
+    for (i = 0; i < rl.rlim_max; i++) {
         close(i);
     }
     gint fd0 = open("/dev/null", O_RDWR);
-    gint fd1 = dup(0);
-    gint fd2 = dup(0);
+    gint fd1 = dup(fd0);
+    gint fd2 = dup(fd0);
     if (fd0 != 0 || fd1 != 0 || fd2 != 0) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 
 
@@ -121,11 +130,28 @@ gint already_running(void)
         close(fd);
         return -1;
     }
+    close(fd);
+    return 0;
+}
+
+/*
+ * Locks the pid file
+ */
+gboolean lock_pidfile(void)
+{
+    gint fd = open(CONFIG_PID_FILE, O_RDWR | O_CREAT, LOCKMODE);
+    if (fd < 0) {
+        return FALSE;
+    }
+    if (!lockfile(fd)) {
+        close(fd);
+        return FALSE;
+    }
     ftruncate(fd, 0);
     gchar buf[32];
     snprintf(buf, sizeof(buf), "%ld", (long) getpid());
     write(fd, buf, strlen(buf) + 1);
-    return 0;
+    return TRUE;
 }
 
 

@@ -38,11 +38,18 @@ gboolean close_fds(void);
 
 /*
  * Check if the process is already running
- * Returns 1 if yes
- * Returns 0 if no
- * Returns -1 on error
+ * If jacques daemon is already running,
+ * already_running() returns its process ID
+ * If jacques daemon is not running, 0 is returned
+ * And -1 is returned on error
  */
 gint already_running(void);
+
+
+/*
+ * Locks the pid file
+ */
+gboolean lock_pidfile(void);
 
 
 /*

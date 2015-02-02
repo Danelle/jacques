@@ -26,7 +26,15 @@
  * Returns 1 on success
  * Returns 0 on error
  */
-gboolean log_init(void);
+gboolean initialize_default_log(void);
+
+
+/*
+ * Re-set log handlers using specified files
+ * @param normal, the file that logs normal message
+ * @param error, the file that logs error message
+ */
+gboolean set_custom_log(const gchar * normal, const gchar * error);
 
 
 

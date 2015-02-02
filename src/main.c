@@ -20,6 +20,7 @@
 #include "master.h"
 #include "utils.h"
 #include "log.h"
+#include "err.h"
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
@@ -84,7 +85,7 @@ int main(gint argc, const gchar * argv[])
     set_proctitle((gchar **) argv, "jacques: master");
     start_jacques();
 
-    return (0);
+    return EXIT_MASTER_OK;
 }
 
 static void inline show_version(void)
@@ -95,7 +96,7 @@ static void inline show_version(void)
     g_printf(_("\tConfiguration Location: %s\n"), CONFIG_LOCATION);
     g_printf(_("\tLog Location: %s\n"), CONFIG_LOG_LOCATION);
     g_printf(_("\tRuntime Location: %s\n"), CONFIG_RUNTIME_LOCATION);
-    exit(0);
+    exit(EXIT_MASTER_OK);
 }
 
 static void inline show_help(void)
@@ -106,7 +107,7 @@ static void inline show_help(void)
     g_printf(_("\t--version\t-v\tshow the version of jacques.\n"));
     g_printf(_("\t--signal\t-s\tsend signal to the "
                "master process: stop, retart.\n"));
-    exit(0);
+    exit(EXIT_MASTER_OK);
 }
 
 
@@ -115,9 +116,17 @@ static void inline initialize_jacques(void)
     g_mkdir_with_parents(CONFIG_RUNTIME_LOCATION, 0755);
     g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
     g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
-    if (!daemonize() || !log_init()) {
+    gint running = already_running();
+    if (running > 0) {
+        g_printf(_("jacqueas is already running!!!\n"));
+        exit(EXIT_MASTER_ALREADY_RUNNING);
+    } else if (running < 0) {
+        g_printf(_("Unable to create pid file:%s\n"), strerror(errno));
+        exit(EXIT_MASTER_INITIALIZE);
+    } else if (!daemonize() || !initialize_default_log()
+               || !lock_pidfile()) {
         g_printf(_("Unable to initialize jacques:%s\n"), strerror(errno));
-        exit(-1);
+        exit(EXIT_MASTER_INITIALIZE);
     }
 }
 
@@ -125,18 +134,9 @@ static void inline start_jacques(void)
 {
     initialize_jacques();
 
-    gint running = already_running();
-    if (running > 0) {
-        g_printf(_("jacqueas is already running!!!\n"));
-    } else if (running < 0) {
-        g_printf(_("Unable to create pid file:%s\n"), strerror(errno));
-    } else {
-        close_fds();
-
-        JaMaster *master = ja_master_create();
-        ja_master_wait(master);
-        ja_master_quit(master);
-    }
+    JaMaster *master = ja_master_create();
+    ja_master_wait(master);
+    ja_master_quit(master);
 }
 
 static void inline stop_jacques(void)
@@ -156,7 +156,7 @@ static void inline stop_jacques(void)
     } else {
         g_printf(("Send signal SIGINT to jacques: %d\n"), running);
     }
-    exit(0);
+    exit(EXIT_MASTER_OK);
 }
 
 static void inline restart_jacques(void)

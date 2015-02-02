@@ -36,7 +36,10 @@ static gint error_fd = -1;
 static gint message_fd = -1;
 
 
-gboolean log_init(void)
+static inline gint log_open(const gchar * name);
+
+
+gboolean initialize_default_log(void)
 {
     g_log_set_handler(NULL, G_LOG_LEVEL_WARNING | G_LOG_FLAG_FATAL
                       | G_LOG_FLAG_RECURSION, warning_log_handler, NULL);
@@ -52,6 +55,40 @@ gboolean log_init(void)
         return FALSE;
     }
     return TRUE;
+}
+
+
+/*
+ * Re-set log handlers using specified files
+ * @param normal, the file that logs normal message
+ * @param error, the file that logs error message
+ */
+gboolean set_custom_log(const gchar * normal, const gchar * error)
+{
+    if (normal) {
+        close(message_fd);
+        message_fd = log_open(normal);
+    }
+    if (error) {
+        close(error_fd);
+        error_fd = log_open(error);
+    }
+    if (error_fd < 0 || message_fd < 0) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+
+static inline gint log_open(const gchar * name)
+{
+    if (g_str_has_prefix(name, "/")) {  /* absolute path */
+        return open_appendable(name);
+    }
+    gchar buf[4096];
+    g_snprintf(buf, sizeof(buf) / sizeof(gchar), "%s/%s",
+               CONFIG_LOG_LOCATION, name);
+    return open_appendable(buf);
 }
 
 

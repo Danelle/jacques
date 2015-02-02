@@ -20,6 +20,7 @@
 #include "worker.h"
 #include "config.h"
 #include "utils.h"
+#include "log.h"
 #include <signal.h>
 #include <unistd.h>
 
@@ -124,6 +125,15 @@ static inline void ja_server_create_from_file(const gchar * name,
         thread_count = DEFAULT_THREAD_COUNT;
     }
 
+    /* more configurations */
+
+    const gchar *log_message = j_config_get_string(cfg, NULL,
+                                                   DIRECTIVE_LOG_MESSAGE);
+    const gchar *log_error = j_config_get_string(cfg, NULL,
+                                                 DIRECTIVE_LOG_ERROR);
+    set_custom_log(log_message, log_error);
+
+    /* */
 
     gServer =
         ja_server_alloc(name, listen_port, max_pending, thread_count, cfg);
