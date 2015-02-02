@@ -72,18 +72,19 @@ GList *ja_server_load(JConfig * cfg)
         g_error_free(err);
         return NULL;
     }
-    GList *pids = NULL;
+    GList *servers = NULL;
     const gchar *name = NULL;
     while ((name = g_dir_read_name(dir))) {
         pid_t pid = ja_server_create(name, cfg);
         if (pid < 0) {
             g_warning("fail to create server %s", name);
         } else {                /* parent */
-            pids = g_list_append(pids, (void *) (gulong) pid);
+            JaRunningServer *server = ja_running_server_new(pid, name);
+            servers = g_list_append(servers, (void *) server);
         }
     }
     g_dir_close(dir);
-    return pids;
+    return servers;
 }
 
 pid_t ja_server_create(const gchar * name, JConfig * cfg)
@@ -253,7 +254,7 @@ static void inline ja_server_initialize(JaServer * server)
     }
     server->listen_sock = jsock;
 
-    set_proctitle((gchar **) NULL, "jacques: server");
+    set_proctitle((gchar **) NULL, "jacques: server %s", server->name);
 }
 
 static void inline signal_initialize(void)
@@ -288,4 +289,26 @@ static inline void ja_server_quit(JaServer * server)
         hooks = g_list_next(hooks);
     }
     _exit(0);
+}
+
+
+
+
+
+
+/********* JaRunningServer ***************/
+JaRunningServer *ja_running_server_new(pid_t pid, const gchar * name)
+{
+    JaRunningServer *server =
+        (JaRunningServer *) g_slice_alloc(sizeof(JaRunningServer));
+    server->pid = pid;
+    server->name = g_strdup(name);
+    server->running = TRUE;
+    return server;
+}
+
+void ja_running_server_free(JaRunningServer * server)
+{
+    g_free(server->name);
+    g_slice_free1(sizeof(JaRunningServer), server);
 }

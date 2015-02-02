@@ -35,6 +35,10 @@ static void sigint_handler(void);
  */
 static void signal_initialize(void);
 
+
+static inline JaRunningServer *ja_running_servers_find(GList * list,
+                                                       pid_t pid);
+
 /*
  * Starts the master process of jacques
  * If fail, will call g_error() to terminate the process
@@ -58,12 +62,18 @@ void ja_master_wait(JaMaster * master)
     while (1) {
         pid_t pid = wait(&status);
         if (pid > 0) {
-            children = g_list_remove(children, (void *) (gulong) pid);
             g_warning("server %d: status %d", pid, status);
+            JaRunningServer *server =
+                ja_running_servers_find(children, pid);
+            if (server && server->running) {
+                server->pid = ja_server_create(server->name, master->cfg);
+            }
         } else if (pid < 0 && errno == ECHILD) {
             break;
         }
     }
+    g_list_free_full(master->children,
+                     (GDestroyNotify) ja_running_server_free);
     master->children = NULL;
 }
 
@@ -94,14 +104,27 @@ static void sigint_handler(void)
 {
     GList *ptr = gMaster->children;
     while (ptr) {
-        pid_t pid = (pid_t) (gulong) ptr->data;
-        kill(pid, SIGINT);
+        JaRunningServer *server = (JaRunningServer *) ptr->data;
+        server->running = FALSE;
+        kill(server->pid, SIGINT);
         ptr = g_list_next(ptr);
     }
 
     while (wait(NULL) > 0) {
     }
-    g_list_free(gMaster->children);
-    gMaster->children = NULL;
     g_message("CORE QUIT");
+}
+
+static inline JaRunningServer *ja_running_servers_find(GList * list,
+                                                       pid_t pid)
+{
+    GList *ptr = list;
+    while (ptr) {
+        JaRunningServer *server = (JaRunningServer *) ptr->data;
+        if (server->pid == pid) {
+            return server;
+        }
+        ptr = g_list_next(ptr);
+    }
+    return NULL;
 }

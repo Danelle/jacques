@@ -63,4 +63,15 @@ typedef struct {
 pid_t ja_server_create(const gchar * name, JConfig * cfg);
 
 
+
+typedef struct {
+    gchar *name;
+    pid_t pid;
+    gboolean running;
+} JaRunningServer;
+
+JaRunningServer *ja_running_server_new(pid_t pid, const gchar * name);
+void ja_running_server_free(JaRunningServer * server);
+
+
 #endif                          /* __JA_SERVER_H__ */
