@@ -106,7 +106,7 @@ static void sigint_handler(void)
     while (ptr) {
         JaRunningServer *server = (JaRunningServer *) ptr->data;
         server->running = FALSE;
-        kill(server->pid, SIGINT);
+        kill(server->pid, SIGINT);  /* Sends signal SIGINT to server */
         ptr = g_list_next(ptr);
     }
 

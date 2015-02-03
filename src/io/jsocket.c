@@ -51,7 +51,7 @@
 /*
  * Creates a new JSocket from a native socket descriptor
  */
-JSocket *j_socket_new_fromfd(gint sockfd, struct sockaddr *addr,
+JSocket *j_socket_new_fromfd(gint sockfd, struct sockaddr * addr,
                              socklen_t addrlen)
 {
     JSocket *jsock = (JSocket *) g_slice_alloc(sizeof(JSocket));

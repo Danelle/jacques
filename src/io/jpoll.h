@@ -112,8 +112,9 @@ gint j_poll_close_all(JPoll * jp);
 
 /*
  * Removes all JSockets that are not active during last timeout seconds
+ * Returns the count of JSockets that are removed
  */
-void j_poll_remove_timeout(JPoll * jp, guint64 timeout);
+guint32 j_poll_remove_timeout(JPoll * jp, guint64 timeout);
 
 
 

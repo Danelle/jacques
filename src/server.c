@@ -294,9 +294,7 @@ static inline void ja_server_quit(JaServer * server)
 
 
 
-
-
-/********* JaRunningServer ***************/
+/********* JaRunningServer **************************************/
 JaRunningServer *ja_running_server_new(pid_t pid, const gchar * name)
 {
     JaRunningServer *server =

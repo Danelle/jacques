@@ -64,6 +64,9 @@ pid_t ja_server_create(const gchar * name, JConfig * cfg);
 
 
 
+/* JaRunningServer is the structure that contains a server process infomation.
+ * Maintained by JaMaster */
+
 typedef struct {
     gchar *name;
     pid_t pid;

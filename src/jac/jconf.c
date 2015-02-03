@@ -162,8 +162,6 @@ static inline void j_config_insert_directive(JConfig * cfg,
 }
 
 
-#define str_remove_whitespace(str)  g_strchomp(g_strchug(str))
-
 static void j_conf_parse_file(const gchar * file, JConfig * cfg)
 {
     if (g_path_is_absolute(file)) {
@@ -191,9 +189,10 @@ void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
         if (pound) {
             *pound = '\0';
         }
-        line = str_remove_whitespace(line);
+        line = g_strstrip(line);
         guint len = strlen(line);
         if (len == 0) {
+            g_free(line);
             continue;
         }
         if (g_str_has_prefix(line, "</")) {
@@ -202,7 +201,7 @@ void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
             } else if (group != NULL) {
                 /* end group */
                 gchar *name = g_strndup(line + 2, len - 3);
-                name = str_remove_whitespace(name);
+                name = g_strstrip(name);
                 if (g_strcmp0(name, group) != 0) {
                     g_warning("group name not match in %s:%d", filepath,
                               linenumber);
@@ -220,7 +219,7 @@ void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
             } else if (group == NULL) {
                 /* start group */
                 group = g_strndup(line + 1, len - 2);
-                group = str_remove_whitespace(group);
+                group = g_strstrip(group);
             } else {
                 g_warning("group in group is not supported! %s:%d",
                           filepath, linenumber);
@@ -231,7 +230,7 @@ void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
             gchar *value = NULL;
             if (white) {
                 name = g_strndup(line, white - line);
-                value = g_strdup(str_remove_whitespace(white + 1));
+                value = g_strdup(g_strstrip(white + 1));
             } else {
                 name = g_strdup(line);
             }

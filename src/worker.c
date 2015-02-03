@@ -25,7 +25,7 @@
 
 
 #define DIRECTIVE_KEEPALIVE "KeepAlive"
-#define DEFAULT_KEEPALIVE   15
+#define DEFAULT_KEEPALIVE   5
 
 
 struct _JaWorker {
@@ -34,7 +34,7 @@ struct _JaWorker {
     JPoll *poller;
     gboolean running;
 
-    gint keepalive;             /* zero means keepalive as long as possible, negative means no keepalive */
+    gint keepalive;             /* negative means keepalive as long as possible, zero means no keepalive */
 
     GMutex lock;
 };
@@ -98,8 +98,7 @@ static inline void ja_worker_modify(JaWorker * jw, JSocket * jsock,
 static inline void ja_worker_remove(JaWorker * jw, JSocket * jsock)
 {
     ja_worker_lock(jw);
-    JPoll *poller = jw->poller;
-    j_poll_delete_close(poller, jsock);
+    j_poll_delete_close(jw->poller, jsock);
     ja_worker_unlock(jw);
     g_message("worker %d: close socket", jw->id);
 }
@@ -115,7 +114,7 @@ static inline gint ja_worker_send(JaWorker * jw, JSocket * jsock,
         ja_worker_modify(jw, jsock, J_POLL_EVENT_IN);
     } else {
         JaAction act = j_socket_get_flag(jsock);
-        if ((!(act & JA_ACTION_KEEP) && jw->keepalive < 0) || (act & JA_ACTION_DROP)) { /* should not keep the connection */
+        if ((!(act & JA_ACTION_KEEP) && jw->keepalive == 0) || (act & JA_ACTION_DROP)) {    /* should not keep the connection */
             ja_worker_remove(jw, jsock);
         }
     }
@@ -155,7 +154,7 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
         }
     }
 
-    if ((!(act & JA_ACTION_KEEP) && jw->keepalive < 0) || (act & JA_ACTION_DROP)) { /* should not keep the connection */
+    if ((!(act & JA_ACTION_KEEP) && jw->keepalive == 0) || (act & JA_ACTION_DROP)) {    /* should not keep the connection */
         ja_worker_remove(jw, jsock);
     }
 
@@ -168,13 +167,16 @@ static inline void ja_worker_handle_request(JaWorker * jw, JSocket * jsock)
  */
 static inline void ja_worker_timeout(JaWorker * jw)
 {
-    if (jw->keepalive == 0) {
+    if (jw->keepalive < 0) {
         return;
     }
-    ja_worker_lock(jw);
     guint64 timeout =
-        jw->keepalive > 0 ? jw->keepalive : DEFAULT_KEEPALIVE;
-    j_poll_remove_timeout(jw->poller, timeout);
+        jw->keepalive == 0 ? DEFAULT_KEEPALIVE : jw->keepalive;
+    ja_worker_lock(jw);
+    guint32 count = j_poll_remove_timeout(jw->poller, timeout);
+    if (count > 0) {
+        g_message("%d Jsocket(s) timeout and removed", count);
+    }
     ja_worker_unlock(jw);
 }
 
@@ -184,38 +186,37 @@ static inline void ja_worker_timeout(JaWorker * jw)
  */
 static void *ja_worker_main(void *arg)
 {
-    JaWorker *self = (JaWorker *) arg;
-    JPoll *poller = self->poller;
+    JaWorker *jw = (JaWorker *) arg;
+    JPoll *poller = jw->poller;
     gint i, n;
-    g_message("new worker:%d", self->id);
+    g_message("new worker:%d", jw->id);
     JPollEvent events[128];
     while ((n =
             j_poll_wait(poller, events,
                         sizeof(events) / sizeof(JPollEvent), 1000)) >= 0) {
-        if (n == 0) {
-            continue;
-        }
-        g_message("poll %d", n);
-        for (i = 0; i < n; i++) {
-            JSocket *jsock = events[i].jsock;
-            guint32 type = events[i].type;
-            if (type & J_POLL_EVENT_IN) {   /* ready for reading */
-                gint n = j_socket_read(jsock);
-                if (n < 0) {    /* read error, EOF? whatever */
-                    ja_worker_remove(self, jsock);
-                } else if (n > 0) {
-                    ja_worker_handle_request(self, jsock);
+        if (n > 0) {
+            for (i = 0; i < n; i++) {
+                JSocket *jsock = events[i].jsock;
+                guint32 type = events[i].type;
+                if (type & J_POLL_EVENT_IN) {   /* ready for reading */
+                    gint n = j_socket_read(jsock);
+                    if (n < 0) {    /* read error, EOF? whatever */
+                        ja_worker_remove(jw, jsock);
+                    } else if (n > 0) {
+                        ja_worker_handle_request(jw, jsock);
+                    }
+                } else if (type & J_POLL_EVENT_OUT) {   /* ready for writing */
+                    ja_worker_send(jw, jsock, NULL, 0);
+                } else if (type & (J_POLL_EVENT_HUP | J_POLL_EVENT_ERR)) {
+                    /* error */
+                    ja_worker_remove(jw, jsock);
                 }
-            } else if (type & J_POLL_EVENT_OUT) {   /* ready for writing */
-                ja_worker_send(self, jsock, NULL, 0);
-            } else if (type & (J_POLL_EVENT_HUP | J_POLL_EVENT_ERR)) {
-                /* error */
-                ja_worker_remove(self, jsock);
             }
         }
+        ja_worker_timeout(jw);
     }
 
-    self->running = FALSE;
+    jw->running = FALSE;
     g_warning("worker quits");
     return (void *) 0;
 }

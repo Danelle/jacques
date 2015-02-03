@@ -226,10 +226,11 @@ static inline void j_poll_event_free(JPollEvent * jpe)
 /*
  * Removes all JSockets that are not active during last timeout seconds
  */
-void j_poll_remove_timeout(JPoll * jp, guint64 timeout)
+guint32 j_poll_remove_timeout(JPoll * jp, guint64 timeout)
 {
     guint64 now = (guint64) time(NULL);
     GList *ptr = jp->jsocks;
+    guint32 count = 0;
     while (ptr) {
         JSocket *jsock = (JSocket *) ptr->data;
         GList *next = g_list_next(ptr);
@@ -243,9 +244,12 @@ void j_poll_remove_timeout(JPoll * jp, guint64 timeout)
             if (next) {
                 next->prev = prev;
             }
+            j_socket_close(jsock);
             g_list_free1(ptr);
             jp->count--;
+            count++;
         }
         ptr = next;
     }
+    return count;
 }
