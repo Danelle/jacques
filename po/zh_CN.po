@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jacques 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-30 16:57+0800\n"
+"POT-Creation-Date: 2015-02-03 15:46+0800\n"
 "PO-Revision-Date: 2015-01-30 16:14+0800\n"
 "Last-Translator: Wiky L <wiiiky@outlook.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/main.c:89
+#: ../src/main.c:93
 #, c-format
 msgid ""
 "jacques version: %u.%u\n"
@@ -26,27 +26,27 @@ msgstr ""
 "jacques 版本: %u.%u\n"
 "\n"
 
-#: ../src/main.c:91
+#: ../src/main.c:95
 #, c-format
 msgid "Build Infomation:\n"
 msgstr "构建信息:\n"
 
-#: ../src/main.c:92
+#: ../src/main.c:96
 #, c-format
 msgid "\tConfiguration Location: %s\n"
 msgstr "\t配置目录: %s\n"
 
-#: ../src/main.c:93
+#: ../src/main.c:97
 #, c-format
 msgid "\tLog Location: %s\n"
 msgstr "\t日志目录: %s\n"
 
-#: ../src/main.c:94
+#: ../src/main.c:98
 #, c-format
 msgid "\tRuntime Location: %s\n"
 msgstr "\t运行时目录: %s\n"
 
-#: ../src/main.c:100
+#: ../src/main.c:104
 #, c-format
 msgid ""
 "Usage: jacques [option]\n"
@@ -55,52 +55,79 @@ msgstr ""
 "使用方式: jacques [选项]\n"
 "\n"
 
-#: ../src/main.c:101
+#: ../src/main.c:105
 #, c-format
 msgid "Options:\n"
 msgstr "选项:\n"
 
-#: ../src/main.c:102
+#: ../src/main.c:106
 #, c-format
 msgid "\t--help\t\t-h\tshow this help info.\n"
 msgstr "\t--help\t\t-h\t显示本帮助.\n"
 
-#: ../src/main.c:103
+#: ../src/main.c:107
 #, c-format
 msgid "\t--version\t-v\tshow the version of jacques.\n"
 msgstr "\t--version\t-v\t显示jacques的版本信息.\n"
 
-#: ../src/main.c:104
+#: ../src/main.c:108
 #, c-format
 msgid "\t--signal\t-s\tsend signal to the master process: stop, retart.\n"
 msgstr "\t--signal\t-s\t给jacques主进程发送信号: stop, restart.\n"
 
-#: ../src/main.c:113
-#, c-format
-msgid "Unable to initialize jacques:%s\n"
-msgstr "无法初始化jacques:%s\n"
-
-#: ../src/main.c:127
+#: ../src/main.c:121
 #, c-format
 msgid "jacqueas is already running!!!\n"
 msgstr "jacques已经在运行!!!\n"
 
-#: ../src/main.c:129
+#: ../src/main.c:124
 #, c-format
 msgid "Unable to create pid file:%s\n"
 msgstr "无法创建PID文件:%s\n"
 
-#: ../src/main.c:143
+#: ../src/main.c:128
+#, c-format
+msgid "Unable to initialize jacques:%s\n"
+msgstr "无法初始化jacques:%s\n"
+
+#: ../src/main.c:146
 #, c-format
 msgid "jacques is not running!!!\n"
 msgstr "jacques没有运行!!!\n"
 
-#: ../src/main.c:146
+#: ../src/main.c:149
 #, c-format
 msgid "Unable to get jacques process id:%s\n"
 msgstr "无法获取jacques的进程ID:%s\n"
 
-#: ../src/main.c:150
+#: ../src/main.c:154
 #, c-format
 msgid "Fail to send signal SIGINT to process %d:%s\n"
 msgstr "给进程 %d 发送信号失败:%s\n"
+
+#. a worker quits unexpectedly. restart it
+#: ../src/server.c:181
+#, c-format
+msgid "Server %s:Restart worker %d"
+msgstr "服务进程 %s:重启工作线程 %d"
+
+#. fail saddly
+#: ../src/server.c:189
+#, c-format
+msgid "Server %s:Fail to restart worker %d"
+msgstr "服务进程 %s:无法重启工作线程 %d"
+
+#: ../src/server.c:221
+#, c-format
+msgid "Server %s:Fail to create worker"
+msgstr "服务进程 %s:无法创建工作线程"
+
+#: ../src/server.c:250
+#, c-format
+msgid "Server %s quits unexpectedly: %s"
+msgstr "服务进程 %s 意外退出: %s"
+
+#: ../src/server.c:258
+#, c-format
+msgid "Unable to set user as %s"
+msgstr "无法设置用户为:%s"

@@ -35,6 +35,8 @@
 typedef struct _JaWorker JaWorker;
 
 
+gint ja_worker_get_id(JaWorker * jw);
+
 /*
  * Creates an JaWorker, and run it
  * JaWorker is thread safe

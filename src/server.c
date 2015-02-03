@@ -23,6 +23,7 @@
 #include "log.h"
 #include <signal.h>
 #include <unistd.h>
+#include <glib/gi18n-lib.h>
 
 
 static JaServer *gServer = NULL;
@@ -176,18 +177,29 @@ static inline JaWorker *ja_server_find_worker(JaServer * server)
         GList *next = g_list_next(ptr);
         JaWorker *jw = (JaWorker *) ptr->data;
         if (!ja_worker_is_running(jw)) {
-            if (next) {
-                next->prev = ptr->prev;
+            /* a worker quits unexpectedly. restart it */
+            g_warning(_("Server %s:Restart worker %d"), server->name,
+                      ja_worker_get_id(jw));
+            ptr->data =
+                ja_worker_create(server->cfg, ja_worker_get_id(jw));
+            if (ptr->data) {
+                /* successfully */
+                worker = jw;
+            } else {            /* fail saddly */
+                g_warning(_("Server %s:Fail to restart worker %d"),
+                          server->name, ja_worker_get_id(jw));
+                GList *prev = g_list_previous(ptr);
+                if (ptr) {
+                    prev->next = next;
+                } else {
+                    server->workers = next;
+                }
+                if (next) {
+                    next->prev = prev;
+                }
+                g_list_free1(ptr);
             }
-
-            if (ptr->prev == NULL) {
-                server->workers = next;
-            } else {
-                ptr->prev->next = next;
-            }
-            g_list_free1(ptr);
             ja_worker_free(jw);
-            g_warning("remove worker");
         } else if (worker == NULL
                    || ja_worker_payload(worker) > ja_worker_payload(jw)) {
             worker = jw;
@@ -206,7 +218,7 @@ static inline void ja_server_initialize_workers(JaServer * server)
         if (worker) {
             server->workers = g_list_prepend(server->workers, worker);
         } else {
-            g_warning("fail to create worker");
+            g_warning(_("Server %s:Fail to create worker"), server->name);
         }
     }
 }
@@ -235,7 +247,7 @@ static inline void ja_server_main(JaServer * server)
         }
         ja_worker_add(worker, conn);
     }
-    g_warning("server %s quits unexpectedly: %s",
+    g_warning(_("Server %s quits unexpectedly: %s"),
               server->name, strerror(errno));
     ja_server_quit(server);
 }
@@ -243,7 +255,7 @@ static inline void ja_server_main(JaServer * server)
 static void inline ja_server_initialize(JaServer * server)
 {
     if (!setuser(CONFIG_USER)) {
-        g_error("fail to set user as %s", CONFIG_USER);
+        g_error(_("Unable to set user as %s"), CONFIG_USER);
     }
     signal_initialize();
     ja_server_initialize_workers(server);

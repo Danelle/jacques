@@ -39,6 +39,11 @@ struct _JaWorker {
     GMutex lock;
 };
 
+gint ja_worker_get_id(JaWorker * jw)
+{
+    return jw->id;
+}
+
 #define ja_worker_lock(jw)  g_mutex_lock (&(jw)->lock)
 #define ja_worker_unlock(jw) g_mutex_unlock (&(jw)->lock)
 
