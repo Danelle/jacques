@@ -1,0 +1,9 @@
+install: make get-deps
+
+./configure && make
+
+script: scons
+
+language: c
+
+compiler: gcc
