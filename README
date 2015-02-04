@@ -31,6 +31,7 @@ a server program which focuses on mobile applications.
 	ThreadCount 6		# 0 for default
 
 注意，目前这些配置并没有完全用到。但是必须有。
+**etc/jacques**目录是我测试用的配置文件，把他放到系统/etc/jacques下。其中包括了一个简单的hello模块。
 有了配置文件后就可以运行jacques了。
 
 运行jacques后会在终端输入监听的端口号，于是就可以使用./client [端口号] 来测试服务器了，目前只是完全的回射服务。
