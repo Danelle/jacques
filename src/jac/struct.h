@@ -51,8 +51,7 @@ void ja_request_free(JaRequest * req);
 
 
 /*******************************************************************/
-typedef void (*JaModuleConfigurationHandler) (GList * global_directives,
-                                              GList * directives);
+typedef void (*JaModuleConfigHandler) (JConfGroup * group);
 
 /* Returns the module configuration structure */
 typedef void (*JaModuleInit) (void);
@@ -64,7 +63,7 @@ typedef struct {
     gchar *name;
 
     JaModuleInit init_func;
-    JaModuleConfigurationHandler cfg_handler;
+    JaModuleConfigHandler cfg_handler;
     JaModuleHooksInit hooks_init_func;
 } JaModule;
 

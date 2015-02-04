@@ -21,7 +21,7 @@
 
 static gint request(JaRequest * req)
 {
-    ja_response_append(req, "hello all", 10);
+    ja_response_append(req, "hello all", 9);
     return JA_ACTION_RESPONSE;
 }
 

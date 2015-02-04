@@ -59,7 +59,10 @@ int main(int argc, const char *argv[])
     /*g_message ("errno: %d",errno); */
 
     const gchar *data = (const gchar *) j_socket_data(jsock);
-    g_message("%s", data);
+    guint32 count = j_socket_data_length(jsock);
+    gchar *ret = g_strndup(data, count);
+    g_message("%s", ret);
+    g_free(ret);
 
     j_socket_close(jsock);
 

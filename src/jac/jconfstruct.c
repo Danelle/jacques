@@ -112,16 +112,9 @@ static gint j_conf_group_compare_directive(gconstpointer a,
 
 void j_conf_group_append_directive(JConfGroup * g, JConfDirective * d)
 {
-    JConfDirective *d3 = j_conf_group_get_directive(g,
-                                                    j_conf_directive_get_name
-                                                    (d));
-    if (d3 == NULL) {
-        j_conf_group_append_node(g,
-                                 j_conf_node_new
-                                 (J_CONF_NODE_TYPE_DIRECTIVE, d));
-    } else {
-        j_conf_directive_merge(d3, d);
-    }
+    j_conf_group_append_node(g,
+                             j_conf_node_new
+                             (J_CONF_NODE_TYPE_DIRECTIVE, d));
 }
 
 static gint j_conf_group_compare_group(gconstpointer a, gconstpointer b)
@@ -182,15 +175,19 @@ static inline void j_conf_group_merge(JConfGroup * g1, JConfGroup * g2)
 JConfDirective *j_conf_group_get_directive(JConfGroup * g,
                                            const gchar * name)
 {
-    GList *ele = g_list_find_custom(j_conf_group_get_nodes(g),
-                                    name,
-                                    (GCompareFunc)
-                                    j_conf_group_compare_directive);
-    if (ele) {
-        JConfNode *node = (JConfNode *) ele->data;
-        return (JConfDirective *) j_conf_node_get_directive(node);
+    JConfDirective *ret = NULL;
+    GList *ptr = j_conf_group_get_nodes(g);
+    while (ptr) {
+        JConfNode *n = (JConfNode *) ptr->data;
+        if (j_conf_node_is_directive(n)) {
+            JConfDirective *d = j_conf_node_get_directive(n);
+            if (g_strcmp0(name, j_conf_directive_get_name(d)) == 0) {
+                ret = d;
+            }
+        }
+        ptr = g_list_next(ptr);
     }
-    return NULL;
+    return ret;
 }
 
 const gchar *j_conf_group_get_directive_value(JConfGroup * g,
