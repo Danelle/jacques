@@ -34,7 +34,8 @@ static JaServer *gServer = NULL;
 static inline JaServer *ja_server_alloc(const gchar * name,
                                         gint listen_port,
                                         gint max_pending,
-                                        gint thread_count, JConfig * cfg);
+                                        gint thread_count,
+                                        JConfParser * cfg);
 
 /*
  * The main loop of server process
@@ -49,7 +50,7 @@ static inline void ja_server_quit(JaServer * server);
 
 
 static inline void ja_server_create_from_file(const gchar * name,
-                                              JConfig * cfg);
+                                              JConfParser * cfg);
 
 
 
@@ -63,7 +64,7 @@ static void sigint_handler(void);
  * Loads configuration of every server, and create server process
  * Return the list of server process id
  */
-GList *ja_server_load(JConfig * cfg)
+GList *ja_server_load(JConfParser * cfg)
 {
     GError *err = NULL;
     GDir *dir = g_dir_open(CONFIG_APP_LOCATION, 0, &err);
@@ -88,7 +89,7 @@ GList *ja_server_load(JConfig * cfg)
     return servers;
 }
 
-pid_t ja_server_create(const gchar * name, JConfig * cfg)
+pid_t ja_server_create(const gchar * name, JConfParser * cfg)
 {
     pid_t pid = fork();
     if (pid < 0) {
@@ -97,29 +98,33 @@ pid_t ja_server_create(const gchar * name, JConfig * cfg)
         return pid;
     }
     ja_server_create_from_file(name, cfg);
-    exit(-1);
+    _exit(-1);
 }
 
 static inline void ja_server_create_from_file(const gchar * name,
-                                              JConfig * cfg)
+                                              JConfParser * cfg)
 {
     gchar buf[4096];
     g_snprintf(buf, sizeof(buf), "%s/%s", CONFIG_APP_LOCATION, name);
-    j_conf_parse_internal(buf, cfg);
+    if (!j_conf_parser_parse(cfg, buf)) {
+        return;
+    }
+
+    JConfRoot *root = j_conf_parser_get_root(cfg);
 
     /* ListenPort must be set */
-    gint listen_port =
-        j_config_get_integer(cfg, NULL, DIRECTIVE_LISTEN_PORT);
+    gint listen_port = j_conf_group_get_directive_integer(root,
+                                                          DIRECTIVE_LISTEN_PORT);
     if (listen_port <= 0 || listen_port > 65536) {
         g_error("%s: Invalid ListenPort", name);
     }
 
     /* if MaxPending and ThreadCount are not set or invalid value is set
      * use default value instead */
-    gint max_pending =
-        j_config_get_integer(cfg, NULL, DIRECTIVE_MAX_PENDING);
-    gint thread_count =
-        j_config_get_integer(cfg, NULL, DIRECTIVE_THREAD_COUNT);
+    gint max_pending = j_conf_group_get_directive_integer(root,
+                                                          DIRECTIVE_MAX_PENDING);
+    gint thread_count = j_conf_group_get_directive_integer(root,
+                                                           DIRECTIVE_THREAD_COUNT);
     if (max_pending <= 0) {
         max_pending = DEFAULT_MAX_PENDING;
     }
@@ -129,10 +134,10 @@ static inline void ja_server_create_from_file(const gchar * name,
 
     /* more configurations */
 
-    const gchar *log_message = j_config_get_string(cfg, NULL,
-                                                   DIRECTIVE_LOG_MESSAGE);
-    const gchar *log_error = j_config_get_string(cfg, NULL,
-                                                 DIRECTIVE_LOG_ERROR);
+    const gchar *log_message = j_conf_group_get_directive_value(root,
+                                                                DIRECTIVE_LOG_MESSAGE);
+    const gchar *log_error = j_conf_group_get_directive_value(root,
+                                                              DIRECTIVE_LOG_ERROR);
     set_custom_log(log_message, log_error);
 
     /* */
@@ -151,7 +156,8 @@ static inline void ja_server_create_from_file(const gchar * name,
 static inline JaServer *ja_server_alloc(const gchar * name,
                                         gint listen_port,
                                         gint max_pending,
-                                        gint thread_count, JConfig * cfg)
+                                        gint thread_count,
+                                        JConfParser * cfg)
 {
     JaServer *server = (JaServer *) g_slice_alloc(sizeof(JaServer));
     server->name = g_strdup(name);

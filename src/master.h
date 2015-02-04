@@ -29,7 +29,7 @@
 
 
 typedef struct {
-    JConfig *cfg;
+    JConfParser *cfg;
     GList *scfg;
     GList *children;
 } JaMaster;

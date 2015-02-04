@@ -1,297 +1,263 @@
 /*
  * jconf.c
+ * Copyright (C) 2015 Wiky L <wiiiky@outlook.com>
  *
- * Copyright (C) 2015 - Wiky L <wiiiky@outlook.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * Jacques is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Jacques is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "jconf.h"
-#include "../io/jio.h"
-#include "../config.h"
+#include <gio/gio.h>
+#include <stdio.h>
 #include <string.h>
 
 
-static void j_directive_list_free(GList * list);
-
-
-JDirective *j_directive_new(const gchar * name, const gchar * value)
+static inline gchar *j_str_preprocess(gchar * line)
 {
-    return j_directive_new_take(g_strdup(name), g_strdup(value));
-}
-
-JDirective *j_directive_new_take(gchar * name, gchar * value)
-{
-    JDirective *jd = (JDirective *) g_slice_alloc(sizeof(JDirective));
-    jd->name = name;
-    jd->value = value;
-    return jd;
-}
-
-void j_directive_free(JDirective * jd)
-{
-    g_free(jd->name);
-    g_free(jd->value);
-    g_slice_free1(sizeof(JDirective), jd);
-}
-
-JDirectiveGroup *j_directive_group_new(const gchar * name)
-{
-    JDirectiveGroup *group =
-        (JDirectiveGroup *) g_slice_alloc(sizeof(JDirectiveGroup));
-    group->name = g_strdup(name);
-    group->directives = NULL;
-    return group;
-}
-
-void j_directive_group_insert(JDirectiveGroup * group,
-                              const gchar * name, const gchar * value)
-{
-    group->directives =
-        g_list_append(group->directives, j_directive_new(name, value));
-}
-
-void j_directive_group_insert_take(JDirectiveGroup * group,
-                                   gchar * name, gchar * value)
-{
-    group->directives =
-        g_list_append(group->directives,
-                      j_directive_new_take(name, value));
-}
-
-JDirective *j_directive_group_lookup(JDirectiveGroup * group,
-                                     const gchar * name)
-{
-    GList *ptr = group->directives;
-    JDirective *ret = NULL;
-    while (ptr) {
-        JDirective *jd = (JDirective *) ptr->data;
-        if (g_strcmp0(name, jd->name) == 0) {
-            ret = jd;
+    line = g_strstrip(line);
+    gchar *c = g_strstr_len(line, -1, "#");
+    if (c) {
+        *c = '\0';
+    }
+    gint len = strlen(line);
+    gint i = 0;
+    for (; i < len; i++) {
+        if (line[i] == '\t') {
+            line[i] = ' ';
+        } else if (line[i] == '\n') {
+            line[i] = ' ';
         }
-        ptr = g_list_next(ptr);
     }
-    return ret;
+    return line;
 }
 
-gint j_directive_group_get_integer(JDirectiveGroup * group,
-                                   const gchar * name)
-{
-    JDirective *jd = j_directive_group_lookup(group, name);
-    if (jd) {
-        return atoi(jd->value);
-    }
-    return -1;
-}
+static inline gchar *j_file_readall(const gchar * file);
 
-const gchar *j_directive_group_get_string(JDirectiveGroup * group,
-                                          const gchar * name)
-{
-    JDirective *jd = j_directive_group_lookup(group, name);
-    if (jd) {
-        return (const gchar *) jd->value;
-    }
-    return NULL;
-}
 
-void j_directive_group_free(JDirectiveGroup * group)
-{
-    g_free(group->name);
-    g_list_free_full(group->directives, (GDestroyNotify) j_directive_free);
-    g_slice_free1(sizeof(JDirectiveGroup), group);
-}
+static inline gboolean j_conf_parse_data(const gchar * data,
+                                         JConfGroup * group);
 
-JDirectiveGroup *j_config_lookup(JConfig * cfg, const gchar * name)
-{
-    if (name == NULL) {
-        return (JDirectiveGroup *) g_hash_table_lookup(cfg->tb,
-                                                       J_GLOBAL_CONFIG_GROUP);
-    }
-    JDirectiveGroup *group =
-        (JDirectiveGroup *) g_hash_table_lookup(cfg->tb, name);
-    return group;
-}
 
 /*
- * group is optional NULl for global
+ * Parses a file,
+ * Returns a JConfParser on success
+ * Otherwise NULL
  */
-gint j_config_get_integer(JConfig * cfg, const gchar * gname,
-                          const gchar * name)
+JConfParser *j_conf_parse(const gchar * filepath)
 {
-    JDirectiveGroup *group = j_config_lookup(cfg, gname);
-    if (group) {
-        return j_directive_group_get_integer(group, name);
+    JConfParser *p = j_conf_parser_new(filepath);
+    if (j_conf_parser_parse(p, filepath)) {
+        return p;
     }
-    return -1;
-}
-
-const gchar *j_config_get_string(JConfig * cfg, const gchar * gname,
-                                 const gchar * name)
-{
-    JDirectiveGroup *group = j_config_lookup(cfg, gname);
-    if (group) {
-        return j_directive_group_get_string(group, name);
-    }
+    j_conf_parser_free(p);
     return NULL;
 }
 
-
-static inline void j_config_insert_directive(JConfig * cfg,
-                                             const gchar * gname,
-                                             gchar * name, gchar * value)
+gboolean j_conf_parser_parse(JConfParser * p, const gchar * filepath)
 {
-    JDirectiveGroup *group =
-        (JDirectiveGroup *) j_config_lookup(cfg, gname);
-    if (group) {
-        j_directive_group_insert_take(group, name, value);
-    } else {
-        group = j_directive_group_new(gname);
-        j_directive_group_insert_take(group, name, value);
-        g_hash_table_insert(cfg->tb, g_strdup(gname), group);
+    gchar *data = j_file_readall(filepath);
+    if (data == NULL) {
+        g_warning("Unable to open %s", filepath);
+        return FALSE;
     }
+    JConfGroup *group = j_conf_parser_get_root(p);
+    gboolean ret = j_conf_parse_data(data, group);
+    g_free(data);
+    if (!ret) {
+        g_warning("Fail to parse %s", filepath);
+        return FALSE;
+    }
+    return TRUE;
 }
 
-
-static void j_conf_parse_file(const gchar * file, JConfig * cfg)
+static inline gchar *j_file_readall(const gchar * filepath)
 {
-    if (g_path_is_absolute(file)) {
-        j_conf_parse_internal(file, cfg);
-    } else {
-        gchar buf[4096];
-        g_snprintf(buf, sizeof(buf), "%s/%s", CONFIG_LOCATION, file);
-        j_conf_parse_internal(buf, cfg);
+    GFile *file = g_file_new_for_path(filepath);
+    GFileInputStream *input = g_file_read(file, NULL, NULL);
+    g_object_unref(file);
+    if (input == NULL) {
+        return NULL;
     }
-}
+    GString *string = g_string_new(NULL);
+    gchar buffer[4096];
+    gssize n;
+    while ((n = g_input_stream_read((GInputStream *) input,
+                                    buffer,
+                                    sizeof(buffer) / sizeof(gchar),
+                                    NULL, NULL)) > 0) {
+        string = g_string_append_len(string, (const gchar *) buffer, n);
+    }
+    g_object_unref(input);
 
-void j_conf_parse_internal(const gchar * filepath, JConfig * cfg)
-{
-    JFile *jf = j_file_open(filepath, "r");
-    if (jf == NULL) {
-        g_warning("fail to open conf file: %s", filepath);
-        return;
-    }
-    gchar *line;
-    guint linenumber = 0;
-    gchar *group = NULL;
-    while ((line = j_file_readline(jf)) != NULL) {
-        linenumber++;
-        gchar *pound = strchr(line, '#');
-        if (pound) {
-            *pound = '\0';
-        }
-        line = g_strstrip(line);
-        guint len = strlen(line);
-        if (len == 0) {
-            g_free(line);
-            continue;
-        }
-        if (g_str_has_prefix(line, "</")) {
-            if (!g_str_has_suffix(line, ">")) {
-                g_warning("invalid syntax in %s:%d", filepath, linenumber);
-            } else if (group != NULL) {
-                /* end group */
-                gchar *name = g_strndup(line + 2, len - 3);
-                name = g_strstrip(name);
-                if (g_strcmp0(name, group) != 0) {
-                    g_warning("group name not match in %s:%d", filepath,
-                              linenumber);
-                }
-                g_free(name);
-                g_free(group);
-                group = NULL;
+    gchar *data = g_string_free(string, FALSE);
+    string = g_string_new(NULL);
+    gchar **lines = g_strsplit(data, "\n", -1);
+    gchar **line = lines;
+    n = 0;
+    while (*line) {
+        n++;
+        gchar *tmp = g_strdup(*line);
+        if (g_str_has_prefix(tmp, "#include ")) {
+            const gchar *path = tmp + 9;
+            gchar *more = j_file_readall(path);
+            if (more) {
+                string = g_string_append(string, more);
+                g_free(more);
             } else {
-                g_warning("unexpected group close! %s:%d", filepath,
-                          linenumber);
-            }
-        } else if (g_str_has_prefix(line, "<")) {
-            if (!g_str_has_suffix(line, ">")) {
-                g_warning("invalid syntax in %s:%d", filepath, linenumber);
-            } else if (group == NULL) {
-                /* start group */
-                group = g_strndup(line + 1, len - 2);
-                group = g_strstrip(group);
-            } else {
-                g_warning("group in group is not supported! %s:%d",
-                          filepath, linenumber);
+                g_warning("Unable to open %s", path);
             }
         } else {
-            gchar *white = strchr(line, ' ');
-            gchar *name = NULL;
-            gchar *value = NULL;
-            if (white) {
-                name = g_strndup(line, white - line);
-                value = g_strdup(g_strstrip(white + 1));
-            } else {
-                name = g_strdup(line);
-            }
-            if (g_strcmp0(name, J_GLOBAL_INCLUDE_CONF) == 0) {
-                if (value == NULL) {
-                    g_warning("%s: conf file not specified",
-                              J_GLOBAL_INCLUDE_CONF);
-                } else {
-                    j_conf_parse_file(value, cfg);
-                }
-                g_free(name);
-                g_free(value);
-            } else if (group) { /* this directive is in a group */
-                j_config_insert_directive(cfg, group, name, value);
-            } else {
-                j_config_insert_directive(cfg, J_GLOBAL_CONFIG_GROUP, name,
-                                          value);
-            }
+            tmp = j_str_preprocess(tmp);
+            string = g_string_append(string, tmp);
+            string = g_string_append_c(string, '\n');
         }
-        g_free(line);
+        g_free(tmp);
+        line++;
     }
-    j_file_close(jf);
+    g_strfreev(lines);
+    g_free(data);
 
-    if (group) {
-        g_warning("group %s not closed! %s", group);
-        g_free(group);
-    }
+    data = g_string_free(string, FALSE);
+    return data;
 }
 
-/*
- * Returns a GHashTable, which has conf group as key, a list of JDirective as value
- */
-JConfig *j_conf_parse(const gchar * filepath)
+typedef enum {
+    J_CONF_PARSE_STATE_START,
+    J_CONF_PARSE_STATE_NAME,
+    J_CONF_PARSE_STATE_NAME_END,
+    J_CONF_PARSE_STATE_GROUP_START,
+    J_CONF_PARSE_STATE_VALUE_START,
+} JConfParseState;
+
+static inline gboolean j_conf_parse_data(const gchar * data,
+                                         JConfGroup * group)
 {
-    JConfig *cfg = j_config_new(filepath);
-
-    j_conf_parse_internal(filepath, cfg);
-
-    return cfg;
-}
-
-
-JConfig *j_config_new(const gchar * name)
-{
-    JConfig *cfg = (JConfig *) g_slice_alloc(sizeof(JConfig));
-    cfg->tb = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                    (GDestroyNotify) g_free,
-                                    (GDestroyNotify)
-                                    j_directive_group_free);
-    g_hash_table_insert(cfg->tb, g_strdup(J_GLOBAL_CONFIG_GROUP),
-                        j_directive_group_new(J_GLOBAL_CONFIG_GROUP));
-    cfg->name = g_strdup(name);
-    return cfg;
-}
-
-void j_config_free(JConfig * cfg)
-{
-    if (cfg == NULL) {
-        return;
+    const gchar *ptr = data;
+    const gchar *value_ptr = NULL;
+    const gchar *group_ptr = NULL;
+    guint group_count = 0;
+    gchar *name = NULL;
+    gchar *value = NULL;
+    JConfParseState state = J_CONF_PARSE_STATE_START;
+    while (*ptr) {
+        gchar c = *ptr;
+        switch (state) {
+        case J_CONF_PARSE_STATE_START:
+            if (g_ascii_isalpha(c)) {
+                state = J_CONF_PARSE_STATE_NAME;
+            } else if (!g_ascii_isspace(c) && c != ';') {
+                goto OUT;
+            }
+            break;
+        case J_CONF_PARSE_STATE_NAME:
+            if (g_ascii_isspace(c)) {
+                name = g_strndup(data,
+                                 (gsize) ((gpointer) ptr -
+                                          (gpointer) data));
+                state = J_CONF_PARSE_STATE_NAME_END;
+            } else if (c == '{') {
+                name = g_strndup(data,
+                                 (gsize) ((gpointer) ptr -
+                                          (gpointer) data));
+                group_ptr = ptr + 1;
+                group_count = 1;
+                state = J_CONF_PARSE_STATE_GROUP_START;
+            } else if (c == ';') {
+                name = g_strndup(data,
+                                 (gsize) ((gpointer) ptr -
+                                          (gpointer) data));
+                JConfDirective *d = j_conf_directive_new_take(name);
+                j_conf_group_append_directive(group, d);
+                value_ptr = NULL;
+                group_ptr = NULL;
+                value = NULL;
+                name = NULL;
+                data = ptr + 1;
+                state = J_CONF_PARSE_STATE_START;
+            } else if (!g_ascii_isalnum(c)) {
+                goto OUT;
+            }
+            break;
+        case J_CONF_PARSE_STATE_NAME_END:
+            if (c == '{') {
+                state = J_CONF_PARSE_STATE_GROUP_START;
+                group_count = 1;
+                group_ptr = ptr + 1;
+            } else if (!g_ascii_ispunct(c) && g_ascii_isprint(c)) {
+                state = J_CONF_PARSE_STATE_VALUE_START;
+                value_ptr = ptr;
+            } else {
+                goto OUT;
+            }
+            break;
+        case J_CONF_PARSE_STATE_VALUE_START:
+            if (c == '{' || c == '}') {
+                goto OUT;
+            } else if (c == ';') {
+                value = g_strndup(value_ptr,
+                                  (gsize) ((gpointer) ptr -
+                                           (gpointer) value_ptr));
+                JConfDirective *d =
+                    j_conf_directive_new_with_values_take(name, value);
+                j_conf_group_append_directive(group, d);
+                state = J_CONF_PARSE_STATE_START;
+                value_ptr = NULL;
+                group_ptr = NULL;
+                value = NULL;
+                name = NULL;
+                data = ptr + 1;
+            }
+            break;
+        case J_CONF_PARSE_STATE_GROUP_START:
+            if (c == '}') {
+                group_count--;
+                if (group_count == 0) {
+                    gchar *gdata = g_strndup(group_ptr,
+                                             (gsize) ((gpointer) ptr -
+                                                      (gpointer)
+                                                      group_ptr));
+                    JConfGroup *g = j_conf_group_new_take(name);
+                    value_ptr = NULL;
+                    group_ptr = NULL;
+                    value = NULL;
+                    name = NULL;
+                    data = ptr + 1;
+                    state = J_CONF_PARSE_STATE_START;
+                    if (j_conf_parse_data(gdata, g)) {
+                        j_conf_group_append_group(group, g);
+                    } else {
+                        j_conf_group_free(g);
+                        g_free(gdata);
+                        goto OUT;
+                    }
+                    g_free(gdata);
+                } else if (group_count < 0) {
+                    goto OUT;
+                }
+            } else if (c == '{') {
+                group_count++;
+            }
+            break;
+        }
+        ptr++;
     }
-    g_free(cfg);
-    g_hash_table_unref(cfg->tb);
-    g_slice_free1(sizeof(JConfig), cfg);
+
+    if (value_ptr || group_ptr) {
+        goto OUT;
+    }
+    return TRUE;
+  OUT:
+    g_free(name);
+    g_free(value);
+    return FALSE;
 }

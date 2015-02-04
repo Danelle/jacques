@@ -48,7 +48,7 @@ AC_FUNC_FORK
 AC_CHECK_FUNCS([ftruncate memset socket strchr strerror])
 
 
-PKG_CHECK_MODULES(JACQUES, [glib-2.0 gmodule-2.0 ])
+PKG_CHECK_MODULES(JACQUES, [glib-2.0 gio-2.0 gmodule-2.0 ])
 
 AC_SEARCH_LIBS([pthread_create],[pthread],
 			   [],

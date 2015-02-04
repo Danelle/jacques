@@ -87,19 +87,19 @@
 
 
 
-
 /*
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-#define ja_config_load()    j_conf_parse(CONFIG_FILEPATH)
+JConfParser *ja_config_load(void);
+
 
 #define DIRECTIVE_LOADMODULE    "LoadModule"
 
 /*
  * Loads modules based on configuration
  */
-void ja_config_load_modules(JConfig * cfg);
+void ja_config_load_modules(JConfParser * cfg);
 
 /*
  * Loads a module

@@ -21,6 +21,7 @@
 #include "config.h"
 #include "utils.h"
 #include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
 
 

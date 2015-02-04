@@ -18,6 +18,20 @@
 
 #include "config.h"
 #include <stdlib.h>
+#include <unistd.h>
+
+
+/*
+ * Parses configuration file CONFIG_FILEPATH
+ * Returns NULL on error
+ */
+JConfParser *ja_config_load(void)
+{
+    chdir(CONFIG_LOCATION);
+    JConfParser *p = j_conf_parse(CONFIG_FILEPATH);
+    chdir("/");
+    return p;
+}
 
 
 static gchar *get_module_name(const gchar * name);
@@ -25,30 +39,18 @@ static gchar *get_module_name(const gchar * name);
 /*
  * Loads modules based on configuration
  */
-void ja_config_load_modules(JConfig * cfg)
+void ja_config_load_modules(JConfParser * cfg)
 {
-    JDirectiveGroup *global = j_config_lookup(cfg, NULL);
+    JConfRoot *root = j_conf_parser_get_root(cfg);
 
-    GList *ptr = global->directives;
+    GList *ptr = j_conf_group_get_nodes(root);
     while (ptr) {
-        JDirective *jd = (JDirective *) ptr->data;
-        if (g_strcmp0(jd->name, DIRECTIVE_LOADMODULE) == 0) {
-            ja_load_module(jd->value);
-        }
-        ptr = g_list_next(ptr);
-    }
-
-    /* handles module configurations */
-    ptr = ja_get_modules();
-    while (ptr) {
-        JaModule *mod = (JaModule *) ptr->data;
-        JaModuleConfigurationHandler handler = mod->cfg_handler;
-        if (handler) {
-            JDirectiveGroup *group = j_config_lookup(cfg, mod->name);
-            if (group) {
-                handler(global->directives, group->directives);
-            } else {
-                handler(global->directives, NULL);
+        JConfNode *n = (JConfNode *) ptr->data;
+        if (j_conf_node_is_directive(n)) {
+            JConfDirective *d = j_conf_node_get_directive(n);
+            if (g_strcmp0(DIRECTIVE_LOADMODULE,
+                          j_conf_directive_get_name(d)) == 0) {
+                ja_load_module(j_conf_directive_get_value(d));
             }
         }
         ptr = g_list_next(ptr);

@@ -2,13 +2,14 @@
 
 
 lib_LIBRARIES =  \
-	libjac.a 
+	libjac.a
 
 libjac_a_SOURCES =  \
+	jconfstruct.c \
 	jconf.c \
 	mod.c \
 	hooks.c \
-	struct.c 
+	struct.c
 
 
 libjac_a_CPPFLAGS =  $(JACQUES_CFLAGS)

@@ -53,7 +53,8 @@ nobase_include_HEADERS = \
 	jac/mod.h \
 	jac/hooks.h \
 	jac/struct.h \
-	jac/jac.h
+	jac/jac.h \
+	jac/jconfstruct.h
 
 
 SUBDIRS = \

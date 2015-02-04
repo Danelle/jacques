@@ -41,7 +41,7 @@ gint ja_worker_get_id(JaWorker * jw);
  * Creates an JaWorker, and run it
  * JaWorker is thread safe
  */
-JaWorker *ja_worker_create(JConfig * cfg, gint id);
+JaWorker *ja_worker_create(JConfParser * cfg, gint id);
 
 void ja_worker_free(JaWorker * jw);
 

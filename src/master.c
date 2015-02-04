@@ -21,6 +21,7 @@
 #include "config.h"
 #include "utils.h"
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -45,7 +46,11 @@ static inline JaRunningServer *ja_running_servers_find(GList * list,
  */
 JaMaster *ja_master_create()
 {
-    JConfig *cfg = ja_config_load();
+    JConfParser *cfg = ja_config_load();
+
+    if (cfg == NULL) {
+        g_error("Fail to parse config file");
+    }
 
     GList *children = ja_server_load(cfg);
     gMaster = (JaMaster *) g_slice_alloc(sizeof(JaMaster));
@@ -79,7 +84,7 @@ void ja_master_wait(JaMaster * master)
 
 void ja_master_quit(JaMaster * master)
 {
-    j_config_free(master->cfg);
+    j_conf_parser_free(master->cfg);
     g_slice_free1(sizeof(JaMaster), master);
 }
 

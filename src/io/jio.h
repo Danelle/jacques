@@ -22,7 +22,6 @@
 
 #include "jsocket.h"
 #include "jpoll.h"
-#include "jfile.h"
 
 
 #endif                          /* __J_JIO_H__ */
