@@ -38,7 +38,7 @@ jacques_LDFLAGS =
 
 SUBLIBS = \
 	jac/libjac.a \
-	io/libjio.a
+	io/libjio.la
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
@@ -54,7 +54,9 @@ nobase_include_HEADERS = \
 	jac/hooks.h \
 	jac/struct.h \
 	jac/jac.h \
-	jac/jconfstruct.h
+	jac/jconfstruct.h \
+	jac/jconf/jconf.h \
+	jac/jconf/struct.h
 
 
 SUBDIRS = \

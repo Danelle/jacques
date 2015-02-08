@@ -18244,7 +18244,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/io/Makefile src/jac/Makefile po/Makefile.in"
+ac_config_files="$ac_config_files Makefile src/Makefile src/io/Makefile src/jac/Makefile src/jac/jconf/Makefile po/Makefile.in"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19367,6 +19367,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/io/Makefile") CONFIG_FILES="$CONFIG_FILES src/io/Makefile" ;;
     "src/jac/Makefile") CONFIG_FILES="$CONFIG_FILES src/jac/Makefile" ;;
+    "src/jac/jconf/Makefile") CONFIG_FILES="$CONFIG_FILES src/jac/jconf/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "po/stamp-it") CONFIG_COMMANDS="$CONFIG_COMMANDS po/stamp-it" ;;
 

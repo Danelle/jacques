@@ -1,0 +1,40 @@
+This document describes the format of jacques configuration file, which
+is called JCONF.
+
+
+JCONF is apache configuration format like. Below is a sample.
+
+1    ListenPort 80
+2    MaxPending 256
+3
+4    # This is comment
+5    <ModuleA hello ALL> # This is comment too
+6        You are  good
+7        PutItOn
+8    </ModuleA>
+
+
+Every line in the configuration file is a logical line which has a
+certain meaning itself.
+
+For instance, line 1 'ListenPort 80' is divided
+in two parts by one or more whitespaces. 'ListenPort' is the directive
+name and 80 is the diretive value.
+
+Directive name must only contain ascii letters, digits or underline,
+and start with a letter. Just like variable naming convention in most programming language. And it's case sensitive too.
+
+Directive value is much more optional. It can be empty or contain any
+printable character, including whitespace.
+
+Have a look at line 6. In this case, 'You' is the directive name and
+'are  good' is the directive value. In line 7, 'PutItOn' is directive
+name with a empty directive value.
+
+JCONF supports directive group. In above example, '<ModuleA hello ALL>'
+is the start of a directive group, and </ModuleA> is the end. The group
+name is ModuleA and its optional argument is 'hello ALL'. The group name
+follows the naming convention of directive name.
+
+Directive group is recursive. A group can contain another group if
+necessary.

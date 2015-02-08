@@ -63,5 +63,6 @@ AC_OUTPUT([
 		   src/Makefile
 		   src/io/Makefile
 		   src/jac/Makefile
+           src/jac/jconf/Makefile
            po/Makefile.in
 		   ])

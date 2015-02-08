@@ -1,10 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
 
-lib_LIBRARIES =  \
-	libjio.a
+lib_LTLIBRARIES = libjio.la
 
-libjio_a_SOURCES =  \
+libjio_la_SOURCES =  \
 	jio.h \
 	jsocket.c \
 	jsocket.h \
@@ -14,4 +13,4 @@ libjio_a_SOURCES =  \
 	jpoll.c
 
 
-libjio_a_CPPFLAGS =  $(JACQUES_CFLAGS)
+libjio_la_CPPFLAGS =  $(JACQUES_CFLAGS)
