@@ -19,7 +19,6 @@
 #ifndef __J_JAC_H__
 #define __J_JAC_H__
 
-#include "jconf.h"
 #include "mod.h"
 #include "struct.h"
 #include "hooks.h"

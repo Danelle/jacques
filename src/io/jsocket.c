@@ -23,6 +23,8 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -32,7 +34,7 @@
 /* macros for read buffer */
 #define j_socket_set_rdata_length(jsock, len) g_byte_array_set_size((jsock)->rbuf,(len))
 #define j_socket_clear_rdata(jsock)  j_socket_set_rdata_length((jsock),0)
-#define j_socket_append_rdata(jsock,data,len) g_byte_array_append((jsock)->rbuf,(data),(len))
+#define j_socket_append_rdata(jsock,data,len) g_byte_array_append((jsock)->rbuf,(void*)(data),(len))
 #define j_socket_total_length(jsock) (jsock)->total_len
 #define j_socket_set_total_length(jsock, len) (jsock)->total_len = (len)
 #define j_socket_left_length(jsock) j_socket_total_length(jsock) - j_socket_data_length(jsock)
@@ -43,7 +45,7 @@
 #define j_socket_wdata_length(jsock)    (jsock)->wbuf->len
 #define j_socket_wdata(jsock)   (jsock)->wbuf->data
 #define j_socket_wdata_pop(jsock,len)   g_byte_array_remove_range((jsock)->wbuf,0,len)
-#define j_socket_wdata_append(jsock,data,len)   g_byte_array_append((jsock)->wbuf,(data),(len))
+#define j_socket_wdata_append(jsock,data,len)   g_byte_array_append((jsock)->wbuf,(void*)(data),(len))
 
 
 #define j_socket_update_active(jsock)   (jsock)->active=(guint64)time(NULL)

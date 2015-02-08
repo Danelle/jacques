@@ -39,6 +39,5 @@ static void hook_register()
 JA_MODULE_EXPORT JaModule hello_struct = {
     "hello all",
     init,
-    NULL,
     hook_register,
 };

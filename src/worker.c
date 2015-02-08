@@ -250,9 +250,8 @@ static inline JaWorker *ja_worker_alloc(JConfParser * cfg, gint id)
     jw->id = id;
     jw->poller = poller;
     jw->running = TRUE;
-    JConfRoot *root = j_conf_parser_get_root(cfg);
-    jw->keepalive = j_conf_group_get_directive_integer(root,
-                                                       DIRECTIVE_KEEPALIVE);
+    jw->keepalive = j_parser_get_directive_integer(cfg,
+                                                   DIRECTIVE_KEEPALIVE);
     g_mutex_init(&jw->lock);
     return jw;
 }

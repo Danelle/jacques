@@ -1,9 +1,17 @@
 ## Process this file with automake to produce Makefile.in
 
+AM_CPPFLAGS = \
+	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
-lib_LTLIBRARIES = libjio.la
+AM_CFLAGS =\
+	 -Wall\
+	 -g
 
-libjio_la_SOURCES =  \
+noinst_LIBRARIES = libjio.a
+
+libjio_a_SOURCES =  \
 	jio.h \
 	jsocket.c \
 	jsocket.h \
@@ -13,4 +21,4 @@ libjio_la_SOURCES =  \
 	jpoll.c
 
 
-libjio_la_CPPFLAGS =  $(JACQUES_CFLAGS)
+libjio_a_CPPFLAGS =  $(JACQUES_CFLAGS)

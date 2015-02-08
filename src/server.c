@@ -106,25 +106,23 @@ static inline void ja_server_create_from_file(const gchar * name,
 {
     gchar buf[4096];
     g_snprintf(buf, sizeof(buf), "%s/%s", CONFIG_APP_LOCATION, name);
-    if (!j_conf_parser_parse(cfg, buf)) {
+    if (!j_parse_more(cfg, buf, NULL)) {
         return;
     }
 
-    JConfRoot *root = j_conf_parser_get_root(cfg);
-
     /* ListenPort must be set */
-    gint listen_port = j_conf_group_get_directive_integer(root,
-                                                          DIRECTIVE_LISTEN_PORT);
+    gint listen_port = j_parser_get_directive_integer(cfg,
+                                                      DIRECTIVE_LISTEN_PORT);
     if (listen_port <= 0 || listen_port > 65536) {
         g_error("%s: Invalid ListenPort", name);
     }
 
     /* if MaxPending and ThreadCount are not set or invalid value is set
      * use default value instead */
-    gint max_pending = j_conf_group_get_directive_integer(root,
-                                                          DIRECTIVE_MAX_PENDING);
-    gint thread_count = j_conf_group_get_directive_integer(root,
-                                                           DIRECTIVE_THREAD_COUNT);
+    gint max_pending = j_parser_get_directive_integer(cfg,
+                                                      DIRECTIVE_MAX_PENDING);
+    gint thread_count = j_parser_get_directive_integer(cfg,
+                                                       DIRECTIVE_THREAD_COUNT);
     if (max_pending <= 0) {
         max_pending = DEFAULT_MAX_PENDING;
     }
@@ -134,10 +132,10 @@ static inline void ja_server_create_from_file(const gchar * name,
 
     /* more configurations */
 
-    const gchar *log_message = j_conf_group_get_directive_value(root,
-                                                                DIRECTIVE_LOG_MESSAGE);
-    const gchar *log_error = j_conf_group_get_directive_value(root,
-                                                              DIRECTIVE_LOG_ERROR);
+    const gchar *log_message = j_parser_get_directive_text(cfg,
+                                                           DIRECTIVE_LOG_MESSAGE);
+    const gchar *log_error = j_parser_get_directive_text(cfg,
+                                                         DIRECTIVE_LOG_ERROR);
     set_custom_log(log_message, log_error);
 
     /* */

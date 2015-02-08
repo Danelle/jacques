@@ -17,8 +17,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __J_STRUCT_H__
-#define __J_STRUCT_H__
+#ifndef __J_CONF_STRUCT_H__
+#define __J_CONF_STRUCT_H__
 
 
 #include <glib.h>
@@ -63,6 +63,9 @@ GList *j_parser_get_group(JParser * p, const gchar * name);
 
 JDirective *j_parser_get_directive_last(JParser * p, const gchar * name);
 JGroup *j_parser_get_group_last(JParser * p, const gchar * name);
+
+gint32 j_parser_get_directive_integer(JParser * p, const gchar * name);
+const gchar *j_parser_get_directive_text(JParser * p, const gchar * name);
 
 
 #endif

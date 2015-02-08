@@ -1,26 +1,20 @@
 ## Process this file with automake to produce Makefile.in
 
-## Created by Anjuta
-
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
-	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
-	$(JACQUES_CFLAGS)
+	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\"
 
 AM_CFLAGS =\
 	 -Wall\
 	 -g
 
-lib_LTLIBRARIES = libjconf.la
+noinst_LIBRARIES = libjconf.a
 
 
-libjconf_la_SOURCES = \
+libjconf_a_SOURCES = \
 	jconf.c \
 	struct.c \
 	private.h
 
-libjconf_la_LDFLAGS = 
-
-libjconf_la_LIBADD = $(JACQUES_LIBS)
-
+libjconf_a_CPPFLAGS = $(JACQUES_CFLAGS)

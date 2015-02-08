@@ -46,10 +46,12 @@ static inline JaRunningServer *ja_running_servers_find(GList * list,
  */
 JaMaster *ja_master_create()
 {
-    JConfParser *cfg = ja_config_load();
+    GError *error = NULL;
+    JConfParser *cfg = ja_config_load(&error);
 
     if (cfg == NULL) {
-        g_error("Fail to parse config file");
+        g_error("Fail to parse configurations: %s", error->message);
+        g_error_free(error);
     }
 
     GList *children = ja_server_load(cfg);
@@ -84,7 +86,7 @@ void ja_master_wait(JaMaster * master)
 
 void ja_master_quit(JaMaster * master)
 {
-    j_conf_parser_free(master->cfg);
+    j_parser_free(master->cfg);
     g_slice_free1(sizeof(JaMaster), master);
 }
 

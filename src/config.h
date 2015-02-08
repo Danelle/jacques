@@ -20,6 +20,7 @@
 
 #include <glib.h>
 #include <jac.h>
+#include <jconf.h>
 
 
 #define JACQUES_VERSION_MAJOR   0
@@ -87,11 +88,12 @@
 
 
 
+typedef JParser JConfParser;
 /*
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-JConfParser *ja_config_load(void);
+JConfParser *ja_config_load(GError ** error);
 
 
 #define DIRECTIVE_LOADMODULE    "LoadModule"

@@ -14,6 +14,7 @@ AM_CFLAGS =\
 	 -pthread \
 	 -Ijac \
 	 -Iio \
+	 -Ijconf \
 	 -g
 
 bin_PROGRAMS = jacques \
@@ -38,7 +39,8 @@ jacques_LDFLAGS =
 
 SUBLIBS = \
 	jac/libjac.a \
-	io/libjio.la
+	io/libjio.a \
+	jconf/libjconf.a
 
 jacques_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
@@ -49,19 +51,18 @@ client_LDADD = $(SUBLIBS) $(JACQUES_LIBS)
 
 
 nobase_include_HEADERS = \
-	jac/jconf.h \
 	jac/mod.h \
 	jac/hooks.h \
 	jac/struct.h \
 	jac/jac.h \
-	jac/jconfstruct.h \
-	jac/jconf/jconf.h \
-	jac/jconf/struct.h
+	jconf/jconf.h \
+	jconf/struct.h
 
 
 SUBDIRS = \
 	io \
 	jac \
+	jconf \
 	modules
 
 bin_SCRIPTS = flood.sh \

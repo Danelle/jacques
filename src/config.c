@@ -25,10 +25,10 @@
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-JConfParser *ja_config_load(void)
+JConfParser *ja_config_load(GError ** error)
 {
     chdir(CONFIG_LOCATION);
-    JConfParser *p = j_conf_parse(CONFIG_FILEPATH);
+    JConfParser *p = j_parse(CONFIG_FILEPATH, error);
     chdir("/");
     return p;
 }
@@ -41,16 +41,14 @@ static gchar *get_module_name(const gchar * name);
  */
 void ja_config_load_modules(JConfParser * cfg)
 {
-    JConfRoot *root = j_conf_parser_get_root(cfg);
-
-    GList *ptr = j_conf_group_get_nodes(root);
+    GList *ptr = j_parser_get_root(cfg);
     while (ptr) {
-        JConfNode *n = (JConfNode *) ptr->data;
-        if (j_conf_node_is_directive(n)) {
-            JConfDirective *d = j_conf_node_get_directive(n);
+        JNode *n = (JNode *) ptr->data;
+        if (j_node_is_directive(n)) {
+            JDirective *d = j_node_get_directive(n);
             if (g_strcmp0(DIRECTIVE_LOADMODULE,
-                          j_conf_directive_get_name(d)) == 0) {
-                ja_load_module(j_conf_directive_get_value(d));
+                          j_directive_get_name(d)) == 0) {
+                ja_load_module(j_directive_get_value(d));
             }
         }
         ptr = g_list_next(ptr);

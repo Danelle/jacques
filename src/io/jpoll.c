@@ -20,6 +20,7 @@
 #include <time.h>
 #include <glib.h>
 #include <errno.h>
+#include <unistd.h>
 
 
 struct _JPoll {

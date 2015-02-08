@@ -1,4 +1,4 @@
-CFLAGS = -I../jac `pkg-config --cflags gtk+-3.0`
+CFLAGS = -I../jac -I../jconf `pkg-config --cflags gtk+-3.0`
 
 
 all: hello

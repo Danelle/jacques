@@ -16,15 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __J_STRUCT_H__
-#define __J_STRUCT_H__
+#ifndef __JA_STRUCT_H__
+#define __JA_STRUCT_H__
 
 
 #include <sys/uio.h>
 #include <netinet/in.h>
 #include <glib.h>
 #include <jconf.h>
-
 
 /* a client request */
 typedef struct {
@@ -51,7 +50,7 @@ void ja_request_free(JaRequest * req);
 
 
 /*******************************************************************/
-typedef void (*JaModuleConfigHandler) (JConfGroup * group);
+// typedef void (*JaModuleConfigHandler) (JConfGroup * group);
 
 /* Returns the module configuration structure */
 typedef void (*JaModuleInit) (void);
@@ -63,7 +62,7 @@ typedef struct {
     gchar *name;
 
     JaModuleInit init_func;
-    JaModuleConfigHandler cfg_handler;
+    // JaModuleConfigHandler cfg_handler;
     JaModuleHooksInit hooks_init_func;
 } JaModule;
 

@@ -18,6 +18,7 @@
  */
 
 #include "private.h"
+#include <stdlib.h>
 
 
 gint j_group_compare(gconstpointer a, gconstpointer b);
@@ -355,6 +356,24 @@ JGroup *j_parser_get_group_last(JParser * p, const gchar * name)
         ptr = g_list_next(ptr);
     }
     return ret;
+}
+
+gint32 j_parser_get_directive_integer(JParser * p, const gchar * name)
+{
+    const gchar *value = j_parser_get_directive_text(p, name);
+    if (value == NULL) {
+        return 0;
+    }
+    return atoi(value);
+}
+
+const gchar *j_parser_get_directive_text(JParser * p, const gchar * name)
+{
+    JDirective *d = j_parser_get_directive_last(p, name);
+    if (d == NULL) {
+        return NULL;
+    }
+    return j_directive_get_value(d);
 }
 
 

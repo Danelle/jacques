@@ -2,17 +2,17 @@
 /*
  * lib.c
  * Copyright (C) 2015 Wiky L <wiiiky@outlook.com>
- * 
+ *
  * libjconf is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * libjconf is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,10 +31,10 @@ static inline gchar *readall(const gchar * path, GError ** error);
  * Parses a file and returns a JParser on success
  * Returns NULL on error
  */
-JParser *j_conf_parse(const gchar * path, GError ** error)
+JParser *j_parse(const gchar * path, GError ** error)
 {
     JParser *p = j_parser_alloc(path);
-    if (!j_conf_parse_more(p, path, error)) {
+    if (!j_parse_more(p, path, error)) {
         j_parser_free(p);
         return NULL;
     }
@@ -72,8 +72,7 @@ typedef enum {
 /*
  * Parses a file with an existing JParser.
  */
-gboolean j_conf_parse_more(JParser * p, const gchar * path,
-                           GError ** error)
+gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
 {
     gboolean ret = FALSE;
 
@@ -179,7 +178,7 @@ gboolean j_conf_parse_more(JParser * p, const gchar * path,
                 if (groups == NULL && g_strcmp0(INCLUDE_CONF, dname) == 0) {
                     gchar *path =
                         g_strstrip(g_strndup(all + start, i - start));
-                    gboolean more = j_conf_parse_more(p, path, error);
+                    gboolean more = j_parse_more(p, path, error);
                     g_free(path);
                     if (!more) {
                         goto OUT;
