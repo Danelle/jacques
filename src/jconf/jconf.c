@@ -118,7 +118,7 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
             if (j_iscomment(c) || j_isnewline(c)) {
                 dname = g_strndup(all + start, i - start);
                 if (groups == NULL && g_strcmp0(INCLUDE_CONF, dname) == 0) {
-                    fill_error(error, "missing file path, at %s: %u", path,
+                    fill_error(error, "missing file path, at %s:%u", path,
                                line);
                     goto OUT;
                 }
@@ -150,7 +150,7 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
         case J_STATE_DIRECTIVE_NAME_END:
             if (j_iscomment(c) || j_isnewline(c)) {
                 if (groups == NULL && g_strcmp0(INCLUDE_CONF, dname) == 0) {
-                    fill_error(error, "missing file path, at %s: %u", path,
+                    fill_error(error, "missing file path, at %s:%u", path,
                                line);
                     goto OUT;
                 }
@@ -215,7 +215,7 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
                 state = J_STATE_GROUP_START_NAME;
                 start = i;
             } else {
-                fill_error(error, "unexpected character %c, at %s: %u", c,
+                fill_error(error, "unexpected character %c, at %s:%u", c,
                            path, line);
                 goto OUT;
             }
@@ -225,7 +225,7 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
                 state = J_STATE_GROUP_START_NAME;
                 start = i;
             } else if (!j_isspace(c)) {
-                fill_error(error, "unexpected character %c, at %s: %u", c,
+                fill_error(error, "unexpected character %c, at %s:%u", c,
                            path, line);
                 goto OUT;
             }
@@ -233,11 +233,11 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
         case J_STATE_GROUP_START_NAME:
             if (j_iscomment(c)) {
                 fill_error(error,
-                           "unexpected character %c in group name, at %s: %u",
+                           "unexpected character %c in group name, at %s:%u",
                            c, path, line);
                 goto OUT;
             } else if (j_isnewline(c)) {
-                fill_error(error, "unexpected EOL at %s: %u", path, line);
+                fill_error(error, "unexpected EOL at %s:%u", path, line);
                 goto OUT;
             } else if (j_isclose(c)) {
                 JGroup *g =
@@ -255,18 +255,18 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
                 state = J_STATE_GROUP_START_NAME_END;
                 dname = g_strndup(all + start, i - start);
             } else if (!j_isname(c)) {
-                fill_error(error, "unexpected character %c, at %s: %u", c,
+                fill_error(error, "unexpected character %c, at %s:%u", c,
                            path, line);
                 goto OUT;
             }
             break;
         case J_STATE_GROUP_START_NAME_END:
             if (j_iscomment(c)) {
-                fill_error(error, "unexpected character %c, at %s: %u", c,
+                fill_error(error, "unexpected character %c, at %s:%u", c,
                            path, line);
                 goto OUT;
             } else if (j_isnewline(c)) {
-                fill_error(error, "unexpected EOL at %s: %u", path, line);
+                fill_error(error, "unexpected EOL at %s:%u", path, line);
                 goto OUT;
             } else if (j_isclose(c)) {
                 JGroup *g = j_group_alloc_take(dname, NULL);
@@ -286,11 +286,11 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
             break;
         case J_STATE_GROUP_START_VALUE:
             if (j_iscomment(c)) {
-                fill_error(error, "unexpected character %c at %s: %u", c,
+                fill_error(error, "unexpected character %c at %s:%u", c,
                            path, line);
                 goto OUT;
             } else if (j_isnewline(c)) {
-                fill_error(error, "unexpected EOL at %s: %u", path, line);
+                fill_error(error, "unexpected EOL at %s:%u", path, line);
                 goto OUT;
             } else if (j_isclose(c)) {
                 JGroup *g = j_group_alloc_take(dname,
@@ -312,7 +312,7 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
                 state = J_STATE_GROUP_END_NAME;
                 start = i;
             } else if (!j_isspace(c)) {
-                fill_error(error, "unexpected character %c at %s: %u",
+                fill_error(error, "unexpected character %c at %s:%u",
                            path, line);
                 goto OUT;
             }
@@ -337,14 +337,14 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
                     g_free(dname);
                     dname = NULL;
                 } else {
-                    fill_error(error, "unexpected group end, at %s: %u",
+                    fill_error(error, "unexpected group end, at %s:%u",
                                path, line);
                     goto OUT;
                 }
                 state = J_STATE_NEW;
             } else if (!j_isname(c)) {
                 fill_error(error,
-                           "unexpected character %c in group name, at %s: %u",
+                           "unexpected character %c in group name, at %s:%u",
                            c, path, line);
                 goto OUT;
             }
@@ -366,13 +366,13 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
                     g_free(dname);
                     dname = NULL;
                 } else {
-                    fill_error(error, "unexpected group end, at %s: %u",
+                    fill_error(error, "unexpected group end, at %s:%u",
                                path, line);
                     goto OUT;
                 }
                 state = J_STATE_NEW;
             } else if (!j_isspace(c)) {
-                fill_error(error, "unexpected character %c, at %s: %u",
+                fill_error(error, "unexpected character %c, at %s:%u",
                            path, line);
                 goto OUT;
             }
@@ -380,10 +380,10 @@ gboolean j_parse_more(JParser * p, const gchar * path, GError ** error)
         }
     }
     if (state != J_STATE_NEW) {
-        fill_error(error, "unexpected EOF at %s: %u", path, line);
+        fill_error(error, "unexpected EOF at %s", path);
         goto OUT;
     } else if (groups != NULL) {
-        fill_error(error, "invalid group end at %s", path);
+        fill_error(error, "missing group end at %s", path);
         goto OUT;
     }
     ret = TRUE;

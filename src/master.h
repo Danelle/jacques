@@ -29,7 +29,7 @@
 
 
 typedef struct {
-    JConfParser *cfg;
+    JaConfig *cfg;
     GList *scfg;
     GList *children;
 } JaMaster;
@@ -39,7 +39,7 @@ typedef struct {
  * Starts the core process of jacques
  * If fail, will call g_error() to terminate the process
  */
-JaMaster *ja_master_create();
+JaMaster *ja_master_create(JaConfig * cfg);
 
 
 void ja_master_wait(JaMaster * core);

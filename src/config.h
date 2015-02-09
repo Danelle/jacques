@@ -88,12 +88,12 @@
 
 
 
-typedef JParser JConfParser;
+typedef JParser JaConfig;
 /*
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-JConfParser *ja_config_load(GError ** error);
+JaConfig *ja_config_load(GError ** error);
 
 
 #define DIRECTIVE_LOADMODULE    "LoadModule"
@@ -101,7 +101,7 @@ JConfParser *ja_config_load(GError ** error);
 /*
  * Loads modules based on configuration
  */
-void ja_config_load_modules(JConfParser * cfg);
+void ja_config_load_modules(JaConfig * cfg);
 
 /*
  * Loads a module

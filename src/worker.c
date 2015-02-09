@@ -48,7 +48,7 @@ gint ja_worker_get_id(JaWorker * jw)
 #define ja_worker_unlock(jw) g_mutex_unlock (&(jw)->lock)
 
 
-static inline JaWorker *ja_worker_alloc(JConfParser * cfg, gint id);
+static inline JaWorker *ja_worker_alloc(JaConfig * cfg, gint id);
 
 /*
  * pthread routine
@@ -60,7 +60,7 @@ static void *ja_worker_main(void *arg);
  * Creates an JaWorker
  * JaWorker is thread safe
  */
-JaWorker *ja_worker_create(JConfParser * cfg, gint id)
+JaWorker *ja_worker_create(JaConfig * cfg, gint id)
 {
     JaWorker *jw = ja_worker_alloc(cfg, id);
     if (jw == NULL) {
@@ -240,7 +240,7 @@ guint32 ja_worker_payload(JaWorker * jw)
     return j_poll_count(jw->poller);
 }
 
-static inline JaWorker *ja_worker_alloc(JConfParser * cfg, gint id)
+static inline JaWorker *ja_worker_alloc(JaConfig * cfg, gint id)
 {
     JPoll *poller = j_poll_new();
     if (poller == NULL) {

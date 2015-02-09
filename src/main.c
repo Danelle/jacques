@@ -31,14 +31,16 @@
 #include <glib/gi18n-lib.h>
 
 
-static void inline show_version(void);
-static void inline show_help(void);
+static inline void show_version(void);
+static inline void show_help(void);
 
+
+static inline JaConfig *read_config(void);
 
 /* Starts/Stops/Restarts jacques daemon */
-static void inline start_jacques(void);
-static void inline stop_jacques(void);
-static void inline restart_jacques(void);
+static inline void start_jacques(void);
+static inline void stop_jacques(void);
+static inline void restart_jacques(void);
 
 
 static void initialize(void)
@@ -111,8 +113,9 @@ static void inline show_help(void)
 }
 
 
-static void inline initialize_jacques(void)
+static inline JaConfig *initialize_jacques(void)
 {
+    JaConfig *cfg = read_config();
     g_mkdir_with_parents(CONFIG_RUNTIME_LOCATION, 0755);
     g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
     g_mkdir_with_parents(CONFIG_LOG_LOCATION, 0755);
@@ -128,13 +131,14 @@ static void inline initialize_jacques(void)
         g_printf(_("Unable to initialize jacques:%s\n"), strerror(errno));
         exit(EXIT_MASTER_INITIALIZE);
     }
+    return cfg;
 }
 
 static void inline start_jacques(void)
 {
-    initialize_jacques();
+    JaConfig *cfg = initialize_jacques();
 
-    JaMaster *master = ja_master_create();
+    JaMaster *master = ja_master_create(cfg);
     ja_master_wait(master);
     ja_master_quit(master);
 }
@@ -161,4 +165,18 @@ static void inline stop_jacques(void)
 
 static void inline restart_jacques(void)
 {
+}
+
+
+static inline JaConfig *read_config(void)
+{
+    GError *error = NULL;
+    JaConfig *cfg = ja_config_load(&error);
+
+    if (cfg == NULL) {
+        g_printf("fail to start jacques:%s\n", error->message);
+        g_error_free(error);
+        exit(EXIT_INVALID_CONFIG);
+    }
+    return cfg;
 }

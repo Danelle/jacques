@@ -25,10 +25,10 @@
  * Parses configuration file CONFIG_FILEPATH
  * Returns NULL on error
  */
-JConfParser *ja_config_load(GError ** error)
+JaConfig *ja_config_load(GError ** error)
 {
     chdir(CONFIG_LOCATION);
-    JConfParser *p = j_parse(CONFIG_FILEPATH, error);
+    JaConfig *p = j_parse(CONFIG_FILEPATH, error);
     chdir("/");
     return p;
 }
@@ -39,7 +39,7 @@ static gchar *get_module_name(const gchar * name);
 /*
  * Loads modules based on configuration
  */
-void ja_config_load_modules(JConfParser * cfg)
+void ja_config_load_modules(JaConfig * cfg)
 {
     GList *ptr = j_parser_get_root(cfg);
     while (ptr) {

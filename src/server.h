@@ -44,7 +44,7 @@
  * Loads configuration of every server, and create server process
  * Return the list of server process id
  */
-GList *ja_server_load(JConfParser * cfg);
+GList *ja_server_load(JaConfig * cfg);
 
 
 
@@ -56,11 +56,11 @@ typedef struct {
 
     JSocket *listen_sock;
     GList *workers;             /* the list of worker thread */
-    JConfParser *cfg;
+    JaConfig *cfg;
 } JaServer;
 
 /* Forks a server, Returns the server pid on success, otherwise returns -1 */
-pid_t ja_server_create(const gchar * name, JConfParser * cfg);
+pid_t ja_server_create(const gchar * name, JaConfig * cfg);
 
 
 

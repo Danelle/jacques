@@ -44,16 +44,8 @@ static inline JaRunningServer *ja_running_servers_find(GList * list,
  * Starts the master process of jacques
  * If fail, will call g_error() to terminate the process
  */
-JaMaster *ja_master_create()
+JaMaster *ja_master_create(JaConfig * cfg)
 {
-    GError *error = NULL;
-    JConfParser *cfg = ja_config_load(&error);
-
-    if (cfg == NULL) {
-        g_error("Fail to parse configurations: %s", error->message);
-        g_error_free(error);
-    }
-
     GList *children = ja_server_load(cfg);
     gMaster = (JaMaster *) g_slice_alloc(sizeof(JaMaster));
     gMaster->cfg = cfg;

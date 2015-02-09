@@ -34,8 +34,7 @@ static JaServer *gServer = NULL;
 static inline JaServer *ja_server_alloc(const gchar * name,
                                         gint listen_port,
                                         gint max_pending,
-                                        gint thread_count,
-                                        JConfParser * cfg);
+                                        gint thread_count, JaConfig * cfg);
 
 /*
  * The main loop of server process
@@ -50,7 +49,7 @@ static inline void ja_server_quit(JaServer * server);
 
 
 static inline void ja_server_create_from_file(const gchar * name,
-                                              JConfParser * cfg);
+                                              JaConfig * cfg);
 
 
 
@@ -64,7 +63,7 @@ static void sigint_handler(void);
  * Loads configuration of every server, and create server process
  * Return the list of server process id
  */
-GList *ja_server_load(JConfParser * cfg)
+GList *ja_server_load(JaConfig * cfg)
 {
     GError *err = NULL;
     GDir *dir = g_dir_open(CONFIG_APP_LOCATION, 0, &err);
@@ -89,7 +88,7 @@ GList *ja_server_load(JConfParser * cfg)
     return servers;
 }
 
-pid_t ja_server_create(const gchar * name, JConfParser * cfg)
+pid_t ja_server_create(const gchar * name, JaConfig * cfg)
 {
     pid_t pid = fork();
     if (pid < 0) {
@@ -102,7 +101,7 @@ pid_t ja_server_create(const gchar * name, JConfParser * cfg)
 }
 
 static inline void ja_server_create_from_file(const gchar * name,
-                                              JConfParser * cfg)
+                                              JaConfig * cfg)
 {
     gchar buf[4096];
     g_snprintf(buf, sizeof(buf), "%s/%s", CONFIG_APP_LOCATION, name);
@@ -154,8 +153,7 @@ static inline void ja_server_create_from_file(const gchar * name,
 static inline JaServer *ja_server_alloc(const gchar * name,
                                         gint listen_port,
                                         gint max_pending,
-                                        gint thread_count,
-                                        JConfParser * cfg)
+                                        gint thread_count, JaConfig * cfg)
 {
     JaServer *server = (JaServer *) g_slice_alloc(sizeof(JaServer));
     server->name = g_strdup(name);
