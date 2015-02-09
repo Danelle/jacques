@@ -1,10 +1,10 @@
-ListenPort  23432;
-ListenPort  23435;
+ListenPort  23432
+ListenPort  23435
 
 #NaxPending = 512
-ThreadCount  4;
+ThreadCount  4
 
-LoadModule hello;
+LoadModule hello
 
-LogMessage gandalf.log;
-LogError gandalf.error;
+LogMessage gandalf.log
+LogError gandalf.error
